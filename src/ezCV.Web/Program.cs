@@ -95,7 +95,10 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-app.UseCors("AllowAll"); // Apply CORS policy
+var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+app.Urls.Add($"http://0.0.0.0:{port}");
+
+app.UseCors("AllowAll"); 
 
 app.UseSession();
 
