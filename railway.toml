@@ -7,22 +7,16 @@ numReplicas = 1
 # API Service
 [[services]]
 name = "api"
-[services.build]
-command = "dotnet publish ezCV.Api/ezCV.Api.csproj -c Release -o /app/output"
-[services.start]
-command = "dotnet /app/output/ezCV.Api.dll --urls=http://0.0.0.0:8081"
 [services.env]
 ASPNETCORE_ENVIRONMENT = "Production"
+ASPNETCORE_URLS = "http://*:8081"
 
 # Web Service
 [[services]]
-name = "web"  
-[services.build]
-command = "dotnet publish ezCV.Web/ezCV.Web.csproj -c Release -o /app/output"
-[services.start]
-command = "dotnet /app/output/ezCV.Web.dll --urls=http://0.0.0.0:8080"
+name = "web"
 [services.env]
 ASPNETCORE_ENVIRONMENT = "Production"
+ASPNETCORE_URLS = "http://*:8080"
 ApiSettings__BaseUrl = "https://${RAILWAY_STATIC_URL}-api.railway.app"
 
 # Ports
