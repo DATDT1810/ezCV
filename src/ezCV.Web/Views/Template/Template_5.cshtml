@@ -1,0 +1,1391 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>30DAY ezCV - Template 5</title>
+    <!-- Font Awesome for icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #f37021;
+            --text-dark: #333;
+            --text-light: #555;
+            --border-color: #e0e0e0;
+            --hover-bg: #fffaf0;
+            --danger-color: #ef4444;
+            --icon-bg: #4A4A4A;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            background-color: #f5f5f4;
+            padding-top: 120px;
+        }
+
+        /* Option Panel */
+        .option-panel {
+            position: fixed;
+            top: 90px;
+            left: 0;
+            right: 0;
+            background: #f8f9fa;
+            padding: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            z-index: 999;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .option-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .option-btn {
+            padding: 0.75rem 1.5rem;
+            border: 2px solid var(--primary-color);
+            border-radius: 8px;
+            background: white;
+            color: var(--primary-color);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+            .option-btn:hover {
+                background: var(--primary-color);
+                color: white;
+            }
+
+            .option-btn.active {
+                background: var(--primary-color);
+                color: white;
+            }
+
+        /* Submit Section */
+        .submit-section {
+            margin-top: 2rem;
+            padding: 2rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            text-align: center;
+            border: 2px dashed #dee2e6;
+        }
+
+        /* Contact Modal */
+        .contact-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .contact-modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 400px;
+        }
+
+        /* Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            display: none;
+        }
+
+        /* CV Template Styles */
+        @@media print {
+            body {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+                background-color: white;
+                padding-top: 0;
+                margin: 0;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+
+            .cv-container {
+                box-shadow: none !important;
+                margin: 0 !important;
+                max-width: 100% !important;
+                border: none !important;
+            }
+
+            .option-panel,
+            .delete-btn,
+            .add-button,
+            .submit-section {
+                display: none !important;
+            }
+
+            [contenteditable]:focus {
+                outline: none;
+                background-color: transparent;
+                box-shadow: none;
+            }
+
+            .dynamic-item:hover {
+                background-color: transparent !important;
+            }
+        }
+
+        .editable {
+            outline: none;
+            transition: background-color 0.2s, box-shadow 0.2s;
+            padding: 2px 4px;
+            margin: -2px -4px;
+            border-radius: 4px;
+            min-height: 1.2em;
+            cursor: text;
+        }
+
+            .editable:hover:not(:focus) {
+                background-color: #f5f5f4;
+            }
+
+            .editable:focus {
+                background-color: #fef3c7;
+                box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
+            }
+
+        [data-placeholder]:empty::before {
+            content: attr(data-placeholder);
+            color: #a8a29e;
+            font-style: italic;
+            pointer-events: none;
+        }
+
+        /* === SỬA LẠI THEO TEMPLATE 2: DELETE BUTTONS === */
+        .dynamic-item {
+            position: relative;
+            padding: 3px;
+            margin: -3px;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+
+            .dynamic-item:hover {
+                background-color: var(--hover-bg);
+            }
+
+        .delete-btn {
+            position: absolute;
+            top: 50%;
+            right: 0;
+            transform: translate(120%, -50%);
+            background: var(--danger-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 9px;
+            z-index: 10;
+        }
+
+        .contact-item .delete-btn {
+            top: 50%;
+            transform: translate(0, -50%);
+            right: -8px;
+        }
+
+        .dynamic-item:hover .delete-btn,
+        .contact-item:hover .delete-btn {
+            opacity: 1;
+        }
+
+        .editable {
+            word-break: break-word;
+        }
+
+        .section-title {
+            font-size: 1.125rem;
+            font-weight: 900;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: #1c1917;
+            margin-bottom: 1rem;
+        }
+
+        .add-button {
+            width: 100%;
+            text-align: center;
+            padding: 0.5rem;
+            margin-top: 0.75rem;
+            border: 2px dashed #d6d3d1;
+            color: #78716c;
+            border-radius: 0.375rem;
+            transition: all 0.2s ease-in-out;
+            font-size: 0.875rem;
+            font-weight: 600;
+            background: transparent;
+            cursor: pointer;
+        }
+
+            .add-button:hover {
+                background-color: #fafaf9;
+                border-style: solid;
+                border-color: #a8a29e;
+                color: #44403c;
+            }
+
+        .page-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Custom CV Layout */
+        .cv-header {
+            border-bottom: 2px solid #000;
+            padding-bottom: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .cv-name {
+            font-size: 3rem;
+            font-weight: 900;
+            color: #000;
+            margin-bottom: 0.25rem;
+        }
+
+        .cv-position {
+            font-size: 1.25rem;
+            color: #57534e;
+            font-weight: 500;
+            letter-spacing: 0.1em;
+        }
+
+        .contact-column {
+            border-left: 2px solid #000;
+            padding-left: 1.5rem;
+        }
+
+        /* === SỬA LẠI CONTACT ITEM THEO TEMPLATE 2 === */
+        .contact-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+            position: relative;
+            padding: 3px;
+            margin: -3px;
+            border-radius: 4px;
+        }
+
+            .contact-item:hover {
+                background-color: var(--hover-bg);
+            }
+
+        .contact-icon {
+            width: 24px;
+            height: 24px;
+            margin-right: 0.75rem;
+            flex-shrink: 0;
+            background-color: var(--icon-bg);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+            .contact-icon i {
+                font-size: 11px;
+                color: white;
+            }
+
+        .main-content {
+            margin-top: 2rem;
+        }
+
+        .left-column {
+            padding-right: 2rem;
+        }
+
+        .right-column {
+            border-left: 2px solid #000;
+            padding-left: 2rem;
+        }
+
+        .experience-item {
+            margin-bottom: 1.5rem;
+            position: relative;
+            padding: 3px;
+            margin: -3px;
+            border-radius: 4px;
+        }
+
+            .experience-item:hover {
+                background-color: var(--hover-bg);
+            }
+
+        .item-header {
+            display: flex;
+            justify-content: between;
+            align-items: flex-start;
+            margin-bottom: 0.5rem;
+            position: relative;
+        }
+
+        .item-title {
+            font-weight: 700;
+            color: #000;
+            margin-bottom: 0.25rem;
+        }
+
+        .item-company {
+            font-weight: 600;
+            color: #44403c;
+            margin-bottom: 0.25rem;
+        }
+
+        .item-period {
+            font-size: 0.875rem;
+            color: #78716c;
+            font-weight: 500;
+        }
+
+        .item-description {
+            padding-left: 1rem;
+        }
+
+            .item-description li {
+                margin-bottom: 0.25rem;
+                position: relative;
+                padding-left: 1rem;
+            }
+
+                .item-description li::before {
+                    content: '•';
+                    position: absolute;
+                    left: 0;
+                    color: #000;
+                    font-weight: bold;
+                }
+
+        /* === SỬA LẠI SKILLS VÀ CERTIFICATIONS THEO TEMPLATE 2 === */
+        .skill-item, .cert-item {
+            position: relative;
+            padding: 3px;
+            margin: -3px;
+            border-radius: 4px;
+        }
+
+            .skill-item:hover, .cert-item:hover {
+                background-color: var(--hover-bg);
+            }
+
+        /* Responsive */
+        @@media (max-width: 768px) {
+            .contact-column {
+                border-left: none;
+                border-top: 2px solid #000;
+                padding-left: 0;
+                padding-top: 1rem;
+                margin-top: 1rem;
+            }
+
+            .right-column {
+                border-left: none;
+                border-top: 2px solid #000;
+                padding-left: 0;
+                padding-top: 2rem;
+                margin-top: 2rem;
+            }
+
+            .cv-name {
+                font-size: 2rem;
+            }
+
+            .delete-btn {
+                opacity: 1;
+                right: -5px;
+            }
+
+            .contact-item .delete-btn {
+                right: -5px;
+            }
+        }
+    </style>
+</head>
+<body class="bg-stone-100">
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="bg-white p-4 rounded-3 text-center">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Đang xử lý...</span>
+            </div>
+            <p class="mt-2 mb-0">Đang gửi CV, vui lòng chờ...</p>
+        </div>
+    </div>
+
+    <!-- Contact Modal -->
+    <div class="contact-modal" id="contactModal">
+        <div class="contact-modal-content">
+            <h5 class="mb-3">Thêm thông tin liên hệ</h5>
+            <select class="form-select mb-3" id="contactTypeSelect">
+                <option value="email">Email</option>
+                <option value="phone">Số điện thoại</option>
+                <option value="address">Địa chỉ</option>
+                <option value="birthday">Ngày sinh</option>
+                <option value="gender">Giới tính</option>
+                <option value="facebook">Facebook</option>
+                <option value="linkedin">LinkedIn</option>
+                <option value="github">GitHub</option>
+                <option value="website">Website</option>
+            </select>
+            <div class="d-flex gap-2">
+                <button class="btn btn-secondary flex-fill" onclick="closeContactModal()">Hủy</button>
+                <button class="btn btn-primary flex-fill" onclick="confirmAddContact()">Thêm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Option Panel -->
+    <div class="option-panel">
+        <div class="container">
+            <div class="option-buttons">
+                <button class="option-btn active" onclick="useSampleData()">
+                    <i class="fas fa-magic"></i> Sử dụng thông tin mẫu
+                </button>
+                <button class="option-btn" onclick="useBlankTemplate()">
+                    <i class="fas fa-file-alt"></i> Bắt đầu với CV trống
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Form ẩn để submit data -->
+    <form id="cvForm" method="post" action="@Url.Action("SubmitCv", "CvProcess")" style="display: none;">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="TemplateId" value="5" />
+
+        <!-- Profile Information -->
+        <input type="hidden" name="Profile.FullName" id="hiddenFullName" />
+        <input type="hidden" name="Profile.JobTitle" id="hiddenJobTitle" />
+        <input type="hidden" name="Profile.ContactEmail" id="hiddenContactEmail" />
+        <input type="hidden" name="Profile.PhoneNumber" id="hiddenPhoneNumber" />
+        <input type="hidden" name="Profile.Address" id="hiddenAddress" />
+        <input type="hidden" name="Profile.Summary" id="hiddenSummary" />
+        <input type="hidden" name="Profile.Photo" id="hiddenPhoto" />
+
+        <!-- Các sections sẽ được tạo dynamic bằng JavaScript -->
+    </form>
+
+    <div class="page-container">
+        <div id="app" class="p-3 p-md-4 text-stone-800">
+            <!-- The CV will be rendered here by JavaScript -->
+        </div>
+
+        <!-- Submit Section -->
+        <div class="submit-section">
+            <h4>Hoàn thành CV của bạn</h4>
+            <p class="text-muted mb-3">Kiểm tra lại thông tin và gửi CV qua email</p>
+            <button type="button" class="btn btn-success btn-lg" onclick="saveAndSubmit()">
+                <i class="fas fa-paper-plane"></i> Gửi CV qua Email
+            </button>
+        </div>
+    </div>
+
+    <!-- Bootstrap & jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // === SAMPLE DATA ===
+        let cvData = {
+            name: 'THAO DINH',
+            position: 'SINH VIÊN NĂM NHẤT NGÀNH MARKETING',
+            contact: [
+                { id: 'dob', icon: 'calendar', value: '02/01/1996' },
+                { id: 'email', icon: 'mail', value: 'thao@viecv.io' },
+                { id: 'address', icon: 'location', value: 'Nguyễn Đình Chiểu, Phường 6, Quận 3, TP.HCM' },
+                { id: 'phone', icon: 'phone', value: '09067999xx' }
+            ],
+            about: 'Là người có tính cách hướng ngoại, năng động, tự tin trong giao tiếp, rất phù hợp với lĩnh vực marketing. Có kiến thức chuyên ngành marketing. Không ngừng học tập, tích lũy kiến thức, nâng cao năng lực trong mọi lĩnh vực được tham gia.',
+            workExperience: [
+                {
+                    role: 'Nhân viên bán hàng part-time',
+                    company: 'CỬA HÀNG VIETCV 1',
+                    period: '11/2010 - 09/2013',
+                    description: [
+                        'Bán hàng trực tiếp tại cửa hàng cho người Việt và người Nhật.',
+                        'Quản lý, báo cáo doanh thu trong ngày.',
+                        'Kiểm kê hàng hoá trong kho, kiểm tra nhập hàng.',
+                        'Phản hồi thắc mắc của khách hàng qua kênh Facebook, Instagram, website.'
+                    ]
+                }
+            ],
+            activities: [
+                {
+                    role: 'Ban Nội dung',
+                    company: 'CÂU LẠC BỘ VIETCV',
+                    period: '01/2017 - 01/2018',
+                    description: [
+                        'Lên nội dung cho các bài viết trên Facebook để quảng bá hình ảnh của câu lạc bộ, kết nạp thêm thành viên mới.',
+                        'Thiết kế ấn phẩm như flyer, brochure cho 2 ngày hội truyền thông hằng năm của câu lạc bộ.',
+                        'Lên ý tưởng, thể lệ, nội dung cho các cuộc thi marketing cho 300 học sinh của trường.'
+                    ]
+                }
+            ],
+            projects: [
+                {
+                    role: 'Blog Fun English',
+                    company: 'Dự án cá nhân: Trang blog dạy trẻ em học tiếng Anh qua lời bài hát và truyện cổ tích',
+                    period: '10/2017 - hiện tại',
+                    description: [
+                        'Lên ý tưởng nội dung mỗi bài viết.',
+                        'Thiết kế hình ảnh minh hoạ cho bài viết học tiếng Anh qua truyện và qua lời bài hát.',
+                        'Đăng 2 bài viết mỗi tuần.',
+                        'Thu hút được khoảng 200 lượt xem mỗi bài viết sau 3 tháng hoạt động.'
+                    ]
+                }
+            ],
+            certifications: [
+                {
+                    title: 'CHỨNG CHỈ IELTS',
+                    date: '01/2011',
+                    details: ['Điểm: 7.5', 'Cấp bởi Hội đồng Anh (British Council)']
+                },
+                {
+                    title: 'TIN HỌC QUỐC TẾ',
+                    date: '02/2013',
+                    details: ['Chứng chỉ về sử dụng thành thạo máy tính và internet', 'Cấp bởi IIG Việt Nam']
+                }
+            ],
+            skills: ['MS Office', 'Adobe Illustrator', 'Thuyết trình', 'Làm việc nhóm', 'Chịu áp lực', 'Giao tiếp'],
+            education: [
+                {
+                    role: 'Khối Xã hội',
+                    company: 'TRUNG HỌC PHỔ THÔNG VIETCV 1',
+                    period: '07/2014 - 07/2015',
+                    description: [
+                        'Tốt nghiệp loại giỏi. Điểm trung bình: 8.2/10',
+                        'Lớp 11: Giải Nhì cuộc thi Học sinh giỏi cấp tỉnh môn Tiếng Anh.'
+                    ]
+                },
+                {
+                    role: 'Ngành Marketing',
+                    company: 'ĐẠI HỌC VIETCV 2',
+                    period: '07/2014 - 07/2015',
+                    description: [
+                        'Sinh viên năm nhất ngành Marketing, GPA hiện tại: 8.1/10',
+                        'Có kiến thức Marketing căn bản, nghiên cứu thị trường, hành vi người tiêu dùng,...',
+                        'Tiếng Anh giao tiếp, Tiếng Anh chuyên ngành Marketing.'
+                    ]
+                }
+            ]
+        };
+
+        // === ICONS === (Cập nhật theo template 2)
+        const icons = {
+            calendar: `<div class="contact-icon"><i class="fas fa-calendar"></i></div>`,
+            location: `<div class="contact-icon"><i class="fas fa-map-marker-alt"></i></div>`,
+            phone: `<div class="contact-icon"><i class="fas fa-phone"></i></div>`,
+            mail: `<div class="contact-icon"><i class="fas fa-envelope"></i></div>`,
+            handle: `<div class="contact-icon"><i class="fas fa-ellipsis-h"></i></div>`,
+            trash: `<i class="fas fa-trash-alt"></i>`
+        };
+
+        // === RENDER FUNCTIONS ===
+        const app = document.getElementById('app');
+
+        function createEditable(path, content, { placeholder = 'Nhập thông tin...', tag = 'div', className = '' } = {}) {
+            return `<${tag} contenteditable="true" data-path="${path}" class="editable ${className}" data-placeholder="${placeholder}">${content}</${tag}>`;
+        }
+
+        function renderExperienceLikeSection(title, items, path, addBtnText) {
+            if (!items || items.length === 0) {
+                return `
+                            <section class="mb-4">
+                                <h2 class="section-title">${title}</h2>
+                                <p class="text-muted">Chưa có thông tin</p>
+                                <button class="add-button no-print" data-action="add" data-path="${path}">${addBtnText}</button>
+                            </section>
+                        `;
+            }
+
+            return `
+                        <section class="mb-4">
+                            <h2 class="section-title">${title}</h2>
+                            <div>
+                                ${items.map((item, pIndex) => `
+                                    <div class="experience-item dynamic-item" data-path="${path}.${pIndex}">
+                                        <button class="delete-btn no-print" data-action="remove" data-path="${path}.${pIndex}">
+                                            ${icons.trash}
+                                        </button>
+                                        <div class="item-header">
+                                            <div class="flex-grow-1">
+                                                ${createEditable(`${path}.${pIndex}.role`, item.role, { className: 'item-title', placeholder: 'Chức vụ/Dự án/Bằng cấp' })}
+                                                ${createEditable(`${path}.${pIndex}.company`, item.company, { className: 'item-company', placeholder: 'Công ty/Tổ chức' })}
+                                                ${createEditable(`${path}.${pIndex}.period`, item.period, { className: 'item-period', placeholder: 'MM/YYYY - MM/YYYY' })}
+                                            </div>
+                                        </div>
+                                        <ul class="item-description list-unstyled">
+                                            ${item.description.map((line, cIndex) => `
+                                                <li class="d-flex align-items-start dynamic-item" data-path="${path}.${pIndex}.description.${cIndex}">
+                                                    <button class="delete-btn no-print ms-2" data-action="remove" data-path="${path}.${pIndex}.description.${cIndex}">
+                                                        ${icons.trash}
+                                                    </button>
+                                                    <div class="flex-grow-1">
+                                                        ${createEditable(`${path}.${pIndex}.description.${cIndex}`, line, { placeholder: 'Mô tả...' })}
+                                                    </div>
+                                                </li>
+                                            `).join('')}
+                                        </ul>
+                                        <button class="add-button no-print" data-action="add" data-path="${path}.${pIndex}.description">+ Thêm mô tả</button>
+                                    </div>
+                                `).join('')}
+                            </div>
+                            <button class="add-button no-print" data-action="add" data-path="${path}">${addBtnText}</button>
+                        </section>
+                    `;
+        }
+
+        function render() {
+            const { name, position, contact, about, skills, certifications, workExperience, activities, projects, education } = cvData;
+
+            app.innerHTML = `
+                        <div class="cv-container bg-white shadow-lg p-4 p-md-5">
+                            <!-- Header -->
+                            <header class="cv-header">
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        ${createEditable('name', name, { tag: 'h1', className: 'cv-name', placeholder: 'Tên của bạn' })}
+                                        ${createEditable('position', position, { tag: 'h2', className: 'cv-position', placeholder: 'Chức vụ' })}
+                                    </div>
+                                    <div class="col-md-4 contact-column">
+                                        <div class="contact-list">
+                                            ${contact.map((item, index) => `
+                                                <div class="contact-item dynamic-item" data-path="contact.${index}">
+                                                    <button class="delete-btn no-print" data-action="remove" data-path="contact.${index}">
+                                                        ${icons.trash}
+                                                    </button>
+                                                    ${icons[item.icon] || icons.handle}
+                                                    ${createEditable(`contact.${index}.value`, item.value, { className: 'flex-grow-1', placeholder: 'Thông tin...' })}
+                                                </div>
+                                            `).join('')}
+                                        </div>
+                                        <button class="add-button no-print mt-2" data-action="add" data-path="contact" onclick="openContactModal()">+ Thêm liên hệ</button>
+                                    </div>
+                                </div>
+                            </header>
+
+                            <!-- Main Content -->
+                            <main class="main-content">
+                                <div class="row">
+                                    <!-- Left Column -->
+                                    <div class="col-md-8 left-column">
+                                        <section class="mb-4">
+                                            <h2 class="section-title">Giới Thiệu</h2>
+                                            ${createEditable('about', about, { className: 'text-justify', placeholder: 'Viết vài dòng giới thiệu về bản thân...' })}
+                                        </section>
+
+                                        ${renderExperienceLikeSection('Kinh Nghiệm Làm Việc', workExperience, 'workExperience', '+ Thêm kinh nghiệm')}
+                                        ${renderExperienceLikeSection('Hoạt Động', activities, 'activities', '+ Thêm hoạt động')}
+                                        ${renderExperienceLikeSection('Dự Án', projects, 'projects', '+ Thêm dự án')}
+                                    </div>
+
+                                    <!-- Right Column -->
+                                    <div class="col-md-4 right-column">
+                                        <!-- Certifications -->
+                                        <section class="mb-4">
+                                            <h2 class="section-title">Chứng Chỉ</h2>
+                                            ${certifications && certifications.length > 0 ? `
+                                                <div>
+                                                    ${certifications.map((cert, pIndex) => `
+                                                        <div class="mb-3 cert-item dynamic-item" data-path="certifications.${pIndex}">
+                                                            <button class="delete-btn no-print" data-action="remove" data-path="certifications.${pIndex}">
+                                                                ${icons.trash}
+                                                            </button>
+                                                            <div class="item-header">
+                                                                <div class="flex-grow-1">
+                                                                    ${createEditable(`certifications.${pIndex}.title`, cert.title, { className: 'item-title', placeholder: 'Tên chứng chỉ' })}
+                                                                    ${createEditable(`certifications.${pIndex}.date`, cert.date, { className: 'item-period', placeholder: 'MM/YYYY' })}
+                                                                </div>
+                                                            </div>
+                                                            <div class="item-description">
+                                                                ${cert.details.map((detail, cIndex) => `
+                                                                    <div class="d-flex align-items-center mb-1 dynamic-item" data-path="certifications.${pIndex}.details.${cIndex}">
+                                                                        <button class="delete-btn no-print ms-2" data-action="remove" data-path="certifications.${pIndex}.details.${cIndex}">
+                                                                            ${icons.trash}
+                                                                        </button>
+                                                                        <div class="flex-grow-1">
+                                                                            ${createEditable(`certifications.${pIndex}.details.${cIndex}`, detail, { className: 'flex-grow-1', placeholder: 'Chi tiết' })}
+                                                                        </div>
+                                                                    </div>
+                                                                `).join('')}
+                                                            </div>
+                                                            <button class="add-button no-print" data-action="add" data-path="certifications.${pIndex}.details">+ Thêm chi tiết</button>
+                                                        </div>
+                                                    `).join('')}
+                                                </div>
+                                            ` : '<p class="text-muted">Chưa có chứng chỉ</p>'}
+                                            <button class="add-button no-print" data-action="add" data-path="certifications">+ Thêm chứng chỉ</button>
+                                        </section>
+
+                                        <!-- Skills -->
+                                        <section class="mb-4">
+                                            <h2 class="section-title">Kỹ Năng</h2>
+                                            ${skills && skills.length > 0 ? `
+                                                <ul class="list-unstyled">
+                                                    ${skills.map((skill, index) => `
+                                                        <li class="d-flex align-items-center mb-1 skill-item dynamic-item" data-path="skills.${index}">
+                                                            <button class="delete-btn no-print ms-2" data-action="remove" data-path="skills.${index}">
+                                                                ${icons.trash}
+                                                            </button>
+                                                            <div class="flex-grow-1">
+                                                                ${createEditable(`skills.${index}`, skill, { className: 'flex-grow-1', placeholder: 'Kỹ năng mới' })}
+                                                            </div>
+                                                        </li>
+                                                    `).join('')}
+                                                </ul>
+                                            ` : '<p class="text-muted">Chưa có kỹ năng</p>'}
+                                            <button class="add-button no-print" data-action="add" data-path="skills">+ Thêm kỹ năng</button>
+                                        </section>
+
+                                        <!-- Education -->
+                                        ${renderExperienceLikeSection('Học Vấn', education, 'education', '+ Thêm học vấn')}
+                                    </div>
+                                </div>
+                            </main>
+                        </div>
+                    `;
+        }
+
+        // === EVENT HANDLING ===
+        function updateData(path, value) {
+            const parts = path.split('.');
+            const last = parts.pop();
+            const obj = parts.reduce((o, k) => o[k] || {}, cvData);
+            if (obj && last) obj[last] = value;
+        }
+
+        app.addEventListener('input', (e) => {
+            if (e.target.matches('.editable')) {
+                const path = e.target.dataset.path;
+                updateData(path, e.target.innerText);
+            }
+        });
+
+        app.addEventListener('focusout', (e) => {
+            if (e.target.matches('.editable')) {
+                const path = e.target.dataset.path;
+                const trimmedValue = e.target.innerText.trim();
+                updateData(path, trimmedValue);
+                e.target.innerText = trimmedValue;
+            }
+        });
+
+        app.addEventListener('click', (e) => {
+            const button = e.target.closest('[data-action]');
+            if (!button) return;
+
+            const { action, path } = button.dataset;
+            const parts = path.split('.');
+            const key = parts.pop();
+            const parent = parts.length > 0 ? parts.reduce((o, k) => o[k], cvData) : cvData;
+
+            if (action === 'remove') {
+                if (confirm('Bạn có chắc muốn xóa mục này?')) {
+                    parent.splice(key, 1);
+                    render();
+                }
+            }
+
+            if (action === 'add') {
+                const list = parent[key] || parent;
+                switch (path) {
+                    case 'skills':
+                        list.push('');
+                        break;
+                    case 'contact':
+                        list.push({ id: `new_${Date.now()}`, icon: 'handle', value: '' });
+                        break;
+                    case 'certifications':
+                        list.push({ title: '', date: '', details: [''] });
+                        break;
+                    case 'workExperience':
+                    case 'activities':
+                    case 'projects':
+                    case 'education':
+                        list.push({ role: '', company: '', period: '', description: [''] });
+                        break;
+                    default:
+                        if (path.endsWith('.details') || path.endsWith('.description')) {
+                            list.push('');
+                        }
+                }
+                render();
+            }
+        });
+
+        // === MODAL FUNCTIONS ===
+        function openContactModal() {
+            document.getElementById('contactModal').style.display = 'flex';
+        }
+
+        function closeContactModal() {
+            document.getElementById('contactModal').style.display = 'none';
+        }
+
+        function confirmAddContact() {
+            const type = document.getElementById('contactTypeSelect').value;
+            addContactItemWithType(type);
+            closeContactModal();
+        }
+
+        function addContactItemWithType(type) {
+            const contactList = cvData.contact;
+            const iconMap = {
+                'email': 'mail',
+                'phone': 'phone',
+                'address': 'location',
+                'birthday': 'calendar',
+                'gender': 'handle',
+                'facebook': 'handle',
+                'linkedin': 'handle',
+                'github': 'handle',
+                'website': 'handle'
+            };
+
+            contactList.push({
+                id: `new_${Date.now()}`,
+                icon: iconMap[type] || 'handle',
+                value: ''
+            });
+
+            render();
+        }
+
+        // === OPTION FUNCTIONS ===
+        function useSampleData() {
+            if (confirm("Bạn có muốn sử dụng thông tin mẫu? Thông tin hiện tại sẽ bị thay thế.")) {
+                // Reset to original sample data
+                cvData = {
+                    name: 'THAO DINH',
+                    position: 'SINH VIÊN NĂM NHẤT NGÀNH MARKETING',
+                    contact: [
+                        { id: 'dob', icon: 'calendar', value: '02/01/1996' },
+                        { id: 'email', icon: 'mail', value: 'thao@viecv.io' },
+                        { id: 'address', icon: 'location', value: 'Nguyễn Đình Chiểu, Phường 6, Quận 3, TP.HCM' },
+                        { id: 'phone', icon: 'phone', value: '09067999xx' }
+                    ],
+                    about: 'Là người có tính cách hướng ngoại, năng động, tự tin trong giao tiếp, rất phù hợp với lĩnh vực marketing. Có kiến thức chuyên ngành marketing. Không ngừng học tập, tích lũy kiến thức, nâng cao năng lực trong mọi lĩnh vực được tham gia.',
+                    workExperience: [
+                        {
+                            role: 'Nhân viên bán hàng part-time',
+                            company: 'CỬA HÀNG VIETCV 1',
+                            period: '11/2010 - 09/2013',
+                            description: [
+                                'Bán hàng trực tiếp tại cửa hàng cho người Việt và người Nhật.',
+                                'Quản lý, báo cáo doanh thu trong ngày.',
+                                'Kiểm kê hàng hoá trong kho, kiểm tra nhập hàng.',
+                                'Phản hồi thắc mắc của khách hàng qua kênh Facebook, Instagram, website.'
+                            ]
+                        }
+                    ],
+                    activities: [
+                        {
+                            role: 'Ban Nội dung',
+                            company: 'CÂU LẠC BỘ VIETCV',
+                            period: '01/2017 - 01/2018',
+                            description: [
+                                'Lên nội dung cho các bài viết trên Facebook để quảng bá hình ảnh của câu lạc bộ, kết nạp thêm thành viên mới.',
+                                'Thiết kế ấn phẩm như flyer, brochure cho 2 ngày hội truyền thông hằng năm của câu lạc bộ.',
+                                'Lên ý tưởng, thể lệ, nội dung cho các cuộc thi marketing cho 300 học sinh của trường.'
+                            ]
+                        }
+                    ],
+                    projects: [
+                        {
+                            role: 'Blog Fun English',
+                            company: 'Dự án cá nhân: Trang blog dạy trẻ em học tiếng Anh qua lời bài hát và truyện cổ tích',
+                            period: '10/2017 - hiện tại',
+                            description: [
+                                'Lên ý tưởng nội dung mỗi bài viết.',
+                                'Thiết kế hình ảnh minh hoạ cho bài viết học tiếng Anh qua truyện và qua lời bài hát.',
+                                'Đăng 2 bài viết mỗi tuần.',
+                                'Thu hút được khoảng 200 lượt xem mỗi bài viết sau 3 tháng hoạt động.'
+                            ]
+                        }
+                    ],
+                    certifications: [
+                        {
+                            title: 'CHỨNG CHỈ IELTS',
+                            date: '01/2011',
+                            details: ['Điểm: 7.5', 'Cấp bởi Hội đồng Anh (British Council)']
+                        },
+                        {
+                            title: 'TIN HỌC QUỐC TẾ',
+                            date: '02/2013',
+                            details: ['Chứng chỉ về sử dụng thành thạo máy tính và internet', 'Cấp bởi IIG Việt Nam']
+                        }
+                    ],
+                    skills: ['MS Office', 'Adobe Illustrator', 'Thuyết trình', 'Làm việc nhóm', 'Chịu áp lực', 'Giao tiếp'],
+                    education: [
+                        {
+                            role: 'Khối Xã hội',
+                            company: 'TRUNG HỌC PHỔ THÔNG VIETCV 1',
+                            period: '07/2014 - 07/2015',
+                            description: [
+                                'Tốt nghiệp loại giỏi. Điểm trung bình: 8.2/10',
+                                'Lớp 11: Giải Nhì cuộc thi Học sinh giỏi cấp tỉnh môn Tiếng Anh.'
+                            ]
+                        },
+                        {
+                            role: 'Ngành Marketing',
+                            company: 'ĐẠI HỌC VIETCV 2',
+                            period: '07/2014 - 07/2015',
+                            description: [
+                                'Sinh viên năm nhất ngành Marketing, GPA hiện tại: 8.1/10',
+                                'Có kiến thức Marketing căn bản, nghiên cứu thị trường, hành vi người tiêu dùng,...',
+                                'Tiếng Anh giao tiếp, Tiếng Anh chuyên ngành Marketing.'
+                            ]
+                        }
+                    ]
+                };
+
+                render();
+
+                // Cập nhật active state cho nút
+                document.querySelectorAll('.option-btn').forEach(btn => btn.classList.remove('active'));
+                event.target.classList.add('active');
+
+                alert("Đã áp dụng thông tin mẫu thành công!");
+            }
+        }
+
+        function useBlankTemplate() {
+            if (confirm("Bạn có muốn bắt đầu với CV trống? Tất cả thông tin hiện tại sẽ bị xóa.")) {
+                // Reset tất cả thông tin
+                cvData = {
+                    name: '',
+                    position: '',
+                    contact: [],
+                    about: '',
+                    workExperience: [],
+                    activities: [],
+                    projects: [],
+                    certifications: [],
+                    skills: [],
+                    education: []
+                };
+
+                render();
+
+                // Cập nhật active state cho nút
+                document.querySelectorAll('.option-btn').forEach(btn => btn.classList.remove('active'));
+                event.target.classList.add('active');
+
+                alert("Đã reset CV thành công! Bạn có thể bắt đầu nhập thông tin mới.");
+            }
+        }
+
+        // === UTILITY FUNCTIONS ===
+        function showLoading() {
+            document.getElementById('loadingOverlay').style.display = 'flex';
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingOverlay').style.display = 'none';
+        }
+
+        // === FORM SUBMISSION ===
+        function saveAndSubmit() {
+            console.log("=== BẮT ĐẦU GỬI CV ===");
+
+            showLoading();
+
+            if (!validateForm()) {
+                hideLoading();
+                return;
+            }
+
+            updateHiddenForm();
+
+            console.log("Đang gửi form đến CvProcess/SubmitCv...");
+
+            // Thêm delay để người dùng thấy loading
+            setTimeout(() => {
+                document.getElementById('cvForm').submit();
+            }, 1000);
+        }
+
+        function validateForm() {
+            const fullName = cvData.name.trim();
+            const emailItem = cvData.contact.find(item => item.icon === 'mail');
+            const email = emailItem?.value.trim();
+
+            console.log("Kiểm tra dữ liệu:", { fullName, email });
+
+            if (!fullName || fullName === '') {
+                alert('Vui lòng nhập họ và tên');
+                // Focus on name field
+                const nameField = document.querySelector('[data-path="name"]');
+                if (nameField) nameField.focus();
+                return false;
+            }
+
+            if (!email || email === '') {
+                alert('Vui lòng nhập email liên hệ');
+                // Focus on email field or add one
+                const emailField = document.querySelector('[data-path^="contact."][data-path$=".value"]');
+                if (emailField) {
+                    emailField.focus();
+                } else {
+                    addContactItemWithType('email');
+                }
+                return false;
+            }
+
+            const emailRegex = /^[a-zA-Z0-9._-]+@@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+            if (!emailRegex.test(email)) {
+                alert('Email không đúng định dạng.');
+                const emailField = document.querySelector('[data-path^="contact."][data-path$=".value"]');
+                if (emailField) emailField.focus();
+                return false;
+            }
+
+            console.log("Kiểm tra thành công");
+            return true;
+        }
+
+        function updateHiddenForm() {
+            console.log("=== CẬP NHẬT FORM ẨN ===");
+
+            // 1. Thông tin cá nhân
+            const fullName = cvData.name.trim();
+            const jobTitle = cvData.position.trim();
+            const summary = cvData.about.trim();
+
+            document.getElementById('hiddenFullName').value = fullName;
+            document.getElementById('hiddenJobTitle').value = jobTitle;
+            document.getElementById('hiddenSummary').value = summary;
+
+            console.log("Thông tin cá nhân:", { fullName, jobTitle, summary });
+
+            // 2. Thông tin liên hệ
+            const contactItems = cvData.contact;
+            let email = '', phone = '', address = '';
+
+            contactItems.forEach(item => {
+                const value = item.value.trim();
+
+                console.log(`Liên hệ: ${item.icon} = ${value}`);
+
+                switch (item.icon) {
+                    case 'mail':
+                        email = value;
+                        document.getElementById('hiddenContactEmail').value = value;
+                        break;
+                    case 'phone':
+                        phone = value;
+                        document.getElementById('hiddenPhoneNumber').value = value;
+                        break;
+                    case 'location':
+                        address = value;
+                        document.getElementById('hiddenAddress').value = value;
+                        break;
+                }
+            });
+
+            console.log("Thông tin liên hệ:", { email, phone, address });
+
+            // 3. Tạo dynamic inputs cho các sections
+            createDynamicInputs();
+        }
+
+        function createDynamicInputs() {
+            const form = document.getElementById('cvForm');
+
+            // Xóa các input cũ
+            document.querySelectorAll('.dynamic-section-input').forEach(input => input.remove());
+
+            console.log("=== TẠO DYNAMIC INPUTS VỚI MODEL CHUẨN API ===");
+
+            // 1. Kinh nghiệm làm việc
+            createWorkExperienceInputs(form, cvData.workExperience);
+
+            // 2. Hoạt động - Dùng References model
+            createActivitiesInputs(form, cvData.activities);
+
+            // 3. Dự án
+            createProjectsInputs(form, cvData.projects);
+
+            // 4. Học vấn
+            createEducationInputs(form, cvData.education);
+
+            // 5. Kỹ năng
+            createSkillsInputs(form, cvData.skills);
+
+            // 6. Chứng chỉ
+            createCertificationInputs(form, cvData.certifications);
+
+            console.log("Đã tạo dynamic inputs với model chuẩn API");
+        }
+
+        function createWorkExperienceInputs(form, items) {
+            if (!items) return;
+
+            items.forEach((item, index) => {
+                if (item.role && item.role.trim() !== '') {
+                    const dateRange = parseDateRange(item.period);
+                    const description = item.description
+                        .filter(text => text && text.trim())
+                        .join('\n');
+
+                    console.log(`WorkExperiences[${index}]:`, item);
+
+                    createHiddenInput(form, `WorkExperiences[${index}].JobTitle`, item.role.trim());
+                    createHiddenInput(form, `WorkExperiences[${index}].CompanyName`, item.company.trim());
+                    if (dateRange.startDate) createHiddenInput(form, `WorkExperiences[${index}].StartDate`, dateRange.startDate);
+                    if (dateRange.endDate) createHiddenInput(form, `WorkExperiences[${index}].EndDate`, dateRange.endDate);
+                    createHiddenInput(form, `WorkExperiences[${index}].Description`, description);
+                }
+            });
+        }
+
+        function createActivitiesInputs(form, items) {
+            if (!items) return;
+
+            items.forEach((item, index) => {
+                if (item.role && item.role.trim() !== '') {
+                    const description = item.description
+                        .filter(text => text && text.trim())
+                        .join('\n');
+
+                    console.log(`Projects[activities-${index}]:`, item);
+
+                    // MAP ACTIVITIES SANG PROJECTS 
+                    createHiddenInput(form, `Projects[activities-${index}].ProjectName`, item.role.trim());
+                    createHiddenInput(form, `Projects[activities-${index}].Description`, description);
+                    createHiddenInput(form, `Projects[activities-${index}].Role`, item.role.trim());
+
+                    // Dùng company làm TechnologiesUsed
+                    if (item.company && item.company.trim()) {
+                        createHiddenInput(form, `Projects[activities-${index}].TechnologiesUsed`, item.company.trim());
+                    }
+                }
+            });
+        }
+
+        function createProjectsInputs(form, items) {
+            if (!items) return;
+
+            items.forEach((item, index) => {
+                if (item.role && item.role.trim() !== '') {
+                    const description = item.description
+                        .filter(text => text && text.trim())
+                        .join('\n');
+
+                    console.log(`Projects[main-${index}]:`, item);
+
+                    // MAP PROJECTS CHUẨN
+                    createHiddenInput(form, `Projects[main-${index}].ProjectName`, item.role.trim());
+                    createHiddenInput(form, `Projects[main-${index}].Description`, description);
+                    createHiddenInput(form, `Projects[main-${index}].Role`, item.role.trim());
+
+                    // Dùng company làm TechnologiesUsed (không dùng ProjectUrl)
+                    if (item.company && item.company.trim()) {
+                        createHiddenInput(form, `Projects[main-${index}].TechnologiesUsed`, item.company.trim());
+                    }
+                }
+            });
+        }
+
+        function createWorkExperienceInputs(form, items) {
+            if (!items) return;
+
+            items.forEach((item, index) => {
+                if (item.role && item.role.trim() !== '') {
+                    const dateRange = parseDateRange(item.period);
+                    const description = item.description
+                        .filter(text => text && text.trim())
+                        .join('\n');
+
+                    console.log(`WorkExperiences[${index}]:`, item);
+
+                    createHiddenInput(form, `WorkExperiences[${index}].JobTitle`, item.role.trim());
+                    createHiddenInput(form, `WorkExperiences[${index}].CompanyName`, item.company.trim());
+                    if (dateRange.startDate) createHiddenInput(form, `WorkExperiences[${index}].StartDate`, dateRange.startDate);
+                    if (dateRange.endDate) createHiddenInput(form, `WorkExperiences[${index}].EndDate`, dateRange.endDate);
+                    createHiddenInput(form, `WorkExperiences[${index}].Description`, description);
+                }
+            });
+        }
+
+        function createEducationInputs(form, items) {
+            if (!items) return;
+
+            items.forEach((item, index) => {
+                if (item.role && item.role.trim() !== '') {
+                    const dateRange = parseDateRange(item.period);
+                    const description = item.description
+                        .filter(text => text && text.trim())
+                        .join('\n');
+
+                    console.log(`Educations[${index}]:`, item);
+
+                    createHiddenInput(form, `Educations[${index}].SchoolName`, item.company.trim());
+                    createHiddenInput(form, `Educations[${index}].Major`, item.role.trim());
+                    if (dateRange.startDate) createHiddenInput(form, `Educations[${index}].StartDate`, dateRange.startDate);
+                    if (dateRange.endDate) createHiddenInput(form, `Educations[${index}].EndDate`, dateRange.endDate);
+                    createHiddenInput(form, `Educations[${index}].Description`, description);
+
+                    // Thêm GPA nếu có trong description
+                    const gpaMatch = description.match(/GPA[:\s]*([\d.]+)/i);
+                    if (gpaMatch) {
+                        createHiddenInput(form, `Educations[${index}].Gpa`, parseFloat(gpaMatch[1]));
+                    }
+                }
+            });
+        }
+
+        function createSkillsInputs(form, items) {
+            if (!items) return;
+
+            items.forEach((skill, index) => {
+                if (skill && skill.trim() !== '') {
+                    createHiddenInput(form, `Skills[${index}].SkillName`, skill.trim());
+                }
+            });
+        }
+
+        function createCertificationInputs(form, items) {
+            if (!items) return;
+
+            items.forEach((cert, index) => {
+                if (cert.title && cert.title.trim() !== '') {
+                    const details = cert.details
+                        .filter(text => text && text.trim())
+                        .join('\n');
+
+                    console.log(`Certificates[${index}]:`, cert);
+
+                    createHiddenInput(form, `Certificates[${index}].CertificateName`, cert.title.trim());
+                    createHiddenInput(form, `Certificates[${index}].IssuingOrganization`, details);
+
+                    // Parse date từ cert.date
+                    const certDate = parseDateOnly(cert.date);
+                    if (certDate) {
+                        createHiddenInput(form, `Certificates[${index}].IssueDate`, certDate);
+                    }
+                }
+            });
+        }
+
+        function parseDateRange(dateText) {
+            console.log("Parsing date range:", dateText);
+
+            if (!dateText) return { startDate: null, endDate: null };
+
+            const parts = dateText.split(' - ');
+            if (parts.length !== 2) {
+                return { startDate: null, endDate: null };
+            }
+
+            let startDate = parseDateOnly(parts[0].trim());
+            let endDate = parts[1].trim().toLowerCase() === 'hiện tại' ||
+                parts[1].trim().toLowerCase() === 'present' ||
+                parts[1].trim().toLowerCase() === 'nay' ?
+                null : parseDateOnly(parts[1].trim());
+
+            console.log("Parsed dates:", { startDate, endDate });
+            return { startDate, endDate };
+        }
+
+        // === DATE PARSING FUNCTIONS ===
+        function parseDateOnly(dateString) {
+            if (!dateString) return null;
+
+            console.log("Parsing date:", dateString);
+
+            // Format: "06/11/1991" (dd/MM/yyyy) -> "1991-11-06"
+            if (dateString.includes('/') && dateString.split('/').length === 3) {
+                const [day, month, year] = dateString.split('/');
+                if (day && month && year) {
+                    const result = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+                    console.log("Parsed as dd/MM/yyyy:", result);
+                    return result;
+                }
+            }
+
+            // Format: "01/2022" (MM/yyyy) -> "2022-01-01"
+            if (dateString.includes('/') && dateString.split('/').length === 2) {
+                const [month, year] = dateString.split('/');
+                if (month && year) {
+                    const result = `${year}-${month.padStart(2, '0')}-01`;
+                    console.log("Parsed as MM/yyyy:", result);
+                    return result;
+                }
+            }
+
+            // Format: "2022" -> "2022-01-01"
+            if (/^\d{4}$/.test(dateString)) {
+                const result = `${dateString}-01-01`;
+                console.log("Parsed as yyyy:", result);
+                return result;
+            }
+
+            // Format: "2022-01-01" -> giữ nguyên
+            if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
+                console.log("Already in correct format:", dateString);
+                return dateString;
+            }
+
+            console.log("Could not parse date:", dateString);
+            return null;
+        }
+
+        function createHiddenInput(form, name, value) {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = name;
+            input.value = value || '';
+            input.className = 'dynamic-section-input';
+            form.appendChild(input);
+        }
+
+        // === INITIALIZATION ===
+        document.addEventListener('DOMContentLoaded', function () {
+            // Render initial data
+            render();
+        });
+    </script>
+</body>
+</html>

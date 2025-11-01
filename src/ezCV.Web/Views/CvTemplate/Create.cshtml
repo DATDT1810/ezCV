@@ -1,0 +1,53 @@
+﻿@using ezCV.Web.Models.CvTemplate
+@model CvTemplateResponse
+@{
+    string templateView = ViewData["TemplateView"] as string ?? "Template_1";
+}
+
+@* Load template partial view tương ứng *@
+@await Html.PartialAsync($"../Template/{templateView}", Model)
+
+
+<div class="actions text-center mt-4 mb-4">
+    <button type="button" onclick="saveCV()" class="btn dream-btn">Lưu CV</button>
+</div>
+
+@section Scripts {
+    <script>
+        async function saveCV() {
+            // Thu thập dữ liệu từ form 
+            const cvData = {
+                templateId: @Model.Id,
+                fullName: document.getElementById('preview-name')?.innerText,
+                contactEmail: '', // Lấy từ form
+                dataJson: JSON.stringify({
+                    // Thu thập data tùy theo cấu trúc của từng template
+                    personal: {
+                        name: document.getElementById('preview-name')?.innerText,
+
+                    }
+                })
+            };
+
+            try {
+                const response = await fetch('/api/CvProcess/Submit', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(cvData)
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    alert(result.message);
+                } else {
+                    throw new Error('Lỗi khi lưu CV');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Có lỗi xảy ra khi lưu CV. Vui lòng thử lại.');
+            }
+        }
+    </script>
+}

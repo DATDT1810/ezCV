@@ -1,0 +1,341 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+@model IEnumerable<ezCV.Web.Models.CvTemplate.CvTemplateResponse>
+
+<div id="test-popup" class="white-popup mfp-hide">
+    <div class="top-form-header">
+        <h4>Đăng nhập</h4>
+    </div>
+    <!-- Thêm anti-forgery token cho bảo mật -->
+    <form action="/Auth/ajax-login" id="main_login_form" method="post">
+        @Html.AntiForgeryToken()
+        <div class="row">
+            <!-- Khu vực hiển thị lỗi chung -->
+            <div id="login-error-message" class="col-12 text-danger mb-3" style="display:none;"></div>
+
+            <div class="col-12 col-md-12">
+                <div class="group">
+                    <input type="text" name="email" id="login-email" required="">
+                    <span class="highlight"></span>
+                    <span class="bar"></span>
+                    <label>Email</label>
+                </div>
+            </div>
+            <div class="col-12 col-md-12">
+                <div class="group">
+                    <input type="password" name="password" id="login-password" required="">
+                    <span class="highlight"></span>
+                    <span class="bar"></span>
+                    <label>Mật khẩu</label>
+                </div>
+            </div>
+
+            <div class="col-12 col-sm-5 text-left ">
+                <button type="submit" class="btn dream-btn">Đăng nhập</button>
+            </div>
+            <div class="col-12 col-sm-7 text-left">
+                <p class="mb-0 mt-10">Bạn chưa có tài khoản? <a href="#signup-popup" class="open-popup-link">Đăng ký</a></p>
+            </div>
+        </div>
+    </form>
+    <div class="other-accounts text-center">
+        <p class="w-text m-0">Login with other account</p>
+        <div class="footer-social-info">
+            <a asp-controller="Auth" asp-action="LoginWithGoogle"><i class="fa fa-google-plus" aria-hidden="true"></i></a>
+        </div>
+    </div>
+</div>
+
+<!-- signup popup form so: -->
+<div id="signup-popup" class="white-popup mfp-hide">
+    <div class="top-form-header">
+        <h4>Đăng ký</h4>
+    </div>
+    <form action="/Auth/ajax-register" method="post" id="main_Signup_form">
+        @Html.AntiForgeryToken()
+        <div class="row">
+            <!-- Khu vực hiển thị lỗi chung -->
+            <div id="register-error-message" class="col-12 text-danger mb-3" style="display:none;"></div>
+
+            <div class="col-12 col-md-12">
+                <div class="group">
+                    <input type="text" name="email" id="signup-email" required="">
+                    <span class="highlight"></span>
+                    <span class="bar"></span>
+                    <label>Email</label>
+                </div>
+            </div>
+            <div class="col-12 col-md-12">
+                <div class="group">
+                    <input type="password" name="password" id="signup-password" required="">
+                    <span class="highlight"></span>
+                    <span class="bar"></span>
+                    <label>Mật khẩu</label>
+                </div>
+            </div>
+            <div class="col-12 col-md-12">
+                <div class="group">
+                    <input type="password" name="confirmPassword" id="signup-confirm-password" required="">
+                    <span class="highlight"></span>
+                    <span class="bar"></span>
+                    <label>Nhập lại mật khẩu</label>
+                </div>
+            </div>
+
+            <div class="col-12 col-sm-5 text-left ">
+                <button type="submit" class="btn dream-btn">Đăng ký</button>
+            </div>
+            <div class="col-12 col-sm-7 text-left">
+                <p class="mb-0 mt-10">Bạn đã có tài khoản? <a class="open-popup-link" href="#test-popup">Đăng nhập</a></p>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- ##### Welcome Area Start ##### -->
+<section class="welcome_area demo2 flex align-items-center">
+
+    <div class="container">
+        <div class="row align-items-center">
+            <!-- Welcome Content -->
+            <div class="col-12 col-lg-6 col-md-12">
+                <div class="welcome-content v2">
+                    <div class="promo-section">
+                        <div class="integration-link light">
+                            <span class="integration-icon">
+                                <img src="~/assets/img/svg/img-dollar.svg" width="24" height="24" alt="">
+                            </span>
+                            <span class="integration-text">Tạo CV chuyên nghiệp trong tầm tay!</span>
+                        </div>
+                    </div>
+                    <h1 class="wow fadeInUp" data-wow-delay="0.2s">Sự nghiệp thành công bắt đầu từ một CV tốt</h1>
+                    <p class="wow fadeInUp" data-wow-delay="0.3s">Trình tạo sơ yếu lý lịch hoàn hảo của chúng tôi giúp bạn loại bỏ mọi rắc rối khi viết CV. Hãy chọn từ nhiều mẫu khác nhau và làm theo các hướng dẫn đơn giản để tạo ra một bản CV hoàn chỉnh, sẵn sàng cho công việc mơ ước</p>
+                    <div class="dream-btn-group wow fadeInUp" data-wow-delay="0.4s">
+                        <a asp-controller="CvTemplate" asp-action="Index" class="btn dream-btn green-btn mr-3">Tạo CV ngay</a>
+                    </div> 
+                </div>
+            </div>
+            <div class="col-12 col-lg-6 col-md-12">
+                <div class="banner-box mt-2 mb-2">
+                    <img src="~/assets/img/core-img/banner2.png" alt="">
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+<!-- ##### Welcome Area End ##### -->
+
+<div class="clearfix"></div>
+
+<div class="clearfix"></div>
+
+<section class="demo m-1 section-padding-70 ring-bg">
+    <div class="container">
+        <div class="section-heading text-center">
+            <div class="dream-dots justify-content-center">
+                <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+            </div>
+            <h2 class="bold">Các Mẫu CV Của Chúng Tôi</h2>
+            <p></p>
+        </div>
+        <div class="row">
+
+            @if (Model != null && Model.Any())
+            {
+                @foreach (var template in Model)
+                {
+                    <div class="col-lg-4 col-md-6 col-sm-12">
+                        <div class="demo-item">
+                            @* Ảnh Preview *@
+                            <a><img src="@Url.Content(template.PreviewImageUrl ?? "~/assets/img/demos/default-cv.png")" alt="@template.TemplateName" class="img-responsive"></a>
+                            <div class="preview-btn-wrapper text-center">
+                                @* Nút Xem Mẫu *@
+                                <a class='preview-demo' style="cursor:pointer;">Xem mẫu <i class="fa fa-search-plus"></i></a>
+
+                                @* Nút Sử dụng mẫu  *@
+                                <a asp-controller="CvTemplate" asp-action="Create" asp-route-templateId="@template.Id" class='preview-demo v2'>
+                                    Sử dụng mẫu
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else if (string.IsNullOrEmpty(ViewBag.ErrorMessage)) 
+            {
+                <div class="col-12 text-center">
+                    <p>Hiện chưa có mẫu CV nào.</p>
+                </div>
+            }
+
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        // ✅ Hàm kiểm tra login bằng API backend
+        async function isUserLoggedIn() {
+            try {
+                const res = await fetch('/Auth/check-login', { credentials: 'include' });
+                if (!res.ok) return false;
+                const data = await res.json();
+                return data.isLoggedIn === true;
+            } catch (err) {
+                console.error("Lỗi khi kiểm tra login:", err);
+                return false;
+            }
+        }
+
+        // ✅ Hàm xử lý khi click "Sử dụng mẫu"
+        async function handleUseTemplate(link) {
+            const loggedIn = await isUserLoggedIn();
+
+            if (loggedIn) {
+                console.log('User đã login, cho phép chuyển hướng');
+                return true; // Cho phép hành vi mặc định
+            }
+
+            console.log('User chưa login, hiện popup');
+            if (window.$ && $.magnificPopup) {
+                $.magnificPopup.open({
+                    items: { src: '#test-popup' },
+                    type: 'inline',
+                    mainClass: 'mfp-fade'
+                });
+            }
+            return false; // Chặn hành vi mặc định
+        }
+
+        // Khi DOM đã load xong
+        document.addEventListener("DOMContentLoaded", async () => {
+            const loggedIn = await isUserLoggedIn();
+            console.log('DOM loaded - Kiểm tra login status:', loggedIn);
+
+            // Gán sự kiện cho các nút "Sử dụng mẫu"
+            document.querySelectorAll('a.preview-demo.v2').forEach(link => {
+                link.addEventListener('click', async (e) => {
+                    e.preventDefault(); 
+                    e.stopPropagation();
+
+                    const loggedIn = await isUserLoggedIn(); 
+                    if (loggedIn) {
+                        console.log('User đã đăng nhập → cho phép dùng mẫu');
+                        window.location.href = link.href; 
+                        return;
+                    }
+
+                    console.log('User chưa đăng nhập → mở popup');
+                    if (window.$ && $.magnificPopup) {
+                        $.magnificPopup.open({
+                            items: { src: '#test-popup' },
+                            type: 'inline',
+                            mainClass: 'mfp-fade'
+                        });
+                    }
+                });
+            });
+
+
+            // Xử lý chuyển đổi giữa popup đăng nhập và đăng ký
+            if (window.$) {
+                $('a.open-popup-link').magnificPopup({
+                    type: 'inline',
+                    midClick: true,
+                    mainClass: 'mfp-fade',
+                    removalDelay: 300
+                });
+            }
+
+            // Xử lý đăng ký
+            const registerForm = document.getElementById("main_Signup_form");
+            if (registerForm) {
+                registerForm.addEventListener("submit", async (e) => {
+                    e.preventDefault();
+
+                    const email = document.getElementById("signup-email").value.trim();
+                    const password = document.getElementById("signup-password").value.trim();
+                    const confirmPassword = document.getElementById("signup-confirm-password").value.trim();
+
+                    if (!email || !password || !confirmPassword) {
+                        alert("Vui lòng nhập đầy đủ thông tin");
+                        return;
+                    }
+
+                    if (password !== confirmPassword) {
+                        alert("Mật khẩu nhập lại không khớp");
+                        return;
+                    }
+
+                    try {
+                        const response = await fetch("/Auth/ajax-register", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                "RequestVerificationToken": getAntiForgeryToken()
+                            },
+                            body: JSON.stringify({ email, password, confirmPassword })
+                        });
+
+                        const result = await response.json();
+
+                        if (response.ok && result.success) {
+                            // Đăng ký thành công
+                            if (window.jQuery && window.jQuery.magnificPopup) {
+                                window.jQuery.magnificPopup.close();
+                            }
+
+                            alert("🎉 Đăng ký thành công! Vui lòng đăng nhập để tiếp tục.");
+                            // Mở popup login
+                            if (window.jQuery) {
+                                window.jQuery.magnificPopup.open({
+                                    items: { src: '#test-popup' },
+                                    type: 'inline'
+                                });
+                            }
+                        } else {
+                            alert(result.message || "Đăng ký thất bại");
+                        }
+                    } catch (err) {
+                        console.error("Fetch error:", err);
+                        alert("Lỗi kết nối đến server");
+                    }
+                });
+            }
+
+            // Xử lý xem mẫu (preview hình ảnh)
+            const previewLinks = document.querySelectorAll(".demo-item .preview-btn-wrapper a:not(.v2)");
+            previewLinks.forEach(link => {
+                link.addEventListener("click", (e) => {
+                    e.preventDefault();
+                    const demoItem = link.closest(".demo-item");
+                    if (!demoItem) return;
+
+                    const imgElement = demoItem.querySelector("img");
+                    const imageSrc = imgElement ? imgElement.src : null;
+
+                    if (imageSrc && window.jQuery && window.jQuery.magnificPopup) {
+                        window.jQuery.magnificPopup.open({
+                            items: { src: imageSrc },
+                            type: 'image',
+                            mainClass: 'mfp-with-zoom mfp-img-mobile mfp-cv-preview',
+                            closeOnContentClick: true,
+                            titleSrc: function (item) {
+                                return imgElement.alt || 'Mẫu CV';
+                            }
+                        }, 0);
+                    }
+                });
+            });
+        });
+
+        // Helper lấy anti-forgery token
+        function getAntiForgeryToken() {
+            return document.querySelector('input[name="__RequestVerificationToken"]')?.value || "";
+        }
+    </script>
+}
+
