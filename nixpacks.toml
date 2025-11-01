@@ -1,13 +1,20 @@
 [phases.setup]
 cmds = [
-    "dotnet restore ezCV.Api/ezCV.Api.csproj",
-    "dotnet restore ezCV.Web/ezCV.Web.csproj"
+    "pwd",
+    "ls -la",
+    "echo '=== CHECK SRC FOLDER ==='",
+    "ls -la src/",
+    "echo '=== FIND CSPROJ FILES ==='",
+    "find . -name '*.csproj' -type f",
+    
+    "dotnet restore src/ezCV.Api/ezCV.Api.csproj",
+    "dotnet restore src/ezCV.Web/ezCV.Web.csproj"
 ]
 
 [phases.build]
 cmds = [
-    "dotnet publish ezCV.Api/ezCV.Api.csproj -c Release -o /app/output/api",
-    "dotnet publish ezCV.Web/ezCV.Web.csproj -c Release -o /app/output/web"
+    "dotnet publish src/ezCV.Api/ezCV.Api.csproj -c Release -o /app/output/api",
+    "dotnet publish src/ezCV.Web/ezCV.Web.csproj -c Release -o /app/output/web"
 ]
 
 [[services]]
