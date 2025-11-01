@@ -8,7 +8,7 @@ restartPolicyType = "ON_FAILURE"
 # Backend API Service
 [[services]]
 name = "api"
-sourcePath = "./ezCV.Api"
+sourcePath = "./src/ezCV.Api"  # THÊM "src/" vào đường dẫn
 [services.env]
 ASPNETCORE_ENVIRONMENT = "Production"
 ASPNETCORE_URLS = "http://*:8081"
@@ -16,7 +16,7 @@ ASPNETCORE_URLS = "http://*:8081"
 # Frontend Web Service
 [[services]]
 name = "web"
-sourcePath = "./ezCV.Web"
+sourcePath = "./src/ezCV.Web"  # THÊM "src/" vào đường dẫn
 [services.env]
 ASPNETCORE_ENVIRONMENT = "Production"
 ASPNETCORE_URLS = "http://*:8080"
