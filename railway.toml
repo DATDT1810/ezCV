@@ -3,26 +3,29 @@ builder = "NIXPACKS"
 
 [deploy]
 numReplicas = 1
-restartPolicyType = "ON_FAILURE"
 
-# Backend API Service
+# API Service
 [[services]]
 name = "api"
-sourcePath = "./src/ezCV.Api"  # THÊM "src/" vào đường dẫn
+[services.build]
+command = "dotnet publish ezCV.Api/ezCV.Api.csproj -c Release -o /app/output"
+[services.start]
+command = "dotnet /app/output/ezCV.Api.dll --urls=http://0.0.0.0:8081"
 [services.env]
 ASPNETCORE_ENVIRONMENT = "Production"
-ASPNETCORE_URLS = "http://*:8081"
 
-# Frontend Web Service
+# Web Service
 [[services]]
-name = "web"
-sourcePath = "./src/ezCV.Web"  # THÊM "src/" vào đường dẫn
+name = "web"  
+[services.build]
+command = "dotnet publish ezCV.Web/ezCV.Web.csproj -c Release -o /app/output"
+[services.start]
+command = "dotnet /app/output/ezCV.Web.dll --urls=http://0.0.0.0:8080"
 [services.env]
 ASPNETCORE_ENVIRONMENT = "Production"
-ASPNETCORE_URLS = "http://*:8080"
 ApiSettings__BaseUrl = "https://${RAILWAY_STATIC_URL}-api.railway.app"
 
-# Ports Configuration
+# Ports
 [[services.ports]]
 port = 8080
 service = "web"
