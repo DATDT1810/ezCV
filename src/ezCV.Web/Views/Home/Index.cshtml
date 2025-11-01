@@ -177,7 +177,7 @@
 
 @section Scripts {
     <script>
-        // ✅ Hàm kiểm tra login bằng API backend
+        // Hàm kiểm tra login bằng API backend
         async function isUserLoggedIn() {
             try {
                 const res = await fetch('/Auth/check-login', { credentials: 'include' });
@@ -190,7 +190,7 @@
             }
         }
 
-        // ✅ Hàm xử lý khi click "Sử dụng mẫu"
+        // Hàm xử lý khi click "Sử dụng mẫu"
         async function handleUseTemplate(link) {
             const loggedIn = await isUserLoggedIn();
 
@@ -249,6 +249,69 @@
                     removalDelay: 300
                 });
             }
+            // Xử lý đăng nhập
+const loginForm = document.getElementById("main_login_form");
+if (loginForm) {
+    loginForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const email = document.getElementById("login-email").value.trim();
+        const password = document.getElementById("login-password").value.trim();
+
+        if (!email || !password) {
+            alert("Vui lòng nhập đầy đủ email và mật khẩu");
+            return;
+        }
+
+        try {
+            console.log("Sending login request...");
+            
+            const response = await fetch("/Auth/ajax-login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "RequestVerificationToken": getAntiForgeryToken(),
+                    "Accept": "application/json"
+                },
+                body: JSON.stringify({ 
+                    email: email, 
+                    password: password 
+                })
+            });
+
+            console.log("Response status:", response.status);
+            
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error("Error response:", errorText);
+                throw new Error(`HTTP ${response.status}: ${errorText}`);
+            }
+
+            const result = await response.json();
+            console.log("Success result:", result);
+
+            if (result.success) {
+                // Đóng popup
+                if (window.jQuery && window.jQuery.magnificPopup) {
+                    window.jQuery.magnificPopup.close();
+                }
+                
+                // Chuyển hướng
+                if (result.redirectUrl) {
+                    window.location.href = result.redirectUrl;
+                } else {
+                    window.location.reload();
+                }
+            } else {
+                alert(result.message || "Đăng nhập thất bại");
+            }
+        } catch (err) {
+            console.error("Login error:", err);
+            alert("Lỗi đăng nhập: " + err.message);
+        }
+    });
+}
+
 
             // Xử lý đăng ký
             const registerForm = document.getElementById("main_Signup_form");
