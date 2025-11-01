@@ -1,6 +1,5 @@
 [phases.setup]
 cmds = [
-    "dotnet restore ezCV.sln",
     "dotnet restore ezCV.Api/ezCV.Api.csproj",
     "dotnet restore ezCV.Web/ezCV.Web.csproj"
 ]
@@ -11,13 +10,11 @@ cmds = [
     "dotnet publish ezCV.Web/ezCV.Web.csproj -c Release -o /app/output/web"
 ]
 
-# For API service
 [[services]]
 name = "api"
 [services.start]
 cmd = "dotnet /app/output/api/ezCV.Api.dll --urls=http://0.0.0.0:8081"
 
-# For Web service
 [[services]]
 name = "web"
 [services.start]
