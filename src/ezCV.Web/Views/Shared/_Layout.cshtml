@@ -1,0 +1,151 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+       <!-- Title -->
+    <title>ezCV - Tạo CV chuyên nghiệp trong tầm tay</title>
+
+    <!-- Favicon -->
+    <link rel="icon" href="~/assets/img/core-img/favicon.ico">
+
+    <!-- Core Stylesheet -->
+    <link rel="stylesheet" href="~/assets/css/style.css">
+
+    <!-- Responsive Stylesheet -->
+    <link rel="stylesheet" href="~/assets/css/responsive.css">
+</head>
+<body class="light-version">
+    <!-- Preloader -->
+    <div id="preloader">
+        <div class="preload-content">
+            <div id="dream-load"></div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="header-area">
+        <div class="classy-nav-container dark breakpoint-off">
+            <div class="container">
+                <nav class="classy-navbar justify-content-between" id="dreamNav">
+                    <a class="nav-brand" href="@Url.Content("~/")">
+                        <img src="@Url.Content("~/assets/img/core-img/logo.png")" alt="30DAY ezCV"> 30DAY ezCV
+                    </a>
+                    <div class="classy-navbar-toggler">
+                        <span class="navbarToggler"><span></span><span></span><span></span></span>
+                    </div>
+                    <div class="classy-menu">
+                        <div class="classycloseIcon">
+                            <div class="cross-wrap"><span class="top"></span><span class="bottom"></span></div>
+                        </div>
+                        <div class="classynav">
+                            <ul id="nav">
+                                <li><a href="@Url.Content("~/")">Trang chủ</a></li>
+                                <li><a href="@Url.Content("~/CvTemplate/Index")">Mẫu CV</a></li>
+                            </ul>
+                            <!-- BẮT ĐẦU LOGIC KIỂM TRA ĐĂNG NHẬP -->
+                            @if (User.Identity.IsAuthenticated)
+                            {
+                                // Lấy tên người dùng từ Claims
+                                var fullNameClaim = User.Claims.FirstOrDefault(c => c.Type == "FullName");
+                                string userName = fullNameClaim?.Value ?? User.Identity.Name ?? "Người dùng";
+
+                                // Hiển thị thông tin người dùng và nút Đăng xuất
+                                 <div class="user-info d-inline-block ml-4">
+                                    <span class="text-black mr-2">
+                                        👋 Xin chào,
+                                        <strong>@((User.Identity?.Name?.Split('@')[0]) ?? "Người dùng")</strong>
+                                     </span>
+                                     
+                                 </div>
+                                <form asp-controller="Auth" asp-action="Logout" method="post">
+                                    <button type="submit" class="btn btn-sm btn-outline-black">Đăng xuất</button>
+                                </form>
+                            }
+                            else
+                            {
+                                // Hiển thị nút Đăng nhập và Đăng ký
+                                <a href="#test-popup" class="btn login-btn mr-im open-login-popup">Đăng nhập</a>
+                                <a href="#signup-popup" class="btn login-btn open-signup-popup">Đăng ký</a>
+                            }
+                            <!-- KẾT THÚC LOGIC KIỂM TRA ĐĂNG NHẬP -->
+                        </div>
+                    </div>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <div class="">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <!-- ##### Footer Area Start ##### -->
+    <footer class="footer-area bg-img">
+
+        <div class="footer-content-area spec">
+            <div class="container">
+                <div class="row ">
+                    <div class="col-12 col-lg-4 col-md-6">
+                        <div class="footer-copywrite-info">
+                            <!-- Copywrite -->
+                            <div class="copywrite_text fadeInUp" data-wow-delay="0.2s">
+                                <div class="footer-logo">
+                                    <a href="#"><img src="~/assets/img/core-img/logo.png" alt="logo"> 30DAY ezCV </a>
+                                </div>
+                                <p>Trình tạo sơ yếu lý lịch hoàn hảo của chúng tôi giúp bạn loại bỏ mọi rắc rối khi viết CV. Hãy chọn từ nhiều mẫu khác nhau và làm theo các hướng dẫn đơn giản để tạo ra một bản CV hoàn chỉnh, sẵn sàng cho công việc mơ ước</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-lg-3 col-md-6">
+                        <div class="contact_info_area d-sm-flex justify-content-between">
+                            <!-- Content Info -->
+                            <div class="contact_info mt-x text-center fadeInUp" data-wow-delay="0.3s">
+                                <h5>Chính sách bảo mật và Điều khoản dịch vụ</h5>
+                                <a href="#"><p>Chính sách bảo mật</p></a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-lg-5 col-md-6 ">
+                        <div class="contact_info_area d-sm-flex justify-content-between">
+                            <!-- Content Info -->
+                            <div class="contact_info mt-s text-center fadeInUp" data-wow-delay="0.4s">
+                                <h5>Liên hệ với chúng tôi</h5>
+                                 <p>Địa chỉ: h10-31 và h10-32 đường số 27, kdc Ngân Thuận, đường Lê Hồng Phong, KV5, phường Bình Thủy, Thành phố Cần Thơ, Việt Nam</p>
+                                 <p>+84 378 196 581</p>
+                                <p>ezcv2025@gmail.com</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+                
+        </div>
+    </footer>
+
+    <!-- ########## All JS ########## -->
+    <!-- jQuery js -->
+    <script src="~/assets/js/jquery.min.js"></script>
+    <!-- Popper js -->
+    <script src="~/assets/js/popper.min.js"></script>
+    <!-- Bootstrap js -->
+    <script src="~/assets/js/bootstrap.min.js"></script>
+    <!-- All Plugins js -->
+    <script src="~/assets/js/plugins.js"></script>
+    <!-- Parallax js -->
+    <script src="~/assets/js/dzsparallaxer.js"></script>
+
+    <script src="~/assets/js/jquery.syotimer.min.js"></script>
+
+    <!-- script js -->
+    <script src="~/assets/js/script.js"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+
+</body>
+</html>

@@ -1,0 +1,1580 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CV Builder - Template 4</title>
+    <!-- Font Awesome for icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* General Styling */
+        :root {
+            --primary-color: #0ea5e9;
+            --text-dark: #1f2937;
+            --text-medium: #4b5563;
+            --text-light: #6b7280;
+            --bg-light: #f3f4f6;
+            --border-color: #e5e7eb;
+            --hover-bg: #e0f2fe;
+            --danger-color: #ef4444;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: white;
+            color: var(--text-medium);
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Option Panel */
+        .option-panel {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: #f8f9fa;
+            padding: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            z-index: 999;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .option-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .option-btn {
+            padding: 0.75rem 1.5rem;
+            border: 2px solid var(--primary-color);
+            border-radius: 8px;
+            background: white;
+            color: var(--primary-color);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+            .option-btn:hover {
+                background: var(--primary-color);
+                color: white;
+            }
+
+            .option-btn.active {
+                background: var(--primary-color);
+                color: white;
+            }
+
+        /* Submit Section */
+        .submit-section {
+            margin-top: 2rem;
+            padding: 2rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            text-align: center;
+            border: 2px dashed #dee2e6;
+        }
+
+        .submit-btn {
+            padding: 0.75rem 2rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            background-color: #10b981;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+            .submit-btn:hover {
+                background-color: #059669;
+            }
+
+        /* Contact Modal */
+        .contact-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .contact-modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 400px;
+        }
+
+        .contact-type-select {
+            width: 100%;
+            padding: 0.5rem;
+            margin-bottom: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        /* Resume Container */
+        #resume-container {
+            max-width: 210mm;
+            min-height: 297mm;
+            margin: 100px auto 2rem auto;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            padding: 2rem;
+        }
+
+        @@media (min-width: 640px) {
+            #resume-container {
+                padding: 2.5rem;
+            }
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+            header h1 {
+                font-size: 2.25rem;
+                font-weight: 700;
+                letter-spacing: -0.025em;
+                color: var(--text-dark);
+                margin: 0;
+                line-height: 1.1;
+                display: block;
+                width: 100%;
+            }
+
+            header h2 {
+                font-size: 1.5rem;
+                color: var(--text-light);
+                margin: 0.5rem 0 0 0;
+                line-height: 1.2;
+                display: block;
+                width: 100%;
+            }
+
+        /* Section Layout */
+        .section {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 8px;
+            padding: 24px 0 0 0;
+            position: relative;
+            border-top: 1px solid var(--border-color);
+        }
+
+        main > .section:first-of-type {
+            border-top: none;
+            padding-top: 0;
+        }
+
+        @@media (min-width: 768px) {
+            .section {
+                grid-template-columns: 1fr 3fr;
+                gap: 1.5rem;
+            }
+        }
+
+        .section-title {
+            font-size: 0.875rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--primary-color);
+            letter-spacing: 0.05em;
+            margin: 0;
+        }
+
+        @@media (min-width: 768px) {
+            .section-title {
+                text-align: right;
+                border-right: 2px solid var(--border-color);
+                padding-right: 1.5rem;
+            }
+        }
+
+        .section-content {
+            line-height: 1.625;
+        }
+
+        /* Editable Fields */
+        .editable-field {
+            cursor: text;
+            padding: 2px 4px;
+            margin: -2px -4px;
+            border-radius: 3px;
+            transition: background-color 0.2s ease-in-out;
+            display: inline-block;
+            min-width: 50px;
+            min-height: 1.5rem;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+            .editable-field:hover {
+                background-color: var(--hover-bg);
+            }
+
+            .editable-field:focus {
+                outline: 1px solid var(--primary-color);
+                background-color: var(--hover-bg);
+                box-shadow: 0 0 5px rgba(14, 165, 233, 0.2);
+            }
+
+            .editable-field[data-placeholder]:empty:before {
+                content: attr(data-placeholder);
+                color: #9ca3af;
+                font-style: italic;
+            }
+
+            .editable-field[data-placeholder]:empty:focus:before {
+                content: '';
+            }
+
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.75rem;
+        }
+
+        @@media (min-width: 640px) {
+            .contact-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 1rem 2rem;
+            }
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            position: relative;
+            padding: 8px 12px;
+            margin: -8px -12px;
+            border-radius: 6px;
+            min-height: 40px;
+        }
+
+            .contact-item:hover {
+                background-color: var(--hover-bg);
+            }
+
+        .contact-icon {
+            color: var(--primary-color);
+            width: 20px;
+            flex-shrink: 0;
+            text-align: center;
+            margin-right: 12px;
+        }
+
+        .delete-icon {
+            color: white;
+            font-size: 10px;
+        }
+
+        .contact-value {
+            flex: 1;
+            min-width: 0;
+        }
+
+        /* Skills Section */
+        .skills-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .skill-item {
+            position: relative;
+            padding: 8px 12px;
+            margin: -8px -12px;
+            border-radius: 6px;
+            min-height: 40px;
+        }
+
+            .skill-item:hover {
+                background-color: var(--hover-bg);
+            }
+
+        /* Experience Section */
+        .experience-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .experience-item {
+            position: relative;
+            padding: 8px 12px;
+            margin: -8px -12px;
+            border-radius: 6px;
+        }
+
+            .experience-item:hover {
+                background-color: var(--hover-bg);
+            }
+
+        .experience-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+            .experience-item-header h3 {
+                font-size: 1.125rem;
+                font-weight: 600;
+                color: var(--text-dark);
+                margin: 0;
+            }
+
+            .experience-item-header p {
+                font-weight: 500;
+                color: var(--text-medium);
+                margin: 0;
+            }
+
+        .experience-item-date {
+            font-size: 0.75rem;
+            color: var(--text-light);
+            white-space: nowrap;
+            text-align: right;
+        }
+
+        .responsibilities-list {
+            list-style: none;
+            padding-left: 0;
+            margin-top: 0.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .responsibility-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+            position: relative;
+            padding: 8px 12px;
+            margin: -8px -12px;
+            border-radius: 6px;
+        }
+
+            .responsibility-item:hover {
+                background-color: var(--hover-bg);
+            }
+
+            .responsibility-item::before {
+                content: '•';
+                color: var(--primary-color);
+                margin-top: 0.15em;
+                font-size: 1.25em;
+                line-height: 1;
+            }
+
+        .delete-btn {
+            position: absolute;
+            background: var(--danger-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            opacity: 0;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            z-index: 10;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .experience-item .delete-btn {
+            top: 12px;
+            right: -25px;
+        }
+
+        .contact-item .delete-btn,
+        .skill-item .delete-btn {
+            top: 50%;
+            right: -25px;
+            transform: translateY(-50%);
+        }
+
+        .responsibility-item .delete-btn {
+            top: 50%;
+            right: -25px;
+            transform: translateY(-50%);
+        }
+
+        .experience-item:hover .delete-btn,
+        .contact-item:hover .delete-btn,
+        .skill-item:hover .delete-btn,
+        .responsibility-item:hover .delete-btn {
+            opacity: 1;
+        }
+
+        .add-btn-container {
+            margin-top: 1rem;
+        }
+
+        .add-btn {
+            background-color: transparent;
+            border: 2px dashed var(--border-color);
+            color: var(--text-light);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            width: 100%;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+            .add-btn:hover {
+                background-color: var(--hover-bg);
+                border-color: var(--primary-color);
+                color: var(--primary-color);
+                border-style: solid;
+            }
+
+            .add-btn i {
+                font-size: 0.8rem;
+            }
+
+        /* Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            display: none;
+        }
+
+        .loading-spinner {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        /* Responsive */
+        @@media (max-width: 768px) {
+            body {
+                padding-top: 150px;
+            }
+
+            .option-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .option-btn {
+                width: 100%;
+                max-width: 300px;
+            }
+
+            .experience-item .delete-btn,
+            .contact-item .delete-btn,
+            .skill-item .delete-btn,
+            .responsibility-item .delete-btn {
+                right: -15px;
+                width: 18px;
+                height: 18px;
+                font-size: 9px;
+            }
+
+            .contact-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .delete-btn i {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Đang xử lý...</span>
+            </div>
+            <p class="mt-2">Đang gửi CV, vui lòng chờ...</p>
+        </div>
+    </div>
+
+    <!-- Contact Modal -->
+    <div class="contact-modal" id="contactModal">
+        <div class="contact-modal-content">
+            <h5>Thêm thông tin liên hệ</h5>
+            <select class="contact-type-select" id="contactTypeSelect">
+                <option value="email">Email</option>
+                <option value="phone">Số điện thoại</option>
+                <option value="address">Địa chỉ</option>
+                <option value="birthday">Ngày sinh</option>
+                <option value="gender">Giới tính</option>
+                <option value="facebook">Facebook</option>
+                <option value="linkedin">LinkedIn</option>
+                <option value="github">GitHub</option>
+                <option value="website">Website</option>
+            </select>
+            <div class="d-flex gap-2">
+                <button class="btn btn-secondary flex-fill" onclick="closeContactModal()">Hủy</button>
+                <button class="btn btn-primary flex-fill" onclick="confirmAddContact()">Thêm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Option Panel -->
+    <div class="option-panel">
+        <div class="container">
+            <div class="option-buttons">
+                <button class="option-btn active" onclick="useSampleData()">
+                    <i class="fas fa-magic"></i> Sử dụng thông tin mẫu
+                </button>
+                <button class="option-btn" onclick="useBlankTemplate()">
+                    <i class="fas fa-file-alt"></i> Bắt đầu với CV trống
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Form ẩn để submit data -->
+    <form id="cvForm" method="post" action="@Url.Action("SubmitCv", "CvProcess")" style="display: none;">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="TemplateId" value="4" />
+
+        <!-- Profile Information -->
+        <input type="hidden" name="Profile.FullName" id="hiddenFullName" />
+        <input type="hidden" name="Profile.JobTitle" id="hiddenJobTitle" />
+        <input type="hidden" name="Profile.ContactEmail" id="hiddenContactEmail" />
+        <input type="hidden" name="Profile.PhoneNumber" id="hiddenPhoneNumber" />
+        <input type="hidden" name="Profile.Address" id="hiddenAddress" />
+        <input type="hidden" name="Profile.Summary" id="hiddenSummary" />
+        <input type="hidden" name="Profile.Photo" id="hiddenPhoto" />
+        <input type="hidden" name="Profile.DateOfBirth" id="hiddenDateOfBirth" />
+        <input type="hidden" name="Profile.Gender" id="hiddenGender" />
+
+        <!-- Các sections sẽ được tạo dynamic bằng JavaScript -->
+    </form>
+
+    <!-- Nội dung template CV -->
+    <div id="resume-container"></div>
+
+    <!-- Submit Section -->
+    <div class="submit-section">
+        <h4>Hoàn thành CV của bạn</h4>
+        <p class="text-muted">Kiểm tra lại thông tin và gửi CV qua email</p>
+        <button type="button" class="submit-btn" onclick="saveAndSubmit()">
+            <i class="fas fa-paper-plane"></i> Gửi CV qua Email
+        </button>
+    </div>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+        // === GLOBAL CONTACTS STATE === (GIỐNG TEMPLATE 2)
+        let contactsState = [];
+        let socialLinkIndex = 0;
+
+        // === SAMPLE DATA ===
+        const sampleData = {
+            name: 'ĐINH XUÂN THẢO',
+            title: 'Product Manager',
+            about: 'Với hơn hai năm kinh nghiệm ở các vị trí Product Manager, Business Analyst, trong việc hỗ trợ nhóm Agile, tạo, sắp xếp mức độ ưu tiên và quản lý backlog; các chứng chỉ TOEIC 750, Google Adwords và bằng Thạc sỹ Quản trị kinh doanh; tôi mong muốn tận dụng các kỹ năng và kiến thức của mình để đóng góp cho công ty với vai trò là Product Manager.',
+            contact: [
+                { id: 1, type: 'birthday', value: '06/11/1991' },
+                { id: 2, type: 'address', value: 'Nguyễn Đình Chiểu, Phường 6, Quận 3, TP.HCM' },
+                { id: 3, type: 'phone', value: '09067999xx' },
+                { id: 4, type: 'email', value: 'thaodx@example.com' },
+                { id: 5, type: 'facebook', value: 'thao_fb_example' },
+                { id: 6, type: 'github', value: 'thao_gh_example' },
+            ],
+            skills: [
+                { id: 1, text: 'Tiếng Anh' },
+                { id: 2, text: 'Phân tích nhu cầu người dùng' },
+                { id: 3, text: 'Sử dụng Pivotal Tracker' },
+                { id: 4, text: 'Vẽ Wireframe' },
+                { id: 5, text: 'Product Management' },
+                { id: 6, text: 'Business Analysis' },
+            ],
+            experience: [
+                {
+                    id: 1,
+                    startDate: '03/2017',
+                    endDate: '03/2018',
+                    role: 'Product Manager',
+                    company: 'VietCV',
+                    responsibilities: [
+                        { id: 1, text: 'Cung cấp thông tin, định hướng và hỗ trợ nhóm Agile trong quá trình phát triển phần mềm.' },
+                        { id: 2, text: 'Làm việc với người dùng/ khách hàng, các bên liên quan và nhóm delivery để thu thập thông tin.' },
+                        { id: 3, text: 'Thảo luận với developer, tester và BA để làm rõ và đảm bảo chức năng phù hợp với mong đợi của người dùng.' },
+                        { id: 4, text: 'Chịu trách nhiệm tạo, lên danh sách và sắp xếp thứ tự ưu tiên của backlog cho sản phẩm web.' },
+                        { id: 5, text: 'Làm việc với Project Manager để lên kế hoạch, chương trình dự phòng, đảm bảo sản phẩm đúng với tầm nhìn và lộ trình.' },
+                    ],
+                },
+                {
+                    id: 2,
+                    startDate: '02/2016',
+                    endDate: '03/2017',
+                    role: 'Business Analyst',
+                    company: 'VietCV',
+                    responsibilities: [
+                        { id: 1, text: 'Dựa trên các thông tin từ người dùng, khách hàng và Product owner, tiến hành phân tích và làm việc cùng nhóm Agile để phát triển sản phẩm web.' },
+                        { id: 2, text: 'Làm việc trực tiếp với người dùng cuối để tìm hiểu và phân tích những khó khăn khi sử dụng sản phẩm.' },
+                        { id: 3, text: 'Phối hợp với developer và tester để cải thiện UI/UX và logic cho các chức năng của sản phẩm.' },
+                        { id: 4, text: 'Chịu trách nhiệm về phát triển cải tiến liên tục, tạo và sắp xếp các story sau khi thảo luận.' },
+                        { id: 5, text: 'Sắp xếp mức độ ưu tiên làm việc cho nhóm Agile và xem xét các backlog còn lại.' },
+                        { id: 6, text: 'Báo cáo KPI Delivery với Project Manager và CTO.' },
+                    ],
+                },
+            ],
+            education: [
+                {
+                    id: 1,
+                    startDate: '09/2014',
+                    endDate: '06/2016',
+                    major: 'Thạc sỹ Quản trị Kinh doanh',
+                    schoolName: 'Đại học Kinh tế TP.HCM',
+                    description: 'Chuyên ngành Quản trị Doanh nghiệp'
+                },
+                {
+                    id: 2,
+                    startDate: '09/2010',
+                    endDate: '06/2014',
+                    major: 'Cử nhân Công nghệ Thông tin',
+                    schoolName: 'Đại học Bách Khoa TP.HCM',
+                    description: 'Chuyên ngành Hệ thống Thông tin'
+                }
+            ],
+            certificates: [
+                {
+                    id: 1,
+                    certificateName: 'TOEIC 750',
+                    issuingOrganization: 'ETS',
+                    issueDate: '03/2019'
+                },
+                {
+                    id: 2,
+                    certificateName: 'Google Adwords Certification',
+                    issuingOrganization: 'Google',
+                    issueDate: '08/2018'
+                }
+            ]
+        };
+
+        // === INITIALIZE CONTACTS STATE === (GIỐNG TEMPLATE 2)
+        function initializeContactsState() {
+            const contactItems = document.querySelectorAll('.contact-item');
+            contactsState = Array.from(contactItems).map(item => ({
+                type: item.dataset.type,
+                value: item.querySelector('.editable-field').innerText.trim(),
+                elementId: item.id
+            }));
+
+            console.log("Initialized contacts state:", contactsState);
+        }
+
+        // === ĐỒNG BỘ STATE VỚI FORM ẨN === (GIỐNG TEMPLATE 2)
+        function syncContactsToHiddenForm() {
+            console.log("=== ĐỒNG BỘ CONTACTS VỚI FORM ẨN ===");
+
+            // Reset các giá trị cũ
+            document.getElementById('hiddenContactEmail').value = '';
+            document.getElementById('hiddenPhoneNumber').value = '';
+            document.getElementById('hiddenAddress').value = '';
+            document.getElementById('hiddenDateOfBirth').value = '';
+            document.getElementById('hiddenGender').value = '';
+
+            // Xóa các dynamic inputs cũ
+            document.querySelectorAll('.dynamic-contact-input').forEach(input => input.remove());
+
+            // Reset social links index
+            socialLinkIndex = 0;
+
+            // Duyệt qua state hiện tại để cập nhật form
+            contactsState.forEach(contact => {
+                console.log(`Syncing contact: ${contact.type} = ${contact.value}`);
+
+                switch (contact.type) {
+                    case 'email':
+                        document.getElementById('hiddenContactEmail').value = contact.value;
+                        break;
+                    case 'phone':
+                        document.getElementById('hiddenPhoneNumber').value = contact.value;
+                        break;
+                    case 'address':
+                        document.getElementById('hiddenAddress').value = contact.value;
+                        break;
+                    case 'birthday':
+                        const parsedBirthday = parseDateForDateOnly(contact.value);
+                        if (parsedBirthday) {
+                            document.getElementById('hiddenDateOfBirth').value = parsedBirthday;
+                        }
+                        break;
+                    case 'gender':
+                        document.getElementById('hiddenGender').value = contact.value;
+                        break;
+                    case 'website':
+                        createHiddenInput('cvForm', 'Profile.Website', contact.value);
+                        break;
+                    case 'facebook':
+                    case 'linkedin':
+                    case 'github':
+                        addToSocialLinks(contact.type, contact.value);
+                        break;
+                }
+            });
+
+            console.log("Form sync completed - Phone:", document.getElementById('hiddenPhoneNumber').value);
+            console.log("Form sync completed - Email:", document.getElementById('hiddenContactEmail').value);
+        }
+
+        // === CẬP NHẬT HÀM REMOVE ITEM === (GIỐNG TEMPLATE 2)
+        function removeItem(elementId) {
+            const item = document.getElementById(elementId);
+            if (item) {
+                // 1. Cập nhật state nếu là contact item
+                if (elementId.startsWith('contact-')) {
+                    contactsState = contactsState.filter(contact => contact.elementId !== elementId);
+                    console.log("Updated contacts state after removal:", contactsState);
+                }
+
+                // 2. Xóa element khỏi DOM
+                item.remove();
+
+                // 3. ĐỒNG BỘ LẠI FORM ẨN NGAY LẬP TỨC
+                syncContactsToHiddenForm();
+            }
+        }
+
+        // === HÀM LẤY GIÁ TRỊ MẶC ĐỊNH === (GIỐNG TEMPLATE 2)
+        function getContactDefaultValue(type) {
+            switch (type) {
+                case 'email': return 'Nhập email';
+                case 'phone': return 'Nhập số điện thoại';
+                case 'address': return 'Nhập địa chỉ';
+                case 'birthday': return 'dd/MM/yyyy';
+                case 'gender': return 'Nhập giới tính';
+                case 'website': return 'https://example.com';
+                case 'facebook': return 'https://facebook.com/username';
+                case 'linkedin': return 'https://linkedin.com/in/username';
+                case 'github': return 'https://github.com/username';
+                default: return 'Nhập thông tin';
+            }
+        }
+
+        // === CẬP NHẬT HÀM THÊM CONTACT === (GIỐNG TEMPLATE 2)
+        function addContactItemWithType(type) {
+            const contactGrid = document.querySelector('.contact-grid');
+            const newId = `contact-${Date.now()}`;
+            const typeName = getContactTypeName(type);
+            const defaultValue = getContactDefaultValue(type);
+
+            const newItemHTML = `
+                        <div id="${newId}" class="contact-item dynamic-item" data-type="${type}">
+                            <button class="delete-btn" onclick="removeItem('${newId}')"><i class="fas fa-trash delete-icon"></i></button>
+                            <i class="fas ${getContactIconClass(type)} contact-icon"></i>
+                            <div class="contact-value">
+                                <div class="editable-field" contenteditable="true" data-placeholder="Nhập ${typeName}">${defaultValue}</div>
+                            </div>
+                        </div>`;
+
+            contactGrid.insertAdjacentHTML('beforeend', newItemHTML);
+
+            // CẬP NHẬT STATE
+            contactsState.push({
+                type: type,
+                value: defaultValue,
+                elementId: newId
+            });
+
+            console.log("Added new contact to state:", contactsState);
+
+            const newItem = contactGrid.lastElementChild;
+            newItem.querySelector('.editable-field').focus();
+
+            // ĐỒNG BỘ FORM NGAY
+            syncContactsToHiddenForm();
+        }
+
+        // === THEO DÕI THAY ĐỔI NỘI DUNG REAL-TIME === (GIỐNG TEMPLATE 2)
+        function setupRealTimeSync() {
+            document.addEventListener('input', function (event) {
+                if (event.target.classList.contains('editable-field') && event.target.isContentEditable) {
+                    const contactItem = event.target.closest('.contact-item');
+                    if (contactItem) {
+                        const elementId = contactItem.id;
+                        const newValue = event.target.innerText.trim();
+
+                        // Cập nhật state
+                        const contactIndex = contactsState.findIndex(contact => contact.elementId === elementId);
+                        if (contactIndex !== -1) {
+                            contactsState[contactIndex].value = newValue;
+                            console.log("Updated contact value in state:", contactsState[contactIndex]);
+
+                            // ĐỒNG BỘ FORM SAU KHI USER NGỪNG TYPING (debounce)
+                            clearTimeout(window.contactSyncTimeout);
+                            window.contactSyncTimeout = setTimeout(() => {
+                                syncContactsToHiddenForm();
+                            }, 1000);
+                        }
+                    }
+                }
+            });
+        }
+
+        // === INITIAL DATA LOAD ===
+        function loadInitialData() {
+            console.log("Đang tải dữ liệu mẫu...");
+
+            // Cập nhật thông tin cơ bản
+            document.getElementById('hiddenFullName').value = sampleData.name;
+            document.getElementById('hiddenJobTitle').value = sampleData.title;
+            document.getElementById('hiddenSummary').value = sampleData.about;
+
+            // Render template với dữ liệu mẫu
+            render();
+
+            console.log("✅ Đã tải dữ liệu mẫu thành công");
+
+            // ĐỒNG BỘ FORM SAU KHI LOAD DATA
+            syncContactsToHiddenForm();
+        }
+
+        // === RENDER FUNCTION ===
+        function render() {
+            const container = document.getElementById('resume-container');
+            if (!container) return;
+
+            const html = `
+                        <header>
+                            <h1 class="editable-field" contenteditable="true" data-placeholder="Họ và tên">${sampleData.name}</h1>
+                            <h2 class="editable-field" contenteditable="true" data-placeholder="Vị trí công việc">${sampleData.title}</h2>
+                        </header>
+
+                        <main>
+                            <section class="section">
+                                <h2 class="section-title">Giới thiệu</h2>
+                                <div class="section-content">
+                                    <div class="editable-field" contenteditable="true" data-placeholder="Giới thiệu bản thân...">${sampleData.about}</div>
+                                </div>
+                            </section>
+
+                            <section class="section">
+                                <h2 class="section-title">Liên hệ</h2>
+                                <div class="section-content">
+                                    <div class="contact-grid">
+                                        ${sampleData.contact.map((item, index) => `
+                                            <div id="contact-${item.id}" class="contact-item dynamic-item" data-type="${item.type}">
+                                                <button class="delete-btn" onclick="removeItem('contact-${item.id}')"><i class="fas fa-trash delete-icon"></i></button>
+                                                <i class="fas ${getContactIconClass(item.type)} contact-icon"></i>
+                                                <div class="contact-value">
+                                                    <div class="editable-field" contenteditable="true" data-placeholder="Nhập ${getContactTypeName(item.type)}">${item.value}</div>
+                                                </div>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                    <div class="add-btn-container">
+                                        <button class="add-btn" onclick="openContactModal()">
+                                            <i class="fas fa-plus"></i> Thêm liên hệ
+                                        </button>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <section class="section">
+                                <h2 class="section-title">Kỹ năng</h2>
+                                <div class="section-content">
+                                    <div class="skills-list">
+                                        ${sampleData.skills.map((skill, index) => `
+                                            <div id="skill-${skill.id}" class="skill-item dynamic-item">
+                                                <button class="delete-btn" onclick="removeItem('skill-${skill.id}')"><i class="fas fa-trash delete-icon"></i></button>
+                                                <div class="editable-field" contenteditable="true" data-placeholder="Kỹ năng">${skill.text}</div>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                    <div class="add-btn-container">
+                                        <button class="add-btn" onclick="addSkill()">
+                                            <i class="fas fa-plus"></i> Thêm kỹ năng
+                                        </button>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <section class="section">
+                                <h2 class="section-title">Kinh nghiệm làm việc</h2>
+                                <div class="section-content">
+                                    <div class="experience-list">
+                                        ${sampleData.experience.map((exp, expIndex) => `
+                                            <div id="exp-${exp.id}" class="experience-item dynamic-item">
+                                                <button class="delete-btn" onclick="removeItem('exp-${exp.id}')"><i class="fas fa-trash delete-icon"></i></button>
+                                                <div class="experience-item-header">
+                                                    <div>
+                                                        <h3 class="editable-field" contenteditable="true" data-placeholder="Chức danh">${exp.role}</h3>
+                                                        <p class="editable-field" contenteditable="true" data-placeholder="Công ty">${exp.company}</p>
+                                                    </div>
+                                                    <div class="experience-item-date">
+                                                        <span class="editable-field" contenteditable="true" data-placeholder="Tháng/Năm">${exp.startDate}</span> -
+                                                        <span class="editable-field" contenteditable="true" data-placeholder="Tháng/Năm">${exp.endDate}</span>
+                                                    </div>
+                                                </div>
+                                                <ul class="responsibilities-list">
+                                                    ${exp.responsibilities.map((resp, respIndex) => `
+                                                        <li id="resp-${resp.id}" class="responsibility-item dynamic-item">
+                                                            <button class="delete-btn" onclick="removeItem('resp-${resp.id}')"><i class="fas fa-trash delete-icon"></i></button>
+                                                            <div class="editable-field" contenteditable="true" data-placeholder="Mô tả công việc">${resp.text}</div>
+                                                        </li>
+                                                    `).join('')}
+                                                </ul>
+                                                <div class="add-btn-container">
+                                                    <button class="add-btn" onclick="addResponsibility(${exp.id})">
+                                                        <i class="fas fa-plus"></i> Thêm trách nhiệm
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                    <div class="add-btn-container">
+                                        <button class="add-btn" onclick="addExperience()">
+                                            <i class="fas fa-plus"></i> Thêm kinh nghiệm
+                                        </button>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <section class="section">
+                                <h2 class="section-title">Học vấn</h2>
+                                <div class="section-content">
+                                    <div class="experience-list">
+                                        ${sampleData.education.map((edu, eduIndex) => `
+                                            <div id="edu-${edu.id}" class="experience-item dynamic-item">
+                                                <button class="delete-btn" onclick="removeItem('edu-${edu.id}')"><i class="fas fa-trash delete-icon"></i></button>
+                                                <div class="experience-item-header">
+                                                    <div>
+                                                        <h3 class="editable-field" contenteditable="true" data-placeholder="Chuyên ngành">${edu.major}</h3>
+                                                        <p class="editable-field" contenteditable="true" data-placeholder="Trường">${edu.schoolName}</p>
+                                                    </div>
+                                                    <div class="experience-item-date">
+                                                        <span class="editable-field" contenteditable="true" data-placeholder="Tháng/Năm">${edu.startDate}</span> -
+                                                        <span class="editable-field" contenteditable="true" data-placeholder="Tháng/Năm">${edu.endDate}</span>
+                                                    </div>
+                                                </div>
+                                                <ul class="responsibilities-list">
+                                                    <li class="responsibility-item">
+                                                        <div class="editable-field" contenteditable="true" data-placeholder="Mô tả">${edu.description}</div>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                    <div class="add-btn-container">
+                                        <button class="add-btn" onclick="addEducation()">
+                                            <i class="fas fa-plus"></i> Thêm học vấn
+                                        </button>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <section class="section">
+                                <h2 class="section-title">Chứng chỉ</h2>
+                                <div class="section-content">
+                                    <div class="experience-list">
+                                        ${sampleData.certificates.map((cert, certIndex) => `
+                                            <div id="cert-${cert.id}" class="experience-item dynamic-item">
+                                                <button class="delete-btn" onclick="removeItem('cert-${cert.id}')"><i class="fas fa-trash delete-icon"></i></button>
+                                                <div class="experience-item-header">
+                                                    <div>
+                                                        <h3 class="editable-field" contenteditable="true" data-placeholder="Tên chứng chỉ">${cert.certificateName}</h3>
+                                                        <p class="editable-field" contenteditable="true" data-placeholder="Tổ chức cấp">${cert.issuingOrganization}</p>
+                                                    </div>
+                                                    <div class="experience-item-date">
+                                                        <span class="editable-field" contenteditable="true" data-placeholder="Tháng/Năm">${cert.issueDate}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                    <div class="add-btn-container">
+                                        <button class="add-btn" onclick="addCertificate()">
+                                            <i class="fas fa-plus"></i> Thêm chứng chỉ
+                                        </button>
+                                    </div>
+                                </div>
+                            </section>
+                        </main>
+                    `;
+            container.innerHTML = html;
+
+            // Setup placeholders sau khi render
+            setupPlaceholders();
+
+            // KHỞI TẠO STATE (GIỐNG TEMPLATE 2)
+            initializeContactsState();
+        }
+
+        // === MODAL FUNCTIONS ===
+        function openContactModal() {
+            document.getElementById('contactModal').style.display = 'flex';
+        }
+
+        function closeContactModal() {
+            document.getElementById('contactModal').style.display = 'none';
+        }
+
+        function confirmAddContact() {
+            const type = document.getElementById('contactTypeSelect').value;
+            addContactItemWithType(type);
+            closeContactModal();
+        }
+
+        // === OPTION FUNCTIONS ===
+        function useSampleData() {
+            if (confirm("Bạn có muốn sử dụng thông tin mẫu? Thông tin hiện tại sẽ bị thay thế.")) {
+                loadInitialData();
+
+                // Cập nhật active state cho nút
+                document.querySelectorAll('.option-btn').forEach(btn => btn.classList.remove('active'));
+                event.target.classList.add('active');
+
+                alert("Đã áp dụng thông tin mẫu thành công!");
+            }
+        }
+
+        function useBlankTemplate() {
+            if (confirm("Bạn có muốn bắt đầu với CV trống? Tất cả thông tin hiện tại sẽ bị xóa.")) {
+                // Reset tất cả thông tin
+                sampleData.name = "";
+                sampleData.title = "";
+                sampleData.about = "";
+                sampleData.contact = [];
+                sampleData.skills = [];
+                sampleData.experience = [];
+                sampleData.education = [];
+                sampleData.certificates = [];
+
+                // Render template trống
+                render();
+
+                // Cập nhật active state cho nút
+                document.querySelectorAll('.option-btn').forEach(btn => btn.classList.remove('active'));
+                event.target.classList.add('active');
+
+                // ĐỒNG BỘ FORM (sẽ clear tất cả)
+                syncContactsToHiddenForm();
+
+                alert("Đã reset CV thành công! Bạn có thể bắt đầu nhập thông tin mới.");
+            }
+        }
+
+        // === UTILITY FUNCTIONS === (GIỐNG TEMPLATE 2)
+        function getContactIconClass(type) {
+            switch (type) {
+                case 'email': return 'fa-envelope';
+                case 'phone': return 'fa-phone';
+                case 'address': return 'fa-map-marker-alt';
+                case 'birthday': return 'fa-birthday-cake';
+                case 'gender': return 'fa-venus-mars';
+                case 'facebook': return 'fab fa-facebook-f';
+                case 'linkedin': return 'fab fa-linkedin-in';
+                case 'github': return 'fab fa-github';
+                case 'website': return 'fa-globe';
+                default: return 'fa-circle-info';
+            }
+        }
+
+        function getContactTypeName(type) {
+            switch (type) {
+                case 'email': return 'email';
+                case 'phone': return 'số điện thoại';
+                case 'address': return 'địa chỉ';
+                case 'birthday': return 'ngày sinh';
+                case 'gender': return 'giới tính';
+                case 'facebook': return 'Facebook';
+                case 'linkedin': return 'LinkedIn';
+                case 'github': return 'GitHub';
+                case 'website': return 'Website';
+                default: return 'thông tin';
+            }
+        }
+
+        function showLoading() {
+            document.getElementById('loadingOverlay').style.display = 'flex';
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingOverlay').style.display = 'none';
+        }
+
+        // === DATE PARSING FUNCTIONS === (GIỐNG TEMPLATE 2)
+        function parseDateForDateOnly(dateString) {
+            if (!dateString) return null;
+
+            console.log("Format date for DateOnly:", dateString);
+
+            // Format: "06/11/1991" (dd/MM/yyyy) -> "1991-11-06"
+            if (dateString.includes('/') && dateString.split('/').length === 3) {
+                const [day, month, year] = dateString.split('/');
+                if (day && month && year) {
+                    const result = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+                    console.log("Formatted for DateOnly:", result);
+                    return result;
+                }
+            }
+
+            // Format: "01/2022" (MM/yyyy) -> "2022-01-01"
+            if (dateString.includes('/') && dateString.split('/').length === 2) {
+                const [month, year] = dateString.split('/');
+                if (month && year) {
+                    const result = `${year}-${month.padStart(2, '0')}-01`;
+                    console.log("Formatted for DateOnly (MM/yyyy):", result);
+                    return result;
+                }
+            }
+
+            console.log("Could not parse date for DateOnly:", dateString);
+            return null;
+        }
+
+        function createHiddenInput(form, name, value) {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = name;
+            input.value = value;
+            input.className = 'dynamic-section-input';
+            form.appendChild(input);
+        }
+
+        function addToSocialLinks(type, value) {
+            const form = document.getElementById('cvForm');
+            createHiddenInput(form, `Profile.SocialLinks[${socialLinkIndex}].PlatformName`, type);
+            createHiddenInput(form, `Profile.SocialLinks[${socialLinkIndex}].Url`, value);
+            socialLinkIndex++;
+        }
+
+        // === DYNAMIC ADD/REMOVE FUNCTIONS ===
+        function addExperience() {
+            const newId = Date.now();
+
+            const newExperience = {
+                id: newId,
+                startDate: 'MM/YYYY',
+                endDate: 'Hiện tại',
+                role: 'Chức danh mới',
+                company: 'Công ty mới',
+                responsibilities: []
+            };
+
+            sampleData.experience.push(newExperience);
+            render();
+
+            // Focus vào field mới
+            setTimeout(() => {
+                const newElement = document.getElementById(`exp-${newId}`);
+                if (newElement) {
+                    const editableField = newElement.querySelector('h3');
+                    if (editableField) {
+                        editableField.focus();
+                    }
+                }
+            }, 100);
+        }
+
+        function addSkill() {
+            const newId = Date.now();
+
+            const newSkill = {
+                id: newId,
+                text: 'Kỹ năng mới'
+            };
+
+            sampleData.skills.push(newSkill);
+            render();
+
+            // Focus vào field mới
+            setTimeout(() => {
+                const newElement = document.getElementById(`skill-${newId}`);
+                if (newElement) {
+                    const editableField = newElement.querySelector('.editable-field');
+                    if (editableField) {
+                        editableField.focus();
+                    }
+                }
+            }, 100);
+        }
+
+        function addEducation() {
+            const newId = Date.now();
+
+            const newEducation = {
+                id: newId,
+                startDate: 'MM/YYYY',
+                endDate: 'MM/YYYY',
+                major: 'Chuyên ngành mới',
+                schoolName: 'Trường mới',
+                description: 'Mô tả học vấn'
+            };
+
+            sampleData.education.push(newEducation);
+            render();
+
+            // Focus vào field mới
+            setTimeout(() => {
+                const newElement = document.getElementById(`edu-${newId}`);
+                if (newElement) {
+                    const editableField = newElement.querySelector('h3');
+                    if (editableField) {
+                        editableField.focus();
+                    }
+                }
+            }, 100);
+        }
+
+        function addCertificate() {
+            const newId = Date.now();
+
+            const newCertificate = {
+                id: newId,
+                certificateName: 'Chứng chỉ mới',
+                issuingOrganization: 'Tổ chức cấp',
+                issueDate: 'MM/YYYY'
+            };
+
+            sampleData.certificates.push(newCertificate);
+            render();
+
+            // Focus vào field mới
+            setTimeout(() => {
+                const newElement = document.getElementById(`cert-${newId}`);
+                if (newElement) {
+                    const editableField = newElement.querySelector('h3');
+                    if (editableField) {
+                        editableField.focus();
+                    }
+                }
+            }, 100);
+        }
+
+        function addResponsibility(expId) {
+            const newId = Date.now();
+
+            const newResponsibility = {
+                id: newId,
+                text: 'Trách nhiệm mới'
+            };
+
+            // Tìm experience item và thêm responsibility
+            const expItem = sampleData.experience.find(exp => exp.id === expId);
+            if (expItem) {
+                expItem.responsibilities.push(newResponsibility);
+                render();
+
+                // Focus vào field mới
+                setTimeout(() => {
+                    const newElement = document.getElementById(`resp-${newId}`);
+                    if (newElement) {
+                        const editableField = newElement.querySelector('.editable-field');
+                        if (editableField) {
+                            editableField.focus();
+                        }
+                    }
+                }, 100);
+            }
+        }
+
+        // === FORM SUBMISSION ===
+        function saveAndSubmit() {
+            console.log("=== BẮT ĐẦU GỬI CV ===");
+
+            showLoading();
+
+            if (!validateForm()) {
+                hideLoading();
+                return;
+            }
+
+            updateHiddenForm();
+
+            console.log("Đang gửi form đến CvProcess/SubmitCv...");
+            document.getElementById('cvForm').submit();
+        }
+
+        function validateForm() {
+            const fullName = document.querySelector('#resume-container header h1').innerText.trim();
+            const emailItem = Array.from(document.querySelectorAll('.contact-item'))
+                .find(item => item.dataset.type === 'email');
+            const email = emailItem?.querySelector('.editable-field').innerText.trim();
+
+            console.log("Kiểm tra dữ liệu:", { fullName, email });
+
+            if (!fullName || fullName === 'Họ và tên' || fullName === '') {
+                alert('Vui lòng nhập họ và tên');
+                document.querySelector('#resume-container header h1').focus();
+                return false;
+            }
+
+            if (!email || email === 'Nhập email' || email === '') {
+                alert('Vui lòng nhập email liên hệ');
+                if (emailItem) {
+                    emailItem.querySelector('.editable-field').focus();
+                } else {
+                    addContactItemWithType('email');
+                }
+                return false;
+            }
+
+            const emailRegex = /^[a-zA-Z0-9._-]+@@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+            if (!emailRegex.test(email)) {
+                alert('Email không đúng định dạng.');
+                if (emailItem) {
+                    emailItem.querySelector('.editable-field').focus();
+                }
+                return false;
+            }
+
+            console.log("Kiểm tra thành công");
+            return true;
+        }
+
+        function updateHiddenForm() {
+            console.log("=== CẬP NHẬT FORM ẨN ===");
+
+            // 1. Thông tin cá nhân
+            const fullName = document.querySelector('#resume-container header h1').innerText.trim();
+            const jobTitle = document.querySelector('#resume-container header h2').innerText.trim();
+            const summary = document.querySelector('#resume-container .section:first-of-type .editable-field').innerText.trim();
+
+            document.getElementById('hiddenFullName').value = fullName;
+            document.getElementById('hiddenJobTitle').value = jobTitle;
+            document.getElementById('hiddenSummary').value = summary;
+
+            console.log("Thông tin cá nhân:", { fullName, jobTitle, summary });
+
+            // 2. Thông tin liên hệ - ĐÃ ĐƯỢC XỬ LÝ BỞI syncContactsToHiddenForm
+
+            console.log("Thông tin liên hệ từ state:", contactsState);
+
+            // 3. Tạo dynamic inputs cho các sections
+            createDynamicInputs();
+        }
+
+        // CHÉP ĐÈ HÀM NÀY TRONG FILE JAVASCRIPT
+        function createDynamicInputs() {
+            const form = document.getElementById('cvForm');
+
+            document.querySelectorAll('.dynamic-section-input').forEach(input => input.remove());
+
+            console.log("=== TẠO DYNAMIC INPUTS VỚI MODEL CHUẨN API ===");
+
+            // 1. Kinh nghiệm làm việc - FIX: Dùng [id^='exp-']
+            const workExperiences = Array.from(document.querySelectorAll("[id^='exp-']")).map((item, index) => {
+                const role = item.querySelector('h3')?.innerText.trim() || '';
+                const company = item.querySelector('p')?.innerText.trim() || '';
+                const startDate = item.querySelector('.experience-item-date span:first-child')?.innerText.trim() || '';
+                const endDate = item.querySelector('.experience-item-date span:last-child')?.innerText.trim() || '';
+
+                // FIX: Xóa '\n• ' và '• ' khi join
+                const descriptionItems = Array.from(item.querySelectorAll('.responsibility-item .editable-field'))
+                    .map(el => el.innerText.trim())
+                    .filter(text => text)
+                    .join('\n'); // <-- FIX LỖI DƯ DẤU •
+
+                return {
+                    JobTitle: role,
+                    CompanyName: company,
+                    StartDate: parseDateOnly(startDate),
+                    EndDate: endDate.toLowerCase() === 'hiện tại' || endDate.toLowerCase() === 'present' ? null : parseDateOnly(endDate),
+                    Description: descriptionItems // <-- FIX LỖI DƯ DẤU •
+                };
+            });
+
+            workExperiences.forEach((exp, index) => {
+                if (exp.JobTitle && exp.JobTitle !== 'Chức danh mới') {
+                    console.log(`WorkExperience[${index}]:`, exp);
+                    createHiddenInput(form, `WorkExperiences[${index}].JobTitle`, exp.JobTitle);
+                    createHiddenInput(form, `WorkExperiences[${index}].CompanyName`, exp.CompanyName);
+                    if (exp.StartDate) createHiddenInput(form, `WorkExperiences[${index}].StartDate`, exp.StartDate);
+                    if (exp.EndDate) createHiddenInput(form, `WorkExperiences[${index}].EndDate`, exp.EndDate);
+                    createHiddenInput(form, `WorkExperiences[${index}].Description`, exp.Description);
+                }
+            });
+
+            // 2. Học vấn - FIX: Dùng [id^='edu-']
+            const educations = Array.from(document.querySelectorAll("[id^='edu-']")).map((item, index) => {
+                const major = item.querySelector('h3')?.innerText.trim() || '';
+                const schoolName = item.querySelector('p')?.innerText.trim() || '';
+                const startDate = item.querySelector('.experience-item-date span:first-child')?.innerText.trim() || '';
+                const endDate = item.querySelector('.experience-item-date span:last-child')?.innerText.trim() || '';
+                const description = item.querySelector('.responsibility-item .editable-field')?.innerText.trim() || '';
+
+                return {
+                    Major: major,
+                    SchoolName: schoolName,
+                    StartDate: parseDateOnly(startDate),
+                    EndDate: endDate.toLowerCase() === 'hiện tại' || endDate.toLowerCase() === 'present' ? null : parseDateOnly(endDate),
+                    Description: description
+                };
+            });
+
+            educations.forEach((edu, index) => {
+                if (edu.Major && edu.Major !== 'Chuyên ngành mới') {
+                    console.log(`Education[${index}]:`, edu);
+                    createHiddenInput(form, `Educations[${index}].Major`, edu.Major);
+                    createHiddenInput(form, `Educations[${index}].SchoolName`, edu.SchoolName);
+                    if (edu.StartDate) createHiddenInput(form, `Educations[${index}].StartDate`, edu.StartDate);
+                    if (edu.EndDate) createHiddenInput(form, `Educations[${index}].EndDate`, edu.EndDate);
+                    createHiddenInput(form, `Educations[${index}].Description`, edu.Description);
+                }
+            });
+
+            // 3. Chứng chỉ - FIX: Dùng [id^='cert-']
+            const certificates = Array.from(document.querySelectorAll("[id^='cert-']")).map((item, index) => {
+                const certificateName = item.querySelector('h3')?.innerText.trim() || '';
+                const issuingOrganization = item.querySelector('p')?.innerText.trim() || '';
+                const issueDate = item.querySelector('.experience-item-date span:first-child')?.innerText.trim() || '';
+
+                return {
+                    CertificateName: certificateName,
+                    IssuingOrganization: issuingOrganization,
+                    IssueDate: parseDateOnly(issueDate)
+                };
+            });
+
+            certificates.forEach((cert, index) => {
+                if (cert.CertificateName && cert.CertificateName !== 'Chứng chỉ mới') {
+                    console.log(`Certificate[${index}]:`, cert);
+                    createHiddenInput(form, `Certificates[${index}].CertificateName`, cert.CertificateName);
+                    createHiddenInput(form, `Certificates[${index}].IssuingOrganization`, cert.IssuingOrganization);
+                    if (cert.IssueDate) createHiddenInput(form, `Certificates[${index}].IssueDate`, cert.IssueDate);
+                }
+            });
+
+            // 4. Kỹ năng
+            const skills = Array.from(document.querySelectorAll("[id^='skill-']")).map((item, index) => {
+                return {
+                    SkillName: item.querySelector('.editable-field')?.innerText.trim() || ''
+                };
+            });
+
+            skills.forEach((skill, index) => {
+                if (skill.SkillName && skill.SkillName !== 'Kỹ năng mới') {
+                    createHiddenInput(form, `Skills[${index}].SkillName`, skill.SkillName);
+                }
+            });
+
+            console.log("Đã tạo dynamic inputs với model chuẩn API");
+        }
+
+        // === DATE PARSING FUNCTIONS ===
+        function parseDateOnly(dateString) {
+            if (!dateString) return null;
+
+            console.log("Parsing date:", dateString);
+
+            // Format: "06/11/1991" (dd/MM/yyyy) -> "1991-11-06"
+            if (dateString.includes('/') && dateString.split('/').length === 3) {
+                const [day, month, year] = dateString.split('/');
+                if (day && month && year) {
+                    const result = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+                    console.log("Parsed as dd/MM/yyyy:", result);
+                    return result;
+                }
+            }
+
+            // Format: "01/2022" (MM/yyyy) -> "2022-01-01"
+            if (dateString.includes('/') && dateString.split('/').length === 2) {
+                const [month, year] = dateString.split('/');
+                if (month && year) {
+                    const result = `${year}-${month.padStart(2, '0')}-01`;
+                    console.log("Parsed as MM/yyyy:", result);
+                    return result;
+                }
+            }
+
+            console.log("Could not parse date:", dateString);
+            return null;
+        }
+
+        // === PLACEHOLDER MANAGEMENT ===
+        function setupPlaceholders() {
+            const editableFields = document.querySelectorAll('.editable-field[data-placeholder]');
+            editableFields.forEach(field => {
+                // Kiểm tra nếu field trống thì hiển thị placeholder
+                if (!field.innerText.trim()) {
+                    field.classList.add('empty');
+                } else {
+                    field.classList.remove('empty');
+                }
+
+                field.addEventListener('focus', function () {
+                    this.classList.remove('empty');
+                    if (this.innerText === this.dataset.placeholder) {
+                        this.innerText = '';
+                    }
+                });
+
+                field.addEventListener('blur', function () {
+                    if (this.innerText.trim() === '') {
+                        this.innerText = this.dataset.placeholder;
+                        this.classList.add('empty');
+                    } else {
+                        this.classList.remove('empty');
+                    }
+                });
+
+                field.addEventListener('input', function () {
+                    if (this.innerText.trim() === '') {
+                        this.classList.add('empty');
+                    } else {
+                        this.classList.remove('empty');
+                    }
+                });
+            });
+        }
+
+        // === INITIALIZATION === (GIỐNG TEMPLATE 2)
+        document.addEventListener('DOMContentLoaded', function () {
+            // Tải dữ liệu mẫu khi trang được tải
+            loadInitialData();
+            setupRealTimeSync(); // BẬT REAL-TIME SYNC
+        });
+    </script>
+</body>
+</html>
