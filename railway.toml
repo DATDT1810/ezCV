@@ -1,0 +1,32 @@
+[build]
+builder = "NIXPACKS"
+
+[deploy]
+numReplicas = 1
+restartPolicyType = "ON_FAILURE"
+
+# Backend API Service
+[[services]]
+name = "api"
+sourcePath = "./ezCV.Api"
+[services.env]
+ASPNETCORE_ENVIRONMENT = "Production"
+ASPNETCORE_URLS = "http://*:8081"
+
+# Frontend Web Service
+[[services]]
+name = "web"
+sourcePath = "./ezCV.Web"
+[services.env]
+ASPNETCORE_ENVIRONMENT = "Production"
+ASPNETCORE_URLS = "http://*:8080"
+ApiSettings__BaseUrl = "https://${RAILWAY_STATIC_URL}-api.railway.app"
+
+# Ports Configuration
+[[services.ports]]
+port = 8080
+service = "web"
+
+[[services.ports]]
+port = 8081
+service = "api"
