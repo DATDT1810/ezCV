@@ -3,12 +3,14 @@
   "dockerfilePath": "Dockerfile",
   "services": {
     "api": {
+      "sourceDirectory": "./", 
       "env": {
         "RAILWAY_SERVICE_NAME": "api",
         "ASPNETCORE_URLS": "http://+:8080"
       }
     },
     "web": {
+      "sourceDirectory": "./",
       "env": {
         "RAILWAY_SERVICE_NAME": "web",
         "ASPNETCORE_URLS": "http://+:8080",
