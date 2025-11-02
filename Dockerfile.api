@@ -2,14 +2,19 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-# SỬA 2 DÒNG NÀY: thêm "src/" trước ezCV.Api
-COPY src/ezCV.Api/*.csproj ./ezCV.Api/
+# Chỉ copy csproj trước → cache nhanh
+COPY src/ezCV.Api/ezCV.Api.csproj ./ezCV.Api/
+COPY src/ezCV.Domain/*.csproj ./ezCV.Domain/
+COPY src/ezCV.Application/*.csproj ./ezCV.Application/
+COPY src/ezCV.Infrastructure/*.csproj ./ezCV.Infrastructure/
+
+# Restore
 RUN dotnet restore ./ezCV.Api/ezCV.Api.csproj
 
-# Copy toàn bộ source (đúng rồi)
+# Copy hết source
 COPY . .
 
-# Publish (đúng rồi)
+# Publish
 RUN dotnet publish ./ezCV.Api/ezCV.Api.csproj -c Release -o /app/publish --no-restore
 
 # ===== RUNTIME =====
