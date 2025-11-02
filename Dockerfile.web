@@ -2,11 +2,18 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-# SỬA 2 DÒNG: thêm "src/"
-COPY src/ezCV.Web/*.csproj ./ezCV.Web/
+# Copy csproj
+COPY src/ezCV.Web/ezCV.Web.csproj ./ezCV.Web/
+COPY src/ezCV.Domain/*.csproj ./ezCV.Domain/
+COPY src/ezCV.Application/*.csproj ./ezCV.Application/
+
+# Restore
 RUN dotnet restore ./ezCV.Web/ezCV.Web.csproj
 
+# Copy source
 COPY . .
+
+# Publish
 RUN dotnet publish ./ezCV.Web/ezCV.Web.csproj -c Release -o /app/publish --no-restore
 
 # ===== RUNTIME =====
