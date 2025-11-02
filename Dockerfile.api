@@ -1,13 +1,13 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-# Copy project file trước
-COPY *.csproj .
-RUN dotnet restore
+# Copy project file từ thư mục ezCV.Api
+COPY ezCV.Api/ezCV.API.csproj ./ezCV.Api/
+RUN dotnet restore ./ezCV.Api/ezCV.API.csproj
 
-# Copy everything else và build
+# Copy everything else
 COPY . .
-RUN dotnet publish -c Release -o /app/publish
+RUN dotnet publish ./ezCV.Api/ezCV.API.csproj -c Release -o /app/publish
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
