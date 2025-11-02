@@ -2,12 +2,15 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /app
 
-# Copy toàn bộ source (vì ezCV.sln trong src/)
+# Copy source
 COPY . .
 
+# QUAN TRỌNG: CD vào thư mục src/ trước khi chạy dotnet restore
+WORKDIR /app/src
+
 # Restore và build API
-RUN dotnet restore src/ezCV.Api/ezCV.Api.csproj
-RUN dotnet publish src/ezCV.Api/ezCV.Api.csproj -c Release -o /output
+RUN dotnet restore ezCV.Api/ezCV.Api.csproj
+RUN dotnet publish ezCV.Api/ezCV.Api.csproj -c Release -o /output
 
 # Runtime stage cho API
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime

@@ -2,12 +2,15 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /app
 
-# Copy toàn bộ source
+# Copy source
 COPY . .
 
+# QUAN TRỌNG: CD vào thư mục src/ 
+WORKDIR /app/src
+
 # Restore và build Web
-RUN dotnet restore src/ezCV.Web/ezCV.Web.csproj
-RUN dotnet publish src/ezCV.Web/ezCV.Web.csproj -c Release -o /output
+RUN dotnet restore ezCV.Web/ezCV.Web.csproj
+RUN dotnet publish ezCV.Web/ezCV.Web.csproj -c Release -o /output
 
 # Runtime stage cho Web
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
