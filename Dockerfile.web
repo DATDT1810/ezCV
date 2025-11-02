@@ -1,24 +1,18 @@
-# Build stage
+# Build stage cho Web
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-WORKDIR /src
+WORKDIR /app
 
-# Copy csproj
-COPY src/ezCV.Web/*.csproj ./ezCV.Web/
-RUN dotnet restore ezCV.Web/ezCV.Web.csproj
+# Copy toàn bộ source
+COPY . .
 
-# Copy source
-COPY src/ezCV.Web/. ./ezCV.Web/
+# Restore và build Web
+RUN dotnet restore src/ezCV.Web/ezCV.Web.csproj
+RUN dotnet publish src/ezCV.Web/ezCV.Web.csproj -c Release -o /output
 
-# Publish
-WORKDIR /src/ezCV.Web
-RUN dotnet publish ezCV.Web.csproj -c Release -o /app/publish --no-restore
-
-# Runtime stage
+# Runtime stage cho Web
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
-COPY --from=build /app/publish .
-
+COPY --from=build /output .
 ENV ASPNETCORE_URLS=http://*:8080
 EXPOSE 8080
-
 ENTRYPOINT ["dotnet", "ezCV.Web.dll"]
