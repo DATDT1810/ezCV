@@ -1,0 +1,21 @@
+# ================= BUILD STAGE =================
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /src
+
+COPY . .
+
+# Restore & publish Web
+RUN dotnet restore src/ezCV.Web/ezCV.Web.csproj
+RUN dotnet publish src/ezCV.Web/ezCV.Web.csproj -c Release -o /app --no-restore -p:UseAppHost=false
+
+# ================= RUNTIME STAGE =================
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
+WORKDIR /app
+
+COPY --from=build /app .
+
+# Đảm bảo static file (CSS/JS/images) tồn tại
+ENV ASPNETCORE_URLS=http://+:8080
+EXPOSE 8080
+
+ENTRYPOINT ["dotnet", "ezCV.Web.dll"]
