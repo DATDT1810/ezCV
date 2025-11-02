@@ -1,13 +1,9 @@
-
 {
   "builder": "DOCKERFILE",
   "dockerfilePath": "Dockerfile.api",
-  "services": {
-    "api": {
-      "sourceDirectory": "./",
-      "env": {
-        "ASPNETCORE_URLS": "http://+:8080"
-      }
-    }
+  "serviceName": "api",
+  "env": {
+    "ASPNETCORE_URLS": "http://+:8080",
+    "ASPNETCORE_ENVIRONMENT": "Production"
   }
 }
