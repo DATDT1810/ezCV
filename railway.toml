@@ -4,26 +4,27 @@ builder = "DOCKERFILE"
 [deploy]
 numReplicas = 1
 
-# API Service
+# --- API service ---
 [[services]]
 name = "api"
+dockerfilePath = "Dockerfile.api"
+
 [services.env]
 ASPNETCORE_ENVIRONMENT = "Production"
-ASPNETCORE_URLS = "http://*:8081"
 
-# Web Service
+[[services.ports]]
+port = 8080  # ĐỔI THÀNH 8080
+targetPort = 8080  # THÊM DÒNG NÀY
+
+# --- Web service ---
 [[services]]
 name = "web"
+dockerfilePath = "Dockerfile.web"
+
 [services.env]
 ASPNETCORE_ENVIRONMENT = "Production"
-ASPNETCORE_URLS = "http://*:8080"
-ApiSettings__BaseUrl = "https://${RAILWAY_STATIC_URL}-api.railway.app"
-
-# Ports
-[[services.ports]]
-port = 8080
-service = "web"
+ApiSettings__BaseUrl = "https://ezcv-api.up.railway.app"
 
 [[services.ports]]
-port = 8081
-service = "api"
+port = 3000  # ĐỔI THÀNH 3000 (Railway recommendation)
+targetPort = 8080  # THÊM DÒNG NÀY
