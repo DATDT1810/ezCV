@@ -1,15 +1,13 @@
-# Build stage cho API - DÙNG .NET 6.0
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
 
-# Copy toàn bộ source (bao gồm cả thư mục src/)
+# Copy toàn bộ source
 COPY . .
 
-# Restore và build API - DÙNG ĐƯỜNG DẪN ĐẦY ĐỦ
+# Restore chỉ định project
 RUN dotnet restore "src/ezCV.Api/ezCV.Api.csproj"
 RUN dotnet publish "src/ezCV.Api/ezCV.Api.csproj" -c Release -o /app/publish
 
-# Runtime stage
 FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS runtime
 WORKDIR /app
 COPY --from=build /app/publish .

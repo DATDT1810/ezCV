@@ -1,13 +1,23 @@
-# Build stage cho Web - DÙNG .NET 6.0
+# Build stage cho Web - .NET 6
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
+
+# Copy toàn bộ source
 COPY . .
+
+# Restore và publish Web chỉ định project
 RUN dotnet restore "src/ezCV.Web/ezCV.Web.csproj"
 RUN dotnet publish "src/ezCV.Web/ezCV.Web.csproj" -c Release -o /app/publish
 
+# Runtime stage
 FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS runtime
 WORKDIR /app
+
+# Copy output từ build stage
 COPY --from=build /app/publish .
+
+# Web lắng nghe trên 8080
 ENV ASPNETCORE_URLS=http://*:8080
 EXPOSE 8080
+
 ENTRYPOINT ["dotnet", "ezCV.Web.dll"]
