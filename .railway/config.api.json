@@ -1,7 +1,14 @@
 {
-  "builder": "DOCKERFILE",
-  "dockerfilePath": "Dockerfile.api",
-  "serviceName": "api",
+  "build": {
+    "builder": "DOCKERFILE",
+    "dockerfilePath": "Dockerfile.api"
+  },
+  "deploy": {
+    "startCommand": "dotnet ezCV.Api.dll"
+  },
+  "service": {
+    "name": "api"
+  },
   "env": {
     "ASPNETCORE_URLS": "http://+:8080",
     "ASPNETCORE_ENVIRONMENT": "Production"
