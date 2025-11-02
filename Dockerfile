@@ -2,22 +2,22 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-# COPY ĐÚNG THEO ẢNH CỦA CON (src/ezCV.Api/ezCV.Api.csproj)
-COPY src/ezCV.Api/ezCV.Api.csproj          ./ezCV.Api/
-COPY src/ezCV.Web/ezCV.Web.csproj          ./ezCV.Web/
-COPY src/ezCV.Application/*.csproj         ./ezCV.Application/
-COPY src/ezCV.Domain/*.csproj              ./ezCV.Domain/
-COPY src/ezCV.Infrastructure/*.csproj      ./ezCV.Infrastructure/
+# COPY ĐÚNG 1000% THEO ẢNH CON CHỤP
+COPY src/ezCV.Api/ezCV.Api.csproj          ezCV.Api/
+COPY src/ezCV.Web/ezCV.Web.csproj          ezCV.Web/
+COPY src/ezCV.Application/*.csproj         ezCV.Application/
+COPY src/ezCV.Domain/*.csproj              ezCV.Domain/
+COPY src/ezCV.Infrastructure/*.csproj      ezCV.Infrastructure/
 
-# Restore CHỈ API (đủ để kéo hết)
-RUN dotnet restore ./ezCV.Api/ezCV.Api.csproj
+# Restore chỉ 1 cái → kéo hết
+RUN dotnet restore ezCV.Api/ezCV.Api.csproj
 
 # Copy toàn bộ source
 COPY . .
 
-# Publish 2 app
-RUN dotnet publish ./ezCV.Api/ezCV.Api.csproj -c Release -o /app/api --no-restore
-RUN dotnet publish ./ezCV.Web/ezCV.Web.csproj -c Release -o /app/web --no-restore
+# Publish
+RUN dotnet publish ezCV.Api/ezCV.Api.csproj -c Release -o /app/api --no-restore
+RUN dotnet publish ezCV.Web/ezCV.Web.csproj -c Release -o /app/web --no-restore
 
 # ===================== RUNTIME =====================
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
@@ -28,7 +28,6 @@ COPY --from=build /app/web ./web
 ENV ASPNETCORE_HTTP_PORTS=8080
 EXPOSE 8080
 
-# TỰ ĐỘNG CHẠY ĐÚNG SERVICE
 ENTRYPOINT ["sh", "-c", "\
   if [ \"$RAILWAY_SERVICE_NAME\" = \"ezcv-api\" ]; then \
     dotnet api/ezCV.Api.dll; \
