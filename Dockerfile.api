@@ -1,13 +1,18 @@
+# Build stage API
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
-WORKDIR /src
+WORKDIR /app
+
+# Copy csproj và restore trước (cache layer)
+COPY src/ezCV.Api/ezCV.Api.csproj ./src/ezCV.Api/
+RUN dotnet restore "./src/ezCV.Api/ezCV.Api.csproj"
 
 # Copy toàn bộ source
 COPY . .
 
-# Restore chỉ định project
-RUN dotnet restore "src/ezCV.Api/ezCV.Api.csproj"
-RUN dotnet publish "src/ezCV.Api/ezCV.Api.csproj" -c Release -o /app/publish
+# Publish
+RUN dotnet publish "./src/ezCV.Api/ezCV.Api.csproj" -c Release -o /app/publish
 
+# Runtime stage
 FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS runtime
 WORKDIR /app
 COPY --from=build /app/publish .
