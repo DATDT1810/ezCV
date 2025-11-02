@@ -4,7 +4,7 @@
     "dockerfilePath": "Dockerfile.api"
   },
   "deploy": {
-    "startCommand": "dotnet ezCV.Api.dll"
+    "startCommand": "dotnet ezCV.API.dll"
   },
   "service": {
     "name": "api"
