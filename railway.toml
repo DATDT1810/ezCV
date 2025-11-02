@@ -1,5 +1,5 @@
 [build]
-builder = "NIXPACKS" 
+builder = "DOCKERFILE"
 
 [deploy]
 numReplicas = 1
@@ -7,7 +7,7 @@ numReplicas = 1
 # --- API service ---
 [[services]]
 name = "api"
-dockerfilePath = "Dockerfile.api"  # Railway sẽ hiểu
+dockerfilePath = "Dockerfile.api"
 
 [services.env]
 ASPNETCORE_ENVIRONMENT = "Production"

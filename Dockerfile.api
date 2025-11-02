@@ -1,30 +1,18 @@
-# Build stage
+# Build stage cho API
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-WORKDIR /src
+WORKDIR /app
 
-# Copy ALL csproj files for proper restore
-COPY ["ezCV.sln", "."]
-COPY ["src/ezCV.Api/ezCV.Api.csproj", "src/ezCV.Api/"]
-COPY ["src/ezCV.Application/ezCV.Application.csproj", "src/ezCV.Application/"]
-COPY ["src/ezCV.Domain/ezCV.Domain.csproj", "src/ezCV.Domain/"]
-COPY ["src/ezCV.Infrastructure/ezCV.Infrastructure.csproj", "src/ezCV.Infrastructure/"]
-
-# Restore packages
-RUN dotnet restore "ezCV.sln"
-
-# Copy source
+# Copy toàn bộ source (vì ezCV.sln trong src/)
 COPY . .
 
-# Publish
-WORKDIR /src/src/ezCV.Api
-RUN dotnet publish -c Release -o /app/publish
+# Restore và build API
+RUN dotnet restore src/ezCV.Api/ezCV.Api.csproj
+RUN dotnet publish src/ezCV.Api/ezCV.Api.csproj -c Release -o /output
 
-# Runtime stage
+# Runtime stage cho API
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
-COPY --from=build /app/publish .
-
+COPY --from=build /output .
 ENV ASPNETCORE_URLS=http://*:8080
 EXPOSE 8080
-
 ENTRYPOINT ["dotnet", "ezCV.Api.dll"]
