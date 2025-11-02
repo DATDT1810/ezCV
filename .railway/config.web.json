@@ -1,13 +1,10 @@
 {
   "builder": "DOCKERFILE",
   "dockerfilePath": "Dockerfile.web",
-  "services": {
-    "web": {
-      "sourceDirectory": "./",
-      "env": {
-        "ASPNETCORE_URLS": "http://+:8080",
-        "ApiSettings__BaseUrl": "https://ezcv-api.up.railway.app"
-      }
-    }
+  "serviceName": "web",
+  "env": {
+    "ASPNETCORE_URLS": "http://+:8080",
+    "ASPNETCORE_ENVIRONMENT": "Production",
+    "ApiSettings__BaseUrl": "https://ezcv-api.up.railway.app"
   }
 }
