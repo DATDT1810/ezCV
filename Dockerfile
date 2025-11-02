@@ -2,21 +2,21 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-# COPY ĐÚNG 1000% THEO ẢNH CON CHỤP
-COPY src/ezCV.Api/ezCV.Api.csproj          ezCV.Api/
+# ĐÚNG 1000% TÊN FILE CỦA CON
+COPY src/ezCV.Api/ezCV.API.csproj          ezCV.Api/
 COPY src/ezCV.Web/ezCV.Web.csproj          ezCV.Web/
 COPY src/ezCV.Application/*.csproj         ezCV.Application/
 COPY src/ezCV.Domain/*.csproj              ezCV.Domain/
 COPY src/ezCV.Infrastructure/*.csproj      ezCV.Infrastructure/
 
-# Restore chỉ 1 cái → kéo hết
-RUN dotnet restore ezCV.Api/ezCV.Api.csproj
+# Restore
+RUN dotnet restore ezCV.Api/ezCV.API.csproj
 
-# Copy toàn bộ source
+# Copy source
 COPY . .
 
 # Publish
-RUN dotnet publish ezCV.Api/ezCV.Api.csproj -c Release -o /app/api --no-restore
+RUN dotnet publish ezCV.Api/ezCV.API.csproj -c Release -o /app/api --no-restore
 RUN dotnet publish ezCV.Web/ezCV.Web.csproj -c Release -o /app/web --no-restore
 
 # ===================== RUNTIME =====================
