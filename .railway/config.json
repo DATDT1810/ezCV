@@ -1,5 +1,19 @@
 {
   "builder": "DOCKERFILE",
   "dockerfilePath": "Dockerfile",
-  "context": "."
+  "services": {
+    "api": {
+      "env": {
+        "RAILWAY_SERVICE_NAME": "api",
+        "ASPNETCORE_URLS": "http://+:8080"
+      }
+    },
+    "web": {
+      "env": {
+        "RAILWAY_SERVICE_NAME": "web",
+        "ASPNETCORE_URLS": "http://+:8080",
+        "ApiSettings__BaseUrl": "https://ezcv-api.up.railway.app"
+      }
+    }
+  }
 }
