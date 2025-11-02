@@ -6,8 +6,8 @@ WORKDIR /src
 COPY . .
 
 # Restore & publish API
-RUN dotnet restore ezCV.Api/ezCV.API.csproj
-RUN dotnet publish ezCV.Api/ezCV.API.csproj -c Release -o /app --no-restore -p:UseAppHost=false
+RUN dotnet restore ./src/ezCV.Api/ezCV.API.csproj
+RUN dotnet publish ./src/ezCV.Api/ezCV.API.csproj -c Release -o /app --no-restore -p:UseAppHost=false
 
 # ================= RUNTIME STAGE =================
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
