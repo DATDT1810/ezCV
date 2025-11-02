@@ -11,9 +11,9 @@ COPY src/ezCV.Infrastructure/*.csproj      ezCV.Infrastructure/
 RUN dotnet restore ezCV.Api/ezCV.API.csproj
 COPY . .
 
-# ĐÚNG 100% .NET 8
-RUN dotnet publish ezCV.Api/ezCV.API.csproj -c Release -o /app/api --no-restore -p:UseAppHost=false
-RUN dotnet publish ezCV.Web/ezCV.Web.csproj -c Release -o /app/web --no-restore -p:UseAppHost=false
+# 2 FLAG VÀNG – KHÔNG BAO GIỜ LỖI NỮA
+RUN dotnet publish ezCV.Api/ezCV.API.csproj -c Release -o /app/api --no-restore -p:UseAppHost=false -p:PublishSingleFile=false
+RUN dotnet publish ezCV.Web/ezCV.Web.csproj -c Release -o /app/web --no-restore -p:UseAppHost=false -p:PublishSingleFile=false
 
 # ===================== RUNTIME =====================
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
