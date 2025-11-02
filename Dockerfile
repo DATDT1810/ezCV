@@ -15,9 +15,18 @@ RUN dotnet restore ezCV.Api/ezCV.API.csproj
 # Copy source
 COPY . .
 
-# Publish
-RUN dotnet publish ezCV.Api/ezCV.API.csproj -c Release -o /app/api --no-restore
-RUN dotnet publish ezCV.Web/ezCV.Web.csproj -c Release -o /app/web --no-restore
+# ===================== PUBLISH ĐÚNG .NET 8 =====================
+RUN dotnet publish ezCV.Api/ezCV.API.csproj \
+    -c Release \
+    -o /app/api \
+    --no-restore \
+    /p:UseAppHost=false
+
+RUN dotnet publish ezCV.Web/ezCV.Web.csproj \
+    -c Release \
+    -o /app/web \
+    --no-restore \
+    /p:UseAppHost=false
 
 # ===================== RUNTIME =====================
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
