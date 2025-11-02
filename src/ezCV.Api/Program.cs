@@ -9,20 +9,8 @@ using ezCV.Application.External.Models;
 var builder = WebApplication.CreateBuilder(args);
 
 // === CONFIG DATABASE ===
-var connectionString = Environment.GetEnvironmentVariable("AZURE_SQL_CONNECTION")
-                       ?? builder.Configuration.GetConnectionString("DefaultConnection");
-
-if (!string.IsNullOrEmpty(connectionString))
-{
-    var dbPassword = Environment.GetEnvironmentVariable("AZURE_SQL_PASSWORD");
-    if (!string.IsNullOrEmpty(dbPassword) && !connectionString.Contains("Password="))
-    {
-        connectionString += $";Password={dbPassword}";
-    }
-
-    builder.Services.AddDbContext<ApplicationDbContext>(options =>
-        options.UseSqlServer(connectionString));
-}
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // === CONFIG EMAIL ===
 builder.Services.Configure<EmailConfiguration>(options =>
