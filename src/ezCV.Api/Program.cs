@@ -35,7 +35,7 @@ builder.Services.Configure<EmailConfiguration>(options =>
 });
 
 // === CONFIG CLOUDINARY ===
-builder.Services.Configure<CloudinarySetting>(options =>  // Sửa thành CloudinarySettings
+builder.Services.Configure<CloudinarySetting>(options =>
 {
     options.CloudName = builder.Configuration["CloudinarySettings:CloudName"];
     options.ApiKey = Environment.GetEnvironmentVariable("CLOUDINARY_APIKEY")
@@ -99,6 +99,12 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+else
+{
+    // Production - vẫn enable Swagger
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
 
 // Railway deployment
 var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
@@ -108,6 +114,17 @@ app.UseHttpsRedirection();
 app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseAuthorization();
+
+// === HEALTH CHECK & ROOT ENDPOINT ===
+app.MapGet("/", () => "ezCV API is running! - " + DateTime.UtcNow.ToString());
+app.MapGet("/health", () => "Healthy");
+app.MapGet("/api/health", () => new { 
+    status = "OK", 
+    timestamp = DateTime.UtcNow,
+    service = "ezCV API",
+    version = "1.0"
+});
+
 app.MapControllers();
 
 app.Run();
