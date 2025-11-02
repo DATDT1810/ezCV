@@ -1,0 +1,17 @@
+{
+  "$schema": "https://railway.app/railway.schema.json",
+  "build": { "builder": "NIXPACKS" },
+  "deploy": { "numReplicas": 1 },
+  "services": [
+    {
+      "name": "ezcv-api",
+      "dockerfilePath": "Dockerfile.api",
+      "ports": [{ "port": 8080, "targetPort": 8080 }]
+    },
+    {
+      "name": "ezcv-web",
+      "dockerfilePath": "Dockerfile.web",
+      "ports": [{ "port": 3000, "targetPort": 8080 }]
+    }
+  ]
+}
