@@ -1,5 +1,5 @@
 [build]
-builder = "DOCKERFILE"
+builder = "NIXPACKS" 
 
 [deploy]
 numReplicas = 1
@@ -7,14 +7,14 @@ numReplicas = 1
 # --- API service ---
 [[services]]
 name = "api"
-dockerfilePath = "Dockerfile.api"
+dockerfilePath = "Dockerfile.api"  # Railway sẽ hiểu
 
 [services.env]
 ASPNETCORE_ENVIRONMENT = "Production"
 
 [[services.ports]]
-port = 8080  # ĐỔI THÀNH 8080
-targetPort = 8080  # THÊM DÒNG NÀY
+port = 8080
+targetPort = 8080
 
 # --- Web service ---
 [[services]]
@@ -26,5 +26,5 @@ ASPNETCORE_ENVIRONMENT = "Production"
 ApiSettings__BaseUrl = "https://ezcv-api.up.railway.app"
 
 [[services.ports]]
-port = 3000  # ĐỔI THÀNH 3000 (Railway recommendation)
-targetPort = 8080  # THÊM DÒNG NÀY
+port = 3000
+targetPort = 8080
