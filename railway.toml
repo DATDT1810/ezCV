@@ -1,5 +1,5 @@
 [build]
-builder = "DOCKERFILE"
+builder = "NIXPACKS"  # Đổi thành NIXPACKS
 
 [deploy]
 numReplicas = 1
@@ -7,7 +7,7 @@ numReplicas = 1
 # --- API service ---
 [[services]]
 name = "api"
-dockerfilePath = "Dockerfile.api"
+dockerfilePath = "Dockerfile.api"  # Sẽ hoạt động với NIXPACKS
 
 [services.env]
 ASPNETCORE_ENVIRONMENT = "Production"
