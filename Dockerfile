@@ -1,31 +1,38 @@
-# ==================== MULTI-STAGE BUILD ====================
+# ===================== BUILD =====================
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-# Copy ALL .csproj để restore 1 lần
-COPY src/*/*.csproj ./
-RUN dotnet restore "src/ezCV.Api/ezCV.Api.csproj" --disable-parallel
+# COPY ĐÚNG THEO ẢNH CỦA CON (src/ezCV.Api/ezCV.Api.csproj)
+COPY src/ezCV.Api/ezCV.Api.csproj          ./ezCV.Api/
+COPY src/ezCV.Web/ezCV.Web.csproj          ./ezCV.Web/
+COPY src/ezCV.Application/*.csproj         ./ezCV.Application/
+COPY src/ezCV.Domain/*.csproj              ./ezCV.Domain/
+COPY src/ezCV.Infrastructure/*.csproj      ./ezCV.Infrastructure/
 
-# Copy source
+# Restore CHỈ API (đủ để kéo hết)
+RUN dotnet restore ./ezCV.Api/ezCV.Api.csproj
+
+# Copy toàn bộ source
 COPY . .
 
-# Build API
-RUN dotnet publish "src/ezCV.Api/ezCV.Api.csproj" -c Release -o /app/api --no-restore
+# Publish 2 app
+RUN dotnet publish ./ezCV.Api/ezCV.Api.csproj -c Release -o /app/api --no-restore
+RUN dotnet publish ./ezCV.Web/ezCV.Web.csproj -c Release -o /app/web --no-restore
 
-# Build Web
-RUN dotnet publish "src/ezCV.Web/ezCV.Web.csproj" -c Release -o /app/web --no-restore
-
-# ==================== RUNTIME ====================
+# ===================== RUNTIME =====================
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
-
-# Copy cả 2 app
 COPY --from=build /app/api ./api
 COPY --from=build /app/web ./web
 
-# Railway sẽ tự chọn PORT
 ENV ASPNETCORE_HTTP_PORTS=8080
 EXPOSE 8080
 
-# Chạy đúng app theo tên service
-ENTRYPOINT ["sh", "-c", "if [ \"$RAILWAY_SERVICE_NAME\" = \"ezcv-api\" ]; then dotnet api/ezCV.Api.dll; else dotnet web/ezCV.Web.dll; fi"]
+# TỰ ĐỘNG CHẠY ĐÚNG SERVICE
+ENTRYPOINT ["sh", "-c", "\
+  if [ \"$RAILWAY_SERVICE_NAME\" = \"ezcv-api\" ]; then \
+    dotnet api/ezCV.Api.dll; \
+  else \
+    dotnet web/ezCV.Web.dll; \
+  fi\
+"]
