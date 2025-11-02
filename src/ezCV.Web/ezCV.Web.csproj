@@ -16,6 +16,5 @@
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
 	</ItemGroup>
-
-
+	 <StaticWebAssetBasePath>/</StaticWebAssetBasePath>
 </Project>

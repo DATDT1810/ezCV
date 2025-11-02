@@ -13,6 +13,9 @@ RUN dotnet restore src/ezCV.Api/ezCV.API.csproj \
 RUN dotnet restore src/ezCV.Web/ezCV.Web.csproj \
  && dotnet publish src/ezCV.Web/ezCV.Web.csproj -c Release -o /app/web --no-restore -p:UseAppHost=false -p:PublishSingleFile=false
 
+# ✅ Bảo đảm static files (CSS/JS/images) được copy
+RUN if [ -d "src/ezCV.Web/wwwroot" ]; then cp -r src/ezCV.Web/wwwroot /app/web/wwwroot; fi
+
 # ================= RUNTIME STAGE =================
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
