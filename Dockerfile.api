@@ -1,22 +1,30 @@
+# ================= BUILD STAGE =================
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-# Copy project file
-COPY src/ezCV.Api/ezCV.API.csproj ./src/ezCV.Api/
-RUN dotnet restore src/ezCV.Api/ezCV.API.csproj
+# 1️⃣ Copy project file và restore
+COPY src/ezCV.Api/ezCV.Api.csproj ./src/ezCV.Api/
+RUN dotnet restore src/ezCV.Api/ezCV.Api.csproj
 
-# Copy source code
-COPY src/ezCV.Api/ ./src/ezCV.Api/
-COPY src/ezCV.Application/ ./src/ezCV.Application/
-COPY src/ezCV.Domain/ ./src/ezCV.Domain/
-COPY src/ezCV.Infrastructure/ ./src/ezCV.Infrastructure/
+# 2️⃣ Copy toàn bộ source code
+COPY src/ ./src/
 
-# Build và publish
-RUN dotnet publish src/ezCV.Api/ezCV.API.csproj -c Release -o /app/publish
+# 3️⃣ Build & publish Release cho Linux
+RUN dotnet publish src/ezCV.Api/ezCV.Api.csproj \
+    -c Release \
+    -o /app/publish \
+    -p:UseAppHost=false
 
+# ================= RUNTIME STAGE =================
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
+
+# 4️⃣ Copy publish từ build stage
 COPY --from=build /app/publish .
+
+# 5️⃣ Cấu hình ASP.NET Core
 ENV ASPNETCORE_URLS=http://+:8080
 EXPOSE 8080
+
+# 6️⃣ ENTRYPOINT chạy ứng dụng
 ENTRYPOINT ["dotnet", "ezCV.API.dll"]
