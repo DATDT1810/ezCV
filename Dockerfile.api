@@ -2,10 +2,12 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
+# Copy toàn bộ project
 COPY . .
 
-RUN dotnet restore src/ezCV.Api/ezCV.Api.csproj
-RUN dotnet publish src/ezCV.Api/ezCV.Api.csproj -c Release -o /app --no-restore -p:UseAppHost=false
+# Restore & publish API
+RUN dotnet restore ezCV.Api/ezCV.API.csproj
+RUN dotnet publish ezCV.Api/ezCV.API.csproj -c Release -o /app --no-restore -p:UseAppHost=false
 
 # ================= RUNTIME STAGE =================
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
@@ -15,4 +17,4 @@ COPY --from=build /app .
 ENV ASPNETCORE_URLS=http://+:8080
 EXPOSE 8080
 
-ENTRYPOINT ["dotnet", "ezCV.Api.dll"]
+ENTRYPOINT ["dotnet", "ezCV.API.dll"]
