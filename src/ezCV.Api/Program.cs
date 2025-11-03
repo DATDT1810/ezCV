@@ -8,6 +8,18 @@ using ezCV.Application.External.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var secretKey = builder.Configuration["SecretKey"];
+if (string.IsNullOrEmpty(secretKey))
+{
+    Console.WriteLine("❌ ERROR: SecretKey not configured in API!");
+    // Có thể throw exception nếu bắt buộc
+    throw new InvalidOperationException("SecretKey not configured.");
+}
+else
+{
+    Console.WriteLine("✅ SecretKey is configured in API");
+}
+
 // === CONFIG DATABASE ===
 var connectionString = Environment.GetEnvironmentVariable("AZURE_SQL_CONNECTION")
                        ?? builder.Configuration.GetConnectionString("DefaultConnection");
