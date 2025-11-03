@@ -110,7 +110,8 @@ builder.Services.AddCors(options =>
     {
         policy.WithOrigins("https://ezcv.up.railway.app")
               .AllowAnyMethod()
-              .AllowAnyHeader();
+              .AllowAnyHeader()
+               .AllowCredentials();
     });
 });
 
