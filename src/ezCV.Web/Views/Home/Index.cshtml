@@ -256,61 +256,76 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // -------------------- Xử lý login --------------------
-    const loginForm = document.getElementById("main_login_form");
-    if (loginForm) {
-        loginForm.addEventListener("submit", async (e) => {
-            e.preventDefault();
+   // -------------------- Xử lý login --------------------
+const loginForm = document.getElementById("main_login_form");
+if (loginForm) {
+    loginForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
 
-            const email = document.getElementById("login-email").value.trim();
-            const password = document.getElementById("login-password").value.trim();
+        const email = document.getElementById("login-email").value.trim();
+        const password = document.getElementById("login-password").value.trim();
 
-            if (!email || !password) {
-                alert("Vui lòng nhập đầy đủ email và mật khẩu");
-                return;
+        if (!email || !password) {
+            alert("Vui lòng nhập đầy đủ email và mật khẩu");
+            return;
+        }
+
+        try {
+            console.log("🔄 Sending login request...");
+            
+            const response = await fetch(`${API_HOST}/api/auth/login`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json"
+                },
+                body: JSON.stringify({ email, password })
+            });
+
+            console.log("📨 Response status:", response.status);
+            
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error("❌ Error response:", errorText);
+                throw new Error(`HTTP ${response.status}: ${errorText}`);
             }
 
-            try {
-                const response = await fetch(`${API_HOST}/api/auth/login`, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Accept": "application/json"
-                    },
-                    body: JSON.stringify({ email, password })
-                });
+            const result = await response.json();
+            console.log("✅ Success result:", result);
 
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    throw new Error(`HTTP ${response.status}: ${errorText}`);
+            // ✅ API trả về token thành công - LƯU TOKEN
+            if (result.accessToken) {
+                // Lưu token vào localStorage
+                localStorage.setItem('accessToken', result.accessToken);
+                localStorage.setItem('refreshToken', result.refreshToken);
+                localStorage.setItem('user', JSON.stringify(result.user));
+                
+                console.log("🔐 Token saved to localStorage");
+
+                // Đóng popup
+                if (window.jQuery && window.jQuery.magnificPopup) {
+                    window.jQuery.magnificPopup.close();
                 }
 
-                const result = await response.json();
-                if (result.success && result.accessToken) {
-                    // Lưu token
-                    localStorage.setItem('accessToken', result.accessToken);
+                // Hiển thị thông báo thành công
+                alert("🎉 Đăng nhập thành công!");
 
-                    // Đóng popup
-                    if (window.jQuery && window.jQuery.magnificPopup) {
-                        window.jQuery.magnificPopup.close();
-                    }
-
-                    // Chuyển hướng
-                    if (result.redirectUrl) {
-                        window.location.href = result.redirectUrl;
-                    } else {
-                        window.location.reload();
-                    }
-                } else {
-                    alert(result.message || "Đăng nhập thất bại");
-                }
-
-            } catch (err) {
-                console.error("Login error:", err);
-                alert("Lỗi đăng nhập: " + err.message);
+                // Chuyển hướng hoặc reload
+                setTimeout(() => {
+                    window.location.href = '/CvTemplate/Index'; // hoặc trang dashboard
+                }, 1000);
+                
+            } else {
+                console.warn("⚠️ No accessToken in response:", result);
+                alert("Đăng nhập thất bại: Không nhận được token");
             }
-        });
-    }
+
+        } catch (err) {
+            console.error("💥 Login error:", err);
+            alert("Lỗi đăng nhập: " + err.message);
+        }
+    });
+}
 
     // -------------------- Xử lý đăng ký --------------------
     const registerForm = document.getElementById("main_Signup_form");
