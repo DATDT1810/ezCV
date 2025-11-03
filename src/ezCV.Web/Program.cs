@@ -58,8 +58,12 @@ builder.Services.AddAuthentication(options =>
     options.CallbackPath = "/signin-google"; 
     options.Events.OnRedirectToAuthorizationEndpoint = context =>
         {
-            context.Response.Redirect(context.RedirectUri.Replace("http://", "https://"));
-            return Task.CompletedTask;
+            var uri = context.RedirectUri;
+        // Force HTTPS và đúng domain Railway
+        uri = uri.Replace("http://", "https://")
+                 .Replace("localhost", "ezcv.up.railway.app");
+        context.Response.Redirect(uri);
+        return Task.CompletedTask;
         };
 });
 
