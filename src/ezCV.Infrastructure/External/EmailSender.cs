@@ -135,7 +135,7 @@ namespace ezCV.Infrastructure.External
                 throw new Exception("SENDGRID_API_KEY chưa được cấu hình trong Railway.");
 
             var client = new SendGridClient(apiKey);
-            var from = new EmailAddress("no-reply@ezcv.app", "ezCV System");
+            var from = new EmailAddress("duongtandat1810@gmail.com", "ezCV System");
             var to = new EmailAddress(recipientEmail, recipientName);
             var subject = $"CV của {recipientName}";
 
