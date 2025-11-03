@@ -25,16 +25,16 @@ namespace ezCV.Infrastructure.External
         {
             // Lấy JWT configuration từ nhiều nguồn
             var secretKey = _configuration["JWT:SecretKey"] 
-                         ?? _configuration["JWT__SecretKey"]
-                         ?? Environment.GetEnvironmentVariable("JWT__SecretKey")
+                         ?? _configuration["JWT_SecretKey"]
+                         ?? Environment.GetEnvironmentVariable("JWT_SecretKey")
                          ?? throw new InvalidOperationException("SecretKey not configured.");
 
             var issuer = _configuration["JWT:Issuer"] 
-                      ?? Environment.GetEnvironmentVariable("JWT__Issuer")
+                      ?? Environment.GetEnvironmentVariable("JWT_Issuer")
                       ?? "https://ezcv-api.up.railway.app";
 
             var audience = _configuration["JWT:Audience"] 
-                        ?? Environment.GetEnvironmentVariable("JWT__Audience")
+                        ?? Environment.GetEnvironmentVariable("JWT_Audience")
                         ?? "https://ezcv.up.railway.app";
 
             Console.WriteLine($"🔐 Generating token for: {user.Email}");
