@@ -55,7 +55,12 @@ builder.Services.AddAuthentication(options =>
     // Make sure these keys exist in appsettings.json or user secrets
     options.ClientId = builder.Configuration["Authentication:Google:ClientId"];
     options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
-    options.CallbackPath = "/signin-google"; // Default callback path
+    options.CallbackPath = "/signin-google"; 
+    options.Events.OnRedirectToAuthorizationEndpoint = context =>
+        {
+            context.Response.Redirect(context.RedirectUri.Replace("http://", "https://"));
+            return Task.CompletedTask;
+        };
 });
 
 
