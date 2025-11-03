@@ -108,7 +108,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
     {
-        policy.AllowAnyOrigin()
+        policy.WithOrigins("https://ezcv.up.railway.app")
               .AllowAnyMethod()
               .AllowAnyHeader();
     });
