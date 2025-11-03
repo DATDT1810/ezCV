@@ -13,6 +13,7 @@
     "ASPNETCORE_URLS": "http://+:8080",
     "ASPNETCORE_ENVIRONMENT": "Production",
      "SecretKey": "EzCv2025@RailwayUltraStrong123456789",
-     "JWT_SecretKey":"EzCv2025@RailwayUltraStrong123456789"
+     "JWT_SecretKey":"EzCv2025@RailwayUltraStrong123456789",
+     "AuthSettings__SecretKey": "EzCv2025@RailwayUltraStrong123456789"
   }
 }
