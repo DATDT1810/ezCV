@@ -9,10 +9,12 @@ using ezCV.Application.External.Models;
 var builder = WebApplication.CreateBuilder(args);
 
 // =======================
-// 1️⃣ Load SecretKey
+// 1️⃣ Load SecretKey (robust fallback)
 // =======================
 var secretKey = Environment.GetEnvironmentVariable("SecretKey")
                 ?? Environment.GetEnvironmentVariable("JWT_SecretKey")
+                ?? Environment.GetEnvironmentVariable("JWT__SecretKey")
+                ?? Environment.GetEnvironmentVariable("Jwt__SecretKey")
                 ?? builder.Configuration["Jwt:SecretKey"]
                 ?? builder.Configuration["SecretKey"];
 
@@ -21,7 +23,7 @@ if (string.IsNullOrEmpty(secretKey))
     Console.WriteLine("❌ SecretKey NULL → API sẽ không hoạt động!");
     throw new InvalidOperationException("SecretKey not configured.");
 }
-Console.WriteLine("✅ SecretKey ĐÃ LOAD: " + secretKey.Substring(0, Math.Min(8, secretKey.Length)) + "…");
+Console.WriteLine("✅ SecretKey ĐÃ LOAD (present)."); // KHÔNG in secret trực tiếp
 
 // =======================
 // 2️⃣ Database
@@ -71,22 +73,32 @@ builder.Services.Configure<CloudinarySetting>(options =>
 });
 
 // =======================
-// 5️⃣ JWT Authentication
+// 5️⃣ JWT Authentication (only validate issuer/audience when present)
 // =======================
+var configuredIssuer = Environment.GetEnvironmentVariable("Jwt__Issuer")
+                       ?? Environment.GetEnvironmentVariable("JWT_ISSUER")
+                       ?? builder.Configuration["Jwt:Issuer"];
+
+var configuredAudience = Environment.GetEnvironmentVariable("Jwt__Audience")
+                       ?? Environment.GetEnvironmentVariable("JWT_AUDIENCE")
+                       ?? builder.Configuration["Jwt:Audience"];
+
+var tokenValidationParameters = new TokenValidationParameters
+{
+    ValidateIssuerSigningKey = true,
+    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
+    ValidateIssuer = !string.IsNullOrEmpty(configuredIssuer),
+    ValidIssuer = configuredIssuer,
+    ValidateAudience = !string.IsNullOrEmpty(configuredAudience),
+    ValidAudience = configuredAudience,
+    ValidateLifetime = true,
+    ClockSkew = TimeSpan.Zero
+};
+
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
-            ValidateIssuer = true,
-            ValidIssuer = builder.Configuration["Jwt:Issuer"],
-            ValidateAudience = true,
-            ValidAudience = builder.Configuration["Jwt:Audience"],
-            ValidateLifetime = true,
-            ClockSkew = TimeSpan.Zero
-        };
+        options.TokenValidationParameters = tokenValidationParameters;
     });
 
 // =======================
@@ -111,7 +123,7 @@ builder.Services.AddCors(options =>
         policy.WithOrigins("https://ezcv.up.railway.app")
               .AllowAnyMethod()
               .AllowAnyHeader()
-               .AllowCredentials();
+              .AllowCredentials();
     });
 });
 
@@ -130,7 +142,6 @@ if (app.Environment.IsDevelopment())
 }
 else
 {
-    // Production - vẫn enable Swagger
     app.UseSwagger();
     app.UseSwaggerUI();
 }
@@ -139,10 +150,25 @@ else
 var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
 app.Urls.Add($"http://0.0.0.0:{port}");
 
-app.UseHttpsRedirection();
+// Consider disabling HTTPS redirection in container env to avoid warnings.
+// app.UseHttpsRedirection();
+
 app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseAuthorization();
+
+// =======================
+// Debug endpoint (temporary) - returns presence boolean only
+// =======================
+app.MapGet("/debug/env", () => new {
+    SecretKey_env = Environment.GetEnvironmentVariable("SecretKey") != null,
+    JWT_SecretKey_env = Environment.GetEnvironmentVariable("JWT_SecretKey") != null,
+    Jwt__SecretKey_env = Environment.GetEnvironmentVariable("Jwt__SecretKey") != null,
+    Builder_JwtSecret = !string.IsNullOrEmpty(app.Configuration["Jwt:SecretKey"]),
+    Builder_SecretKey = !string.IsNullOrEmpty(app.Configuration["SecretKey"]),
+    Builder_JwtIssuer = !string.IsNullOrEmpty(app.Configuration["Jwt:Issuer"]),
+    Builder_JwtAudience = !string.IsNullOrEmpty(app.Configuration["Jwt:Audience"])
+});
 
 // =======================
 // 11️⃣ Health Check & Root
