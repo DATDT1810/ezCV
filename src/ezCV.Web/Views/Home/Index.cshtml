@@ -174,33 +174,68 @@
         </div>
     </div>
 </section>
-
 @section Scripts {
-    <script>
-    const API_HOST = "https://ezcv-api.up.railway.app";
-        // Hàm kiểm tra login bằng API backend
-        async function isUserLoggedIn() {
-            try {
-                const res = await fetch('/Auth/check-login', { credentials: 'include' });
-                if (!res.ok) return false;
-                const data = await res.json();
-                return data.isLoggedIn === true;
-            } catch (err) {
-                console.error("Lỗi khi kiểm tra login:", err);
-                return false;
-            }
-        }
+<script>
+const API_HOST = "https://ezcv-api.up.railway.app";
 
-        // Hàm xử lý khi click "Sử dụng mẫu"
-        async function handleUseTemplate(link) {
+// -------------------- Helper lấy anti-forgery token --------------------
+function getAntiForgeryToken() {
+    return document.querySelector('input[name="__RequestVerificationToken"]')?.value || "";
+}
+
+// -------------------- Kiểm tra user đã login hay chưa --------------------
+async function isUserLoggedIn() {
+    const token = localStorage.getItem('accessToken');
+    if (!token) return false;
+
+    try {
+        const res = await fetch(`${API_HOST}/api/auth/me`, {
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Accept": "application/json"
+            }
+        });
+        if (!res.ok) return false;
+        const data = await res.json();
+        return data && data.user ? true : false;
+    } catch (err) {
+        console.error("Lỗi khi kiểm tra login:", err);
+        return false;
+    }
+}
+
+// -------------------- Xử lý click "Sử dụng mẫu" --------------------
+async function handleUseTemplate(link) {
+    const loggedIn = await isUserLoggedIn();
+    if (loggedIn) {
+        return true; // cho phép redirect
+    }
+    // Nếu chưa login → mở popup
+    if (window.$ && $.magnificPopup) {
+        $.magnificPopup.open({
+            items: { src: '#test-popup' },
+            type: 'inline',
+            mainClass: 'mfp-fade'
+        });
+    }
+    return false; // chặn redirect
+}
+
+// -------------------- DOM Loaded --------------------
+document.addEventListener("DOMContentLoaded", () => {
+
+    // Gán sự kiện cho các nút "Sử dụng mẫu"
+    document.querySelectorAll('a.preview-demo.v2').forEach(link => {
+        link.addEventListener('click', async (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+
             const loggedIn = await isUserLoggedIn();
-
             if (loggedIn) {
-                console.log('User đã login, cho phép chuyển hướng');
-                return true; // Cho phép hành vi mặc định
+                window.location.href = link.href;
+                return;
             }
 
-            console.log('User chưa login, hiện popup');
             if (window.$ && $.magnificPopup) {
                 $.magnificPopup.open({
                     items: { src: '#test-popup' },
@@ -208,197 +243,154 @@
                     mainClass: 'mfp-fade'
                 });
             }
-            return false; // Chặn hành vi mặc định
-        }
-
-        // Khi DOM đã load xong
-        document.addEventListener("DOMContentLoaded", async () => {
-            const loggedIn = await isUserLoggedIn();
-            console.log('DOM loaded - Kiểm tra login status:', loggedIn);
-
-            // Gán sự kiện cho các nút "Sử dụng mẫu"
-            document.querySelectorAll('a.preview-demo.v2').forEach(link => {
-                link.addEventListener('click', async (e) => {
-                    e.preventDefault(); 
-                    e.stopPropagation();
-
-                    const loggedIn = await isUserLoggedIn(); 
-                    if (loggedIn) {
-                        console.log('User đã đăng nhập → cho phép dùng mẫu');
-                        window.location.href = link.href; 
-                        return;
-                    }
-
-                    console.log('User chưa đăng nhập → mở popup');
-                    if (window.$ && $.magnificPopup) {
-                        $.magnificPopup.open({
-                            items: { src: '#test-popup' },
-                            type: 'inline',
-                            mainClass: 'mfp-fade'
-                        });
-                    }
-                });
-            });
-
-
-            // Xử lý chuyển đổi giữa popup đăng nhập và đăng ký
-            if (window.$) {
-                $('a.open-popup-link').magnificPopup({
-                    type: 'inline',
-                    midClick: true,
-                    mainClass: 'mfp-fade',
-                    removalDelay: 300
-                });
-            }
-            // Xử lý đăng nhập
-const loginForm = document.getElementById("main_login_form");
-if (loginForm) {
-    loginForm.addEventListener("submit", async (e) => {
-        e.preventDefault();
-
-        const email = document.getElementById("login-email").value.trim();
-        const password = document.getElementById("login-password").value.trim();
-
-        if (!email || !password) {
-            alert("Vui lòng nhập đầy đủ email và mật khẩu");
-            return;
-        }
-
-        try {
-            console.log("Sending login request...");
-            
-            const response = await fetch(`${API_HOST}/api/auth/login`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Accept": "application/json"
-                },
-                body: JSON.stringify({ 
-                    email: email, 
-                    password: password 
-                }),
-                credentials: 'include'
-            });
-
-            console.log("Response status:", response.status);
-            
-            if (!response.ok) {
-                const errorText = await response.text();
-                console.error("Error response:", errorText);
-                throw new Error(`HTTP ${response.status}: ${errorText}`);
-            }
-
-            const result = await response.json();
-            console.log("Success result:", result);
-
-            if (result.success) {
-                // Đóng popup
-                if (window.jQuery && window.jQuery.magnificPopup) {
-                    window.jQuery.magnificPopup.close();
-                }
-                
-                // Chuyển hướng
-                if (result.redirectUrl) {
-                    window.location.href = result.redirectUrl;
-                } else {
-                    window.location.reload();
-                }
-            } else {
-                alert(result.message || "Đăng nhập thất bại");
-            }
-        } catch (err) {
-            console.error("Login error:", err);
-            alert("Lỗi đăng nhập: " + err.message);
-        }
-    });
-}
-
-
-            // Xử lý đăng ký
-            const registerForm = document.getElementById("main_Signup_form");
-            if (registerForm) {
-                registerForm.addEventListener("submit", async (e) => {
-                    e.preventDefault();
-
-                    const email = document.getElementById("signup-email").value.trim();
-                    const password = document.getElementById("signup-password").value.trim();
-                    const confirmPassword = document.getElementById("signup-confirm-password").value.trim();
-
-                    if (!email || !password || !confirmPassword) {
-                        alert("Vui lòng nhập đầy đủ thông tin");
-                        return;
-                    }
-
-                    if (password !== confirmPassword) {
-                        alert("Mật khẩu nhập lại không khớp");
-                        return;
-                    }
-
-                    try {
-                        const response = await fetch("/Auth/ajax-register", {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json",
-                                "RequestVerificationToken": getAntiForgeryToken()
-                            },
-                            body: JSON.stringify({ email, password, confirmPassword })
-                        });
-
-                        const result = await response.json();
-
-                        if (response.ok && result.success) {
-                            // Đăng ký thành công
-                            if (window.jQuery && window.jQuery.magnificPopup) {
-                                window.jQuery.magnificPopup.close();
-                            }
-
-                            alert("🎉 Đăng ký thành công! Vui lòng đăng nhập để tiếp tục.");
-                            // Mở popup login
-                            if (window.jQuery) {
-                                window.jQuery.magnificPopup.open({
-                                    items: { src: '#test-popup' },
-                                    type: 'inline'
-                                });
-                            }
-                        } else {
-                            alert(result.message || "Đăng ký thất bại");
-                        }
-                    } catch (err) {
-                        console.error("Fetch error:", err);
-                        alert("Lỗi kết nối đến server");
-                    }
-                });
-            }
-
-            // Xử lý xem mẫu (preview hình ảnh)
-            const previewLinks = document.querySelectorAll(".demo-item .preview-btn-wrapper a:not(.v2)");
-            previewLinks.forEach(link => {
-                link.addEventListener("click", (e) => {
-                    e.preventDefault();
-                    const demoItem = link.closest(".demo-item");
-                    if (!demoItem) return;
-
-                    const imgElement = demoItem.querySelector("img");
-                    const imageSrc = imgElement ? imgElement.src : null;
-
-                    if (imageSrc && window.jQuery && window.jQuery.magnificPopup) {
-                        window.jQuery.magnificPopup.open({
-                            items: { src: imageSrc },
-                            type: 'image',
-                            mainClass: 'mfp-with-zoom mfp-img-mobile mfp-cv-preview',
-                            closeOnContentClick: true,
-                            titleSrc: function (item) {
-                                return imgElement.alt || 'Mẫu CV';
-                            }
-                        }, 0);
-                    }
-                });
-            });
         });
+    });
 
-        // Helper lấy anti-forgery token
-        function getAntiForgeryToken() {
-            return document.querySelector('input[name="__RequestVerificationToken"]')?.value || "";
-        }
-    </script>
+    // Popup login/register
+    if (window.$) {
+        $('a.open-popup-link').magnificPopup({
+            type: 'inline',
+            midClick: true,
+            mainClass: 'mfp-fade',
+            removalDelay: 300
+        });
+    }
+
+    // -------------------- Xử lý login --------------------
+    const loginForm = document.getElementById("main_login_form");
+    if (loginForm) {
+        loginForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const email = document.getElementById("login-email").value.trim();
+            const password = document.getElementById("login-password").value.trim();
+
+            if (!email || !password) {
+                alert("Vui lòng nhập đầy đủ email và mật khẩu");
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_HOST}/api/auth/login`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Accept": "application/json"
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`HTTP ${response.status}: ${errorText}`);
+                }
+
+                const result = await response.json();
+                if (result.success && result.accessToken) {
+                    // Lưu token
+                    localStorage.setItem('accessToken', result.accessToken);
+
+                    // Đóng popup
+                    if (window.jQuery && window.jQuery.magnificPopup) {
+                        window.jQuery.magnificPopup.close();
+                    }
+
+                    // Chuyển hướng
+                    if (result.redirectUrl) {
+                        window.location.href = result.redirectUrl;
+                    } else {
+                        window.location.reload();
+                    }
+                } else {
+                    alert(result.message || "Đăng nhập thất bại");
+                }
+
+            } catch (err) {
+                console.error("Login error:", err);
+                alert("Lỗi đăng nhập: " + err.message);
+            }
+        });
+    }
+
+    // -------------------- Xử lý đăng ký --------------------
+    const registerForm = document.getElementById("main_Signup_form");
+    if (registerForm) {
+        registerForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const email = document.getElementById("signup-email").value.trim();
+            const password = document.getElementById("signup-password").value.trim();
+            const confirmPassword = document.getElementById("signup-confirm-password").value.trim();
+
+            if (!email || !password || !confirmPassword) {
+                alert("Vui lòng nhập đầy đủ thông tin");
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                alert("Mật khẩu nhập lại không khớp");
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_HOST}/api/auth/register`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Accept": "application/json",
+                        "RequestVerificationToken": getAntiForgeryToken()
+                    },
+                    body: JSON.stringify({ email, password, confirmPassword })
+                });
+
+                const result = await response.json();
+                if (response.ok && result.success) {
+                    // Đóng popup
+                    if (window.jQuery && window.jQuery.magnificPopup) {
+                        window.jQuery.magnificPopup.close();
+                    }
+
+                    alert("🎉 Đăng ký thành công! Vui lòng đăng nhập để tiếp tục.");
+                    // Mở popup login
+                    if (window.jQuery) {
+                        window.jQuery.magnificPopup.open({
+                            items: { src: '#test-popup' },
+                            type: 'inline'
+                        });
+                    }
+                } else {
+                    alert(result.message || "Đăng ký thất bại");
+                }
+            } catch (err) {
+                console.error("Register error:", err);
+                alert("Lỗi kết nối đến server");
+            }
+        });
+    }
+
+    // -------------------- Preview hình ảnh CV --------------------
+    const previewLinks = document.querySelectorAll(".demo-item .preview-btn-wrapper a:not(.v2)");
+    previewLinks.forEach(link => {
+        link.addEventListener("click", (e) => {
+            e.preventDefault();
+            const demoItem = link.closest(".demo-item");
+            if (!demoItem) return;
+
+            const imgElement = demoItem.querySelector("img");
+            const imageSrc = imgElement ? imgElement.src : null;
+
+            if (imageSrc && window.jQuery && window.jQuery.magnificPopup) {
+                window.jQuery.magnificPopup.open({
+                    items: { src: imageSrc },
+                    type: 'image',
+                    mainClass: 'mfp-with-zoom mfp-img-mobile mfp-cv-preview',
+                    closeOnContentClick: true,
+                    titleSrc: () => imgElement.alt || 'Mẫu CV'
+                }, 0);
+            }
+        });
+    });
+
+});
+</script>
 }
