@@ -36,6 +36,7 @@ builder.Services.AddHttpClient<ICvTemplateService, CvTemplateService>(client =>
     client.DefaultRequestHeaders.Add("Accept", "application/json");
 });
 
+
 // --- Authentication ---
 builder.Services.AddAuthentication(options =>
 {
@@ -98,7 +99,16 @@ if (!app.Environment.IsDevelopment())
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
-
+app.Use((context, next) =>
+{
+    // Railway / Render / Fly.io thường gắn header X-Forwarded-Proto
+    if (context.Request.Headers.TryGetValue("X-Forwarded-Proto", out var proto)
+        && proto == "https")
+    {
+        context.Request.Scheme = "https";
+    }
+    return next();
+});
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
