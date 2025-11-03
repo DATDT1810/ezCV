@@ -8,17 +8,17 @@ using ezCV.Application.External.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var secretKey = builder.Configuration["SecretKey"];
+var secretKey = Environment.GetEnvironmentVariable("SecretKey")
+                ?? Environment.GetEnvironmentVariable("JWT_SecretKey")
+                ?? builder.Configuration["Jwt:SecretKey"]
+                ?? builder.Configuration["SecretKey"];
+
 if (string.IsNullOrEmpty(secretKey))
 {
-    Console.WriteLine("❌ ERROR: SecretKey not configured in API!");
-    // Có thể throw exception nếu bắt buộc
+    Console.WriteLine("❌ SecretKey NULL → API crash!");
     throw new InvalidOperationException("SecretKey not configured.");
 }
-else
-{
-    Console.WriteLine("✅ SecretKey is configured in API");
-}
+Console.WriteLine("✅ SecretKey ĐÃ LOAD OK!");
 
 // === CONFIG DATABASE ===
 var connectionString = Environment.GetEnvironmentVariable("AZURE_SQL_CONNECTION")
@@ -57,7 +57,7 @@ builder.Services.Configure<CloudinarySetting>(options =>
 });
 
 // === CONFIG JWT ===
-// Trong Program.cs của API project
+
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
