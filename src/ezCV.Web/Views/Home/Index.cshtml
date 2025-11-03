@@ -185,21 +185,26 @@ function getAntiForgeryToken() {
 
 // -------------------- Kiểm tra user đã login hay chưa --------------------
 async function isUserLoggedIn() {
-    const token = localStorage.getItem('accessToken');
-    if (!token) return false;
-
     try {
-        const res = await fetch(`${API_HOST}/api/auth/me`, {
-            headers: {
-                "Authorization": `Bearer ${token}`,
-                "Accept": "application/json"
-            }
+        console.log("🔍 Checking login status via Web backend...");
+        
+        // ✅ SỬA: Kiểm tra qua Web backend endpoint
+        const res = await fetch('/Auth/check-login', { 
+            credentials: 'include' 
         });
-        if (!res.ok) return false;
-        const data = await res.json();
-        return data && data.user ? true : false;
+        
+        console.log("Login check response status:", res.status);
+        
+        if (res.ok) {
+            const data = await res.json();
+            console.log("✅ Login check result:", data);
+            return data.isLoggedIn === true;
+        } else {
+            console.log("Login check failed, status:", res.status);
+            return false;
+        }
     } catch (err) {
-        console.error("Lỗi khi kiểm tra login:", err);
+        console.error("Error checking login:", err);
         return false;
     }
 }
