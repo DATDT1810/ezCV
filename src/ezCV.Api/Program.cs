@@ -57,32 +57,25 @@ builder.Services.Configure<CloudinarySetting>(options =>
 });
 
 // === CONFIG JWT ===
-var jwtSecretKey = Environment.GetEnvironmentVariable("JWT_SECRET_KEY")
-                   ?? builder.Configuration["JwtSettings:SecretKey"];
-
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-}).AddJwtBearer(options =>
-{
-    options.SaveToken = true;
-    options.RequireHttpsMetadata = false;
-    options.TokenValidationParameters = new TokenValidationParameters
+// Trong Program.cs của API project
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
     {
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        ValidIssuer = Environment.GetEnvironmentVariable("JWT_ISSUER")
-                      ?? builder.Configuration["JwtSettings:Issuer"],
-        ValidAudience = Environment.GetEnvironmentVariable("JWT_AUDIENCE")
-                        ?? builder.Configuration["JwtSettings:Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(jwtSecretKey ?? "fallback-dev-key"))
-    };
-});
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
+                builder.Configuration["Jwt:SecretKey"] ?? 
+                builder.Configuration["SecretKey"] ?? 
+                throw new Exception("SecretKey not configured"))),
+            ValidateIssuer = true,
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidateAudience = true,
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+            ValidateLifetime = true,
+            ClockSkew = TimeSpan.Zero
+        };
+    });
 
 // === INFRASTRUCTURE SERVICES ===
 builder.Services.AddInfrastructureServices(builder.Configuration);
