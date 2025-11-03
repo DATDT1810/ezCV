@@ -19,13 +19,36 @@ RUN dotnet publish src/ezCV.Api/ezCV.API.csproj \
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
 
-COPY --from=build /app/publish .
+# ✅ Cài Chromium và các thư viện cần thiết cho PuppeteerSharp
+RUN apt-get update && apt-get install -y \
+    chromium \
+    chromium-common \
+    chromium-driver \
+    libnss3 \
+    libxss1 \
+    libasound2 \
+    libatk1.0-0 \
+    libatk-bridge2.0-0 \
+    libcups2 \
+    libxcomposite1 \
+    libxrandr2 \
+    libgbm1 \
+    libgtk-3-0 \
+    fonts-liberation \
+    libappindicator3-1 \
+    libxdamage1 \
+    xdg-utils \
+    --no-install-recommends && \
+    rm -rf /var/lib/apt/lists/*
 
-# ================= Env =================
-# Lấy port từ Railway, mặc định 8080
+# ✅ Khai báo đường dẫn Chromium cho PuppeteerSharp
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
+
+# ✅ Railway mặc định port 8080
 ENV ASPNETCORE_URLS=http://+:${PORT:-8080}
-
-
 EXPOSE 8080
+
+# Copy app đã publish
+COPY --from=build /app/publish .
 
 ENTRYPOINT ["dotnet", "ezCV.API.dll"]
