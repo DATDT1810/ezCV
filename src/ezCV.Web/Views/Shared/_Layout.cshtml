@@ -29,8 +29,9 @@
         <div class="classy-nav-container dark breakpoint-off">
             <div class="container">
                 <nav class="classy-navbar justify-content-between" id="dreamNav">
-                    <a class="nav-brand" href="@Url.Content("~/")">
-                        <img src="@Url.Content("~/assets/img/core-img/logo.png")" alt="30DAY ezCV"> 30DAY ezCV
+                    <a class="nav-brand" href="@Url.Content("~/")" style="display: flex; align-items: center; gap: 8px;">
+                        <img src="@Url.Content("~/assets/img/core-img/logo.png")" alt="30DAY ezCV">
+                        <h4 style="margin: 0;">30DAY ezCV</h4>
                     </a>
                     <div class="classy-navbar-toggler">
                         <span class="navbarToggler"><span></span><span></span><span></span></span>
@@ -51,21 +52,46 @@
                                 var fullNameClaim = User.Claims.FirstOrDefault(c => c.Type == "FullName");
                                 string userName = fullNameClaim?.Value ?? User.Identity.Name ?? "Người dùng";
 
-                                // Hiển thị thông tin người dùng và nút Đăng xuất
-                                 <div class="user-info d-inline-block ml-4">
-                                    <span class="text-black mr-2">
-                                        👋 Xin chào,
-                                        <strong>@((User.Identity?.Name?.Split('@')[0]) ?? "Người dùng")</strong>
-                                     </span>
-                                     
-                                 </div>
-                                <form asp-controller="Auth" asp-action="Logout" method="post">
-                                    <button type="submit" class="btn btn-sm btn-outline-black">Đăng xuất</button>
-                                </form>
+                                <div class="user-dropdown">
+                                    <div class="user-trigger">
+                                        <div class="user-avatar">
+                                            <i class="ti-user"></i>
+                                        </div>
+                                        <span class="user-name">@((User.Identity?.Name?.Split('@')[0]) ?? "Người dùng")</span>
+                                        <i class="ti-angle-down dropdown-arrow"></i>
+                                    </div>
+                                    <div class="user-dropdown-menu">
+                                        <div class="user-info-header">
+                                            <div class="user-details">
+                                                <div class="user-avatar-large">
+                                                    <i class="ti-user"></i>
+                                                </div>
+                                                <div class="user-info-content">
+                                                    <p>@userName.Split('@')[0]</p>
+                                                    <a asp-controller="User" asp-action="Index" class="view-profile">Xem tài khoản</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="user-dropdown-content">
+                                            <h6>Xem hồ sơ</h6>
+                                            <ul class="user-links">
+                                                <li><a href="#"><i class="ti-settings"></i>Cài đặt</a></li>
+                                                <li><a href="#"><i class="ti-user"></i>Mời bạn bè</a></li>
+                                            </ul>
+                                            <div class="user-dropdown-footer">
+                                                <form asp-controller="Auth" asp-action="Logout" method="post">
+                                                    <button type="submit" class="logout-btn">
+                                                        <i class="ti-power-off"></i>Đăng xuất
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             }
                             else
                             {
-                                // Hiển thị nút Đăng nhập và Đăng ký
+                // Hiển thị nút Đăng nhập và Đăng ký
                                 <a href="#test-popup" class="btn login-btn mr-im open-login-popup">Đăng nhập</a>
                                 <a href="#signup-popup" class="btn login-btn open-signup-popup">Đăng ký</a>
                             }

@@ -1,0 +1,116 @@
+﻿@using ezCV.Web.Models.Users
+@{
+    ViewData["Title"] = "Profile";
+}
+
+@model UserResponse;
+<link href="~/assets/css/profile.css" rel="stylesheet" />
+
+<div class="profile-container">
+    <div class="profile-header">
+        <!-- Avatar Section -->
+        <div class="avatar-section">
+            <div class="avatar-container">
+                @if (Model?.UserProfile != null && !string.IsNullOrEmpty(Model.UserProfile.AvatarUrl))
+                {
+                    <img src="@Model.UserProfile.AvatarUrl" alt="Avatar" class="avatar-image" />
+                }
+                else
+                {
+                    <div class="avatar-placeholder">
+                        <i class="ti-user"></i>
+                    </div>
+                }
+                <button class="avatar-edit-btn" title="Đổi ảnh đại diện">
+                    <i class="ti-camera"></i>
+                </button>
+            </div>
+        </div>
+
+        <h1 class="profile-name">@(Model.UserProfile?.FullName?.ToUpper() ?? Model.Email.Split('@')[0].ToUpper())</h1>
+        <p class="profile-email">@Model.Email</p>
+
+        <!-- Additional Info -->
+        <div class="profile-meta">
+            @if (!string.IsNullOrEmpty(Model.UserProfile?.JobTitle))
+            {
+                <span class="job-title">@Model.UserProfile.JobTitle</span>
+            }
+            @if (!string.IsNullOrEmpty(Model.UserProfile?.PhoneNumber))
+            {
+                <span class="phone-number">• @Model.UserProfile.PhoneNumber</span>
+            }
+        </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Chọn CV Chính Section -->
+    <section class="main-cv-section">
+        <h2 class="section-title">Chọn CV Chính</h2>
+
+        <div class="create-cv-card">
+            <div class="create-cv-content">
+                <div class="add-icon">+</div>
+                <div class="create-cv-text">
+                    <p>Để các nhà tuyển dụng dễ dàng tiếp cận bạn hơn, hãy tạo một CV hoàn chỉnh bằng những template có sẵn của chúng tôi nhé</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Analytics Section -->
+    <section class="analytics-section">
+        <div class="analytics-item">
+            <input type="checkbox" id="analytics-toggle" checked />
+            <label for="analytics-toggle">Phân tích</label>
+        </div>
+
+        <div class="analytics-stats">
+            <div class="stat-item">
+                <span class="stat-label">Chỉ hiển thị với bạn</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Đã xem hồ sơ của bạn</span>
+                <span class="stat-value">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Đã lưu hồ sơ của bạn</span>
+                <span class="stat-value">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Tìm kiếm xuất hiện</span>
+                <span class="stat-value">0</span>
+            </div>
+        </div>
+
+        <button class="view-details-btn">
+            Xem chi tiết
+        </button>
+    </section>
+</div>
+
+<!-- Thêm JavaScript cho avatar upload (tùy chọn) -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const avatarEditBtn = document.querySelector('.avatar-edit-btn');
+        const avatarInput = document.createElement('input');
+        avatarInput.type = 'file';
+        avatarInput.accept = 'image/*';
+        avatarInput.style.display = 'none';
+
+        avatarEditBtn.addEventListener('click', function() {
+            avatarInput.click();
+        });
+
+        avatarInput.addEventListener('change', function(e) {
+            if (e.target.files && e.target.files[0]) {
+                // Xử lý upload avatar ở đây
+                console.log('Selected file:', e.target.files[0]);
+                // Gọi API upload avatar
+            }
+        });
+
+        document.body.appendChild(avatarInput);
+    });
+</script>

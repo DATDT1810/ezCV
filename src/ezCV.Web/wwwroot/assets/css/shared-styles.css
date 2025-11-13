@@ -1,0 +1,229 @@
+/* === VARIABLES & RESET === */
+:root {
+    --primary-color: #10b981;
+    --danger-color: #ef4444;
+    --text-dark: #333;
+    --text-light: #555;
+    --border-color: #e0e0e0;
+    --hover-bg: #f0f8ff;
+    --icon-bg: #4A4A4A;
+}
+
+/* === COMMON STYLES === */
+.shared-loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.shared-loading-spinner {
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.shared-option-panel {
+    position: fixed;
+    top: 90px;
+    left: 0;
+    right: 0;
+    background: #f8f9fa;
+    padding: 1rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    z-index: 999;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.shared-option-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.shared-option-btn {
+    padding: 0.75rem 1.5rem;
+    border: 2px solid var(--primary-color);
+    border-radius: 8px;
+    background: white;
+    color: var(--primary-color);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.shared-option-btn:hover,
+.shared-option-btn.active {
+    background: var(--primary-color);
+    color: white;
+}
+
+.shared-contact-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 10000;
+    justify-content: center;
+    align-items: center;
+}
+
+.shared-contact-modal-content {
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 400px;
+}
+
+.shared-contact-type-select {
+    width: 100%;
+    padding: 0.5rem;
+    margin-bottom: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.shared-submit-section {
+    margin-top: 2rem;
+    padding: 2rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    text-align: center;
+    border: 2px dashed #dee2e6;
+}
+
+.shared-submit-btn {
+    padding: 0.75rem 2rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    background-color: #10b981;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.shared-submit-btn:hover {
+    background-color: #059669;
+}
+
+/* === EDITABLE STYLES === */
+.shared-editable {
+    outline: none;
+    padding: 2px 4px;
+    margin: -2px -4px;
+    border-radius: 4px;
+    min-height: 1.2em;
+    cursor: text;
+    transition: background-color 0.2s;
+}
+
+.shared-editable:hover:not(:focus) {
+    background-color: var(--hover-bg);
+}
+
+.shared-editable:focus {
+    background-color: var(--hover-bg);
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.shared-editable[data-placeholder]:empty:before {
+    content: attr(data-placeholder);
+    color: #a8a29e;
+    font-style: italic;
+}
+
+/* === DELETE BUTTONS === */
+.shared-dynamic-item {
+    position: relative;
+    padding: 3px;
+    margin: -3px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.shared-dynamic-item:hover {
+    background-color: var(--hover-bg);
+}
+
+.shared-delete-btn {
+    position: absolute;
+    top: 50%;
+    right: 0;
+    transform: translate(120%, -50%);
+    background: var(--danger-color);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    z-index: 10;
+}
+
+.shared-dynamic-item:hover .shared-delete-btn {
+    opacity: 1;
+}
+
+/* === ADD BUTTONS === */
+.shared-add-btn-container {
+    margin-top: 0.5rem;
+}
+
+.shared-add-btn {
+    background-color: transparent;
+    border: 2px dashed var(--border-color);
+    color: var(--text-light);
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 100%;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.shared-add-btn:hover {
+    background-color: var(--hover-bg);
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+    border-style: solid;
+}
+
+/* === PRINT STYLES === */
+@media print {
+    .no-print {
+        display: none !important;
+    }
+    
+    .shared-dynamic-item:hover {
+        background-color: transparent !important;
+    }
+    
+    .shared-delete-btn {
+        display: none !important;
+    }
+}

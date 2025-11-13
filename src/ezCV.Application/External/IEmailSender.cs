@@ -6,6 +6,7 @@ namespace ezCV.Application.External
 {
     public interface IEmailSender
     {
+        Task SendEmailAsync(string sendFor, string subject, string body, CancellationToken cancellationToken = default);
         Task SendCvByEmailAsync(string recipientEmail, string recipientName, string cvPdfAttachmentPath);
         Task SendWelcomeEmailAsync(string sendFor, string subject, string body, CancellationToken cancellationToken = default);
         Task SendEmailPasswordAsync(string sendFor, string subject, string body, CancellationToken cancellationToken = default);

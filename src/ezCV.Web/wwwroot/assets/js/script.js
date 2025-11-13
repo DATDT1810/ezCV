@@ -202,3 +202,35 @@
     }
 
 })(jQuery);
+
+// User Dropdown Functionality
+document.addEventListener('DOMContentLoaded', function () {
+    const userDropdowns = document.querySelectorAll('.user-dropdown');
+
+    userDropdowns.forEach(dropdown => {
+        const trigger = dropdown.querySelector('.user-trigger');
+
+        trigger.addEventListener('click', function (e) {
+            e.stopPropagation();
+            dropdown.classList.toggle('active');
+        });
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function (e) {
+        userDropdowns.forEach(dropdown => {
+            if (!dropdown.contains(e.target)) {
+                dropdown.classList.remove('active');
+            }
+        });
+    });
+
+    // Close dropdown when pressing escape key
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') {
+            userDropdowns.forEach(dropdown => {
+                dropdown.classList.remove('active');
+            });
+        }
+    });
+});

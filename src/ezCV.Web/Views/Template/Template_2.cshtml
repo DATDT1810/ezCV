@@ -40,13 +40,23 @@
         .option-panel {
             position: fixed;
             top: 90px;
-            left: 0;
-            right: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 210mm;
+            max-width: 100%;
             background: #f8f9fa;
-            padding: 1rem;
+            padding: 10px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             z-index: 999;
             border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: center;
+        }
+
+        .option-panel-container {
+            width: 210mm;
+            max-width: 100%;
+            padding: 0 1rem;
         }
 
         .option-buttons {
@@ -65,6 +75,9 @@
             font-weight: 500;
             cursor: pointer;
             transition: all 0.3s ease;
+            flex: 1;
+            min-width: 200px;
+            max-width: 300px;
         }
 
             .option-btn:hover {
@@ -85,12 +98,39 @@
             border-radius: 8px;
             text-align: center;
             border: 2px dashed #dee2e6;
+            width: 210mm;
+            max-width: 100%;
+            margin-left: auto;
+            margin-right: auto; 
         }
 
         .submit-btn {
             padding: 0.75rem 2rem;
             font-size: 1.1rem;
             font-weight: 600;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+            .submit-btn:hover {
+                background: #e55e1a;
+            }
+
+        .page-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center; 
+            margin-top: 8px;
         }
 
         /* Contact Modal */
@@ -123,7 +163,6 @@
             border-radius: 4px;
         }
 
-        /* === PHẦN QUAN TRỌNG: CSS PHẢI GIỐNG 100% VỚI API === */
         .cv-container {
             background-color: white;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
@@ -572,9 +611,9 @@
         </div>
     </div>
 
-    <!-- Option Panel -->
+    <!-- Option Panel - ĐÃ ĐỒNG BỘ VỚI TEMPLATE 1 -->
     <div class="option-panel">
-        <div class="container">
+        <div class="option-panel-container">
             <div class="option-buttons">
                 <button class="option-btn active" onclick="useSampleData()">
                     <i class="fas fa-magic"></i> Sử dụng thông tin mẫu
@@ -683,8 +722,8 @@
         <!-- Submit Section -->
         <div class="submit-section">
             <h4>Hoàn thành CV của bạn</h4>
-            <p class="text-muted">Kiểm tra lại thông tin và gửi CV qua email</p>
-            <button type="button" class="btn btn-success submit-btn" onclick="saveAndSubmit()">
+            <p class="text-danger">Kiểm tra thông tin trước khi gửi. CV sẽ được gửi qua email bạn đã nhập (lưu ý điền đúng email)</p>
+            <button type="button" class="submit-btn" onclick="saveAndSubmit()">
                 <i class="fas fa-paper-plane"></i> Gửi CV qua Email
             </button>
         </div>
@@ -756,14 +795,10 @@
                 value: item.querySelector('.contact-value').innerText.trim(),
                 elementId: item.id
             }));
-
-            console.log("Initialized contacts state:", contactsState);
         }
 
         // === ĐỒNG BỘ STATE VỚI FORM ẨN ===
         function syncContactsToHiddenForm() {
-            console.log("=== ĐỒNG BỘ CONTACTS VỚI FORM ẨN ===");
-
             // Reset các giá trị cũ
             document.getElementById('hiddenContactEmail').value = '';
             document.getElementById('hiddenPhoneNumber').value = '';
@@ -779,8 +814,6 @@
 
             // Duyệt qua state hiện tại để cập nhật form
             contactsState.forEach(contact => {
-                console.log(`Syncing contact: ${contact.type} = ${contact.value}`);
-
                 switch (contact.type) {
                     case 'email':
                         document.getElementById('hiddenContactEmail').value = contact.value;
@@ -810,9 +843,6 @@
                         break;
                 }
             });
-
-            console.log("Form sync completed - DateOfBirth:", document.getElementById('hiddenDateOfBirth').value);
-            console.log("Form sync completed - Gender:", document.getElementById('hiddenGender').value);
         }
 
         // === CẬP NHẬT HÀM REMOVE ITEM ===
@@ -821,7 +851,6 @@
             if (item) {
                 // 1. Cập nhật state
                 contactsState = contactsState.filter(contact => contact.elementId !== elementId);
-                console.log("Updated contacts state after removal:", contactsState);
 
                 // 2. Xóa element khỏi DOM
                 item.remove();
@@ -855,13 +884,13 @@
             const defaultValue = getContactDefaultValue(type);
 
             const newItemHTML = `
-                        <li id="${newId}" class="contact-item dynamic-item" data-type="${type}">
-                            <button class="delete-btn" onclick="removeItem('${newId}')">
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
-                            <div class="contact-icon"><i class="${getContactIconClass(type)}"></i></div>
-                            <div class="contact-value editable-field" contenteditable="true" data-placeholder="Nhập ${typeName}">${defaultValue}</div>
-                        </li>`;
+                                <li id="${newId}" class="contact-item dynamic-item" data-type="${type}">
+                                    <button class="delete-btn" onclick="removeItem('${newId}')">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                    <div class="contact-icon"><i class="${getContactIconClass(type)}"></i></div>
+                                    <div class="contact-value editable-field" contenteditable="true" data-placeholder="Nhập ${typeName}">${defaultValue}</div>
+                                </li>`;
 
             list.insertAdjacentHTML('beforeend', newItemHTML);
 
@@ -871,8 +900,6 @@
                 value: defaultValue,
                 elementId: newId
             });
-
-            console.log("Added new contact to state:", contactsState);
 
             const newItem = list.lastElementChild;
             newItem.querySelector('.contact-value').focus();
@@ -894,7 +921,6 @@
                         const contactIndex = contactsState.findIndex(contact => contact.elementId === elementId);
                         if (contactIndex !== -1) {
                             contactsState[contactIndex].value = newValue;
-                            console.log("Updated contact value in state:", contactsState[contactIndex]);
 
                             // ĐỒNG BỘ FORM SAU KHI USER NGỪNG TYPING (debounce)
                             clearTimeout(window.contactSyncTimeout);
@@ -909,8 +935,6 @@
 
         // === INITIAL DATA LOAD ===
         function loadInitialData() {
-            console.log("Đang tải dữ liệu mẫu...");
-
             // Cập nhật thông tin cơ bản
             document.getElementById('cv-name').innerText = sampleData.fullName;
             document.getElementById('cv-title').innerText = sampleData.jobTitle;
@@ -926,12 +950,12 @@
             sampleData.contacts.forEach((contact, index) => {
                 const contactId = `contact-${index + 1}`;
                 contactList.innerHTML += `
-                            <li id="${contactId}" class="contact-item dynamic-item" data-type="${contact.type}">
-                                <button class="delete-btn" onclick="removeItem('${contactId}')"><i class="fas fa-trash-alt"></i></button>
-                                <div class="contact-icon"><i class="${getContactIconClass(contact.type)}"></i></div>
-                                <div class="contact-value editable-field" contenteditable="true" data-placeholder="Nhập ${getContactTypeName(contact.type)}">${contact.value}</div>
-                            </li>
-                        `;
+                                    <li id="${contactId}" class="contact-item dynamic-item" data-type="${contact.type}">
+                                        <button class="delete-btn" onclick="removeItem('${contactId}')"><i class="fas fa-trash-alt"></i></button>
+                                        <div class="contact-icon"><i class="${getContactIconClass(contact.type)}"></i></div>
+                                        <div class="contact-value editable-field" contenteditable="true" data-placeholder="Nhập ${getContactTypeName(contact.type)}">${contact.value}</div>
+                                    </li>
+                                `;
 
                 // CẬP NHẬT STATE
                 contactsState.push({
@@ -947,15 +971,15 @@
             sampleData.education.forEach((edu, index) => {
                 const eduId = `edu-${index + 1}`;
                 educationList.innerHTML += `
-                            <div id="${eduId}" class="list-item dynamic-item">
-                                <button class="delete-btn" onclick="removeItem('${eduId}')"><i class="fas fa-trash-alt"></i></button>
-                                <h4 class="item-title editable-field" contenteditable="true" data-placeholder="Bằng cấp/Chuyên ngành">${edu.degree}</h4>
-                                <p class="item-subtitle editable-field" contenteditable="true" data-placeholder="Trường/Tổ chức | Thời gian">${edu.institution} | ${edu.date}</p>
-                                <ul class="item-description">
-                                    ${edu.description.split('\n').map(line => line.trim() ? `<li class="editable-field" contenteditable="true" data-placeholder="Mô tả chi tiết">${line.replace(/^•\s*/, '')}</li>` : '').join('')}
-                                </ul>
-                            </div>
-                        `;
+                                    <div id="${eduId}" class="list-item dynamic-item">
+                                        <button class="delete-btn" onclick="removeItem('${eduId}')"><i class="fas fa-trash-alt"></i></button>
+                                        <h4 class="item-title editable-field" contenteditable="true" data-placeholder="Bằng cấp/Chuyên ngành">${edu.degree}</h4>
+                                        <p class="item-subtitle editable-field" contenteditable="true" data-placeholder="Trường/Tổ chức | Thời gian">${edu.institution} | ${edu.date}</p>
+                                        <ul class="item-description">
+                                            ${edu.description.split('\n').map(line => line.trim() ? `<li class="editable-field" contenteditable="true" data-placeholder="Mô tả chi tiết">${line.replace(/^•\s*/, '')}</li>` : '').join('')}
+                                        </ul>
+                                    </div>
+                                `;
             });
 
             // Cập nhật kinh nghiệm
@@ -964,15 +988,15 @@
             sampleData.experience.forEach((exp, index) => {
                 const expId = `exp-${index + 1}`;
                 experienceList.innerHTML += `
-                            <div id="${expId}" class="list-item dynamic-item">
-                                <button class="delete-btn" onclick="removeItem('${expId}')"><i class="fas fa-trash-alt"></i></button>
-                                <h4 class="item-title editable-field" contenteditable="true" data-placeholder="Chức danh">${exp.title}</h4>
-                                <p class="item-subtitle editable-field" contenteditable="true" data-placeholder="Công ty | Thời gian">${exp.company} | ${exp.date}</p>
-                                <ul class="item-description">
-                                    ${exp.description.split('\n').map(line => line.trim() ? `<li class="editable-field" contenteditable="true" data-placeholder="Mô tả công việc">${line.replace(/^•\s*/, '')}</li>` : '').join('')}
-                                </ul>
-                            </div>
-                        `;
+                                    <div id="${expId}" class="list-item dynamic-item">
+                                        <button class="delete-btn" onclick="removeItem('${expId}')"><i class="fas fa-trash-alt"></i></button>
+                                        <h4 class="item-title editable-field" contenteditable="true" data-placeholder="Chức danh">${exp.title}</h4>
+                                        <p class="item-subtitle editable-field" contenteditable="true" data-placeholder="Công ty | Thời gian">${exp.company} | ${exp.date}</p>
+                                        <ul class="item-description">
+                                            ${exp.description.split('\n').map(line => line.trim() ? `<li class="editable-field" contenteditable="true" data-placeholder="Mô tả công việc">${line.replace(/^•\s*/, '')}</li>` : '').join('')}
+                                        </ul>
+                                    </div>
+                                `;
             });
 
             // Cập nhật kỹ năng
@@ -981,14 +1005,12 @@
             sampleData.skills.forEach((skill, index) => {
                 const skillId = `skill-${index + 1}`;
                 skillsList.innerHTML += `
-                            <div id="${skillId}" class="list-item dynamic-item">
-                                <button class="delete-btn" onclick="removeItem('${skillId}')"><i class="fas fa-trash-alt"></i></button>
-                                <h4 class="item-title editable-field" contenteditable="true" data-placeholder="Kỹ năng">${skill}</h4>
-                            </div>
-                        `;
+                                    <div id="${skillId}" class="list-item dynamic-item">
+                                        <button class="delete-btn" onclick="removeItem('${skillId}')"><i class="fas fa-trash-alt"></i></button>
+                                        <h4 class="item-title editable-field" contenteditable="true" data-placeholder="Kỹ năng">${skill}</h4>
+                                    </div>
+                                `;
             });
-
-            console.log("✅ Đã tải dữ liệu mẫu thành công");
 
             // ĐỒNG BỘ FORM SAU KHI LOAD DATA
             syncContactsToHiddenForm();
@@ -1143,14 +1165,14 @@
             const list = document.getElementById('experience-list');
             const newId = `exp-${Date.now()}`;
             const newItemHTML = `
-                        <div id="${newId}" class="list-item dynamic-item">
-                            <button class="delete-btn" onclick="removeItem('${newId}')"><i class="fas fa-trash-alt"></i></button>
-                            <h4 class="item-title editable-field" contenteditable="true" data-placeholder="Chức danh">Chức danh</h4>
-                            <p class="item-subtitle editable-field" contenteditable="true" data-placeholder="Công ty | Thời gian">Công ty | Tháng/Năm - Tháng/Năm</p>
-                            <ul class="item-description">
-                                <li class="editable-field" contenteditable="true" data-placeholder="Mô tả công việc">Mô tả công việc của bạn ở đây.</li>
-                            </ul>
-                        </div>`;
+                                <div id="${newId}" class="list-item dynamic-item">
+                                    <button class="delete-btn" onclick="removeItem('${newId}')"><i class="fas fa-trash-alt"></i></button>
+                                    <h4 class="item-title editable-field" contenteditable="true" data-placeholder="Chức danh">Chức danh</h4>
+                                    <p class="item-subtitle editable-field" contenteditable="true" data-placeholder="Công ty | Thời gian">Công ty | Tháng/Năm - Tháng/Năm</p>
+                                    <ul class="item-description">
+                                        <li class="editable-field" contenteditable="true" data-placeholder="Mô tả công việc">Mô tả công việc của bạn ở đây.</li>
+                                    </ul>
+                                </div>`;
             insertAndFocus(list, newItemHTML, '.item-title');
         }
 
@@ -1158,14 +1180,14 @@
             const list = document.getElementById('education-list');
             const newId = `edu-${Date.now()}`;
             const newItemHTML = `
-                        <div id="${newId}" class="list-item dynamic-item">
-                            <button class="delete-btn" onclick="removeItem('${newId}')"><i class="fas fa-trash-alt"></i></button>
-                            <h4 class="item-title editable-field" contenteditable="true" data-placeholder="Bằng cấp/Chuyên ngành">Bằng cấp/Chuyên ngành</h4>
-                            <p class="item-subtitle editable-field" contenteditable="true" data-placeholder="Trường/Tổ chức | Thời gian">Trường/Tổ chức | Năm - Năm</p>
-                            <ul class="item-description">
-                                <li class="editable-field" contenteditable="true" data-placeholder="Mô tả chi tiết">Mô tả về quá trình học tập.</li>
-                            </ul>
-                        </div>`;
+                                <div id="${newId}" class="list-item dynamic-item">
+                                    <button class="delete-btn" onclick="removeItem('${newId}')"><i class="fas fa-trash-alt"></i></button>
+                                    <h4 class="item-title editable-field" contenteditable="true" data-placeholder="Bằng cấp/Chuyên ngành">Bằng cấp/Chuyên ngành</h4>
+                                    <p class="item-subtitle editable-field" contenteditable="true" data-placeholder="Trường/Tổ chức | Thời gian">Trường/Tổ chức | Năm - Năm</p>
+                                    <ul class="item-description">
+                                        <li class="editable-field" contenteditable="true" data-placeholder="Mô tả chi tiết">Mô tả về quá trình học tập.</li>
+                                    </ul>
+                                </div>`;
             insertAndFocus(list, newItemHTML, '.item-title');
         }
 
@@ -1173,17 +1195,15 @@
             const list = document.getElementById('skills-list');
             const newId = `skill-${Date.now()}`;
             const newItemHTML = `
-                        <div id="${newId}" class="list-item dynamic-item">
-                            <button class="delete-btn" onclick="removeItem('${newId}')"><i class="fas fa-trash-alt"></i></button>
-                            <h4 class="item-title editable-field" contenteditable="true" data-placeholder="Kỹ năng">Kỹ năng mới</h4>
-                        </div>`;
+                                <div id="${newId}" class="list-item dynamic-item">
+                                    <button class="delete-btn" onclick="removeItem('${newId}')"><i class="fas fa-trash-alt"></i></button>
+                                    <h4 class="item-title editable-field" contenteditable="true" data-placeholder="Kỹ năng">Kỹ năng mới</h4>
+                                </div>`;
             insertAndFocus(list, newItemHTML, '.item-title');
         }
 
         // === FORM SUBMISSION ===
         function saveAndSubmit() {
-            console.log("=== BẮT ĐẦU GỬI CV ===");
-
             showLoading();
 
             if (!validateForm()) {
@@ -1193,7 +1213,6 @@
 
             updateHiddenForm();
 
-            console.log("Đang gửi form đến CvProcess/SubmitCv...");
             document.getElementById('cvForm').submit();
         }
 
@@ -1202,8 +1221,6 @@
             const emailItem = Array.from(document.querySelectorAll('#contact-list .contact-item'))
                 .find(item => item.dataset.type === 'email');
             const email = emailItem?.querySelector('.contact-value').innerText.trim();
-
-            console.log("Kiểm tra dữ liệu:", { fullName, email });
 
             if (!fullName || fullName === 'Họ và tên' || fullName === '') {
                 alert('Vui lòng nhập họ và tên');
@@ -1230,13 +1247,10 @@
                 return false;
             }
 
-            console.log("Kiểm tra thành công");
             return true;
         }
 
         function updateHiddenForm() {
-            console.log("=== CẬP NHẬT FORM ẨN ===");
-
             // 1. Thông tin cá nhân
             const fullName = document.getElementById('cv-name').innerText.trim();
             const jobTitle = document.getElementById('cv-title').innerText.trim();
@@ -1247,11 +1261,7 @@
             document.getElementById('hiddenJobTitle').value = jobTitle;
             document.getElementById('hiddenSummary').value = summary;
 
-            console.log("Thông tin cá nhân:", { fullName, jobTitle, summary });
-
             // 2. Thông tin liên hệ - ĐÃ ĐƯỢC XỬ LÝ BỞI syncContactsToHiddenForm
-
-            console.log("Thông tin liên hệ từ state:", contactsState);
 
             // 3. Tạo dynamic inputs cho các sections
             createDynamicInputs();
@@ -1262,8 +1272,6 @@
 
             // Xóa các inputs cũ
             document.querySelectorAll('.dynamic-section-input').forEach(input => input.remove());
-
-            console.log("=== TẠO DYNAMIC INPUTS VỚI MODEL CHUẨN API ===");
 
             // 1. Kinh nghiệm làm việc - XỬ LÝ DATEONLY
             const workExperiences = Array.from(document.querySelectorAll('#experience-list .list-item')).map((item, index) => {
@@ -1287,7 +1295,6 @@
 
             workExperiences.forEach((exp, index) => {
                 if (exp.JobTitle && exp.JobTitle !== 'Chức danh') {
-                    console.log(`WorkExperience[${index}]:`, exp);
                     createHiddenInput(form, `WorkExperiences[${index}].JobTitle`, exp.JobTitle);
                     createHiddenInput(form, `WorkExperiences[${index}].CompanyName`, exp.CompanyName);
                     if (exp.StartDate) createHiddenInput(form, `WorkExperiences[${index}].StartDate`, exp.StartDate);
@@ -1318,7 +1325,6 @@
 
             educations.forEach((edu, index) => {
                 if (edu.Major && edu.Major !== 'Bằng cấp/Chuyên ngành') {
-                    console.log(`Education[${index}]:`, edu);
                     createHiddenInput(form, `Educations[${index}].SchoolName`, edu.SchoolName);
                     createHiddenInput(form, `Educations[${index}].Major`, edu.Major);
                     if (edu.StartDate) createHiddenInput(form, `Educations[${index}].StartDate`, edu.StartDate);
@@ -1339,13 +1345,9 @@
                     createHiddenInput(form, `Skills[${index}].SkillName`, skill.SkillName);
                 }
             });
-
-            console.log("Đã tạo dynamic inputs với model chuẩn API");
         }
 
         function parseDateRangeForDateOnly(dateText) {
-            console.log("Parsing date range for DateOnly:", dateText);
-
             if (!dateText) return { startDate: null, endDate: null };
 
             const parts = dateText.split(' - ');
@@ -1356,7 +1358,6 @@
                 parts[1].trim().toLowerCase() === 'present' ?
                 null : parseDateForDateOnly(parts[1].trim());
 
-            console.log("Parsed DateOnly dates:", { startDate, endDate });
             return { startDate, endDate };
         }
 
@@ -1364,14 +1365,11 @@
         function parseDateForDateOnly(dateString) {
             if (!dateString) return null;
 
-            console.log("Format date for DateOnly:", dateString);
-
             // Format: "18/10/2003" (dd/MM/yyyy) -> "2003-10-18"
             if (dateString.includes('/') && dateString.split('/').length === 3) {
                 const [day, month, year] = dateString.split('/');
                 if (day && month && year) {
                     const result = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
-                    console.log("Formatted for DateOnly:", result);
                     return result;
                 }
             }
@@ -1381,12 +1379,10 @@
                 const [month, year] = dateString.split('/');
                 if (month && year) {
                     const result = `${year}-${month.padStart(2, '0')}-01`;
-                    console.log("Formatted for DateOnly (MM/yyyy):", result);
                     return result;
                 }
             }
 
-            console.log("Could not parse date for DateOnly:", dateString);
             return null;
         }
 

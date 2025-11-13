@@ -16,10 +16,13 @@ namespace ezCV.Application.Features.Auth.Interface
         Task<AuthResponse> LoginAsync(LoginRequest request, CancellationToken cancellationToken = default);
 
         // Quên mật khẩu - gửi email đặt lại mật khẩu
-        Task<bool> ForgotPasswordAsync(string email, CancellationToken cancellationToken = default);
+        Task<bool> ForgotPasswordAsync(string identifier, CancellationToken cancellationToken = default);
 
         // Đặt lại mật khẩu bằng token
-        Task<bool> ResetPasswordAsync(string email, string newPassword, CancellationToken cancellationToken = default);
+        Task<bool> ResetPasswordAsync(string identifier, string newPassword, CancellationToken cancellationToken = default);
+
+        // Authen email 
+        Task<string> AuthenWithEmail(string email, CancellationToken cancellationToken = default);
 
         // Refresh token xác thực
         Task<AuthResponse> RefreshTokenAsync(Guid refreshToken, CancellationToken cancellationToken = default);

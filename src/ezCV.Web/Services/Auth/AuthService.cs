@@ -9,7 +9,7 @@ namespace ezCV.Web.Services.Auth
     {
         private readonly HttpClient _httpClient;
         private readonly JsonSerializerOptions _jsonOptions;
-        private const string ApiBaseUrl = "api/auth";
+        private const string ApiBaseUrl = "api/Auth";
 
         public AuthService(HttpClient httpClient)
         {
@@ -82,7 +82,7 @@ namespace ezCV.Web.Services.Auth
             var jsonContent = JsonSerializer.Serialize(request);
             var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
-            var response = await _httpClient.PostAsync($"{ApiBaseUrl}/reset-password", content);
+            var response = await _httpClient.PostAsync($"{ApiBaseUrl}/reset-password-with-otp", content);
 
             return response.IsSuccessStatusCode;
         }
@@ -110,6 +110,66 @@ namespace ezCV.Web.Services.Auth
             {
                 var error = await response.Content.ReadAsStringAsync();
                 throw new HttpRequestException($"LoginWithGoogle failed ({response.StatusCode}): {error}");
+            }
+        }
+
+        public async Task<string> AuthenWithEmail(string email, CancellationToken cancellationToken = default)
+        {
+            var request = new { email = email };
+            var jsonContent = JsonSerializer.Serialize(request);
+            var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+            var response = await _httpClient.PostAsync($"{ApiBaseUrl}/authen-with-email", content);
+            if (response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadAsStringAsync();
+                return result; // Trả về OTP hoặc thông báo thành công
+            }
+            else
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                throw new HttpRequestException($"AuthenWithEmail failed ({response.StatusCode}): {error}");
+            }
+        }
+
+        public async Task<bool> VerifyOtp(VerifyOtpRequest verifyOtp)
+        {
+            var request = new { email = verifyOtp.Email, otp = verifyOtp.Otp };
+            var jsonContent = JsonSerializer.Serialize(request);
+            var content = new StringContent(jsonContent, Encoding.UTF8 , "application/json");
+
+            var response = await _httpClient.PostAsync($"{ApiBaseUrl}/verify-otp", content);
+            if (response.IsSuccessStatusCode)
+            {
+                var jsonString = await response.Content.ReadAsStringAsync();
+                var result = JsonSerializer.Deserialize<VerifyOtpRequest>(jsonString, _jsonOptions);
+                return true;
+            }
+            else
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                throw new HttpRequestException($"VerifyOtp failed ({response.StatusCode}): {error}");
+            }
+        }
+
+        public async Task<bool> ResetPasswordWithOtp(string email, string newPassword, string otp)
+        {
+            var request = new { identifier = email, newPassword = newPassword, otp = otp };
+            var jsonContent = JsonSerializer.Serialize(request);
+            var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+            var response = await _httpClient.PostAsync($"{ApiBaseUrl}/reset-password-with-otp", content);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var jsonString = await response.Content.ReadAsStringAsync();
+                var result = JsonSerializer.Deserialize<Dictionary<string, bool>>(jsonString, _jsonOptions);
+                return result?.ContainsKey("success") == true && result["success"];
+            }
+            else
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                throw new HttpRequestException($"ResetPasswordWithOtp failed ({response.StatusCode}): {error}");
             }
         }
     }
