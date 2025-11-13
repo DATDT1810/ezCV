@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ezCV.Application.External.Models
+namespace ezCV.Application.External
 {
     public interface ICvRenderService
     {

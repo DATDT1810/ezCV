@@ -9,6 +9,10 @@ project.lock.json
 # Visual Studio Code
 .vscode
 
+# Ignore environment variables
+.env
+.env.*
+
 # User-specific files
 *.suo
 *.user

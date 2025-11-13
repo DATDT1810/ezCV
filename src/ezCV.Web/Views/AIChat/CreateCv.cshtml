@@ -1,0 +1,640 @@
+﻿@model ezCV.Web.Models.AIChat.ChatViewModel
+@{
+    ViewData["Title"] = "Tạo CV với AI";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="ai-chat-container">
+                <!-- Header -->
+                <div class="chat-header">
+                    <div class="header-content">
+                        <div class="d-flex align-items-center">
+                            <a href="/" class="btn btn-outline-light btn-sm me-2">
+                                <i class="fa fa-arrow-left"></i>
+                            </a>
+                            <h2 class="mb-0"><i class="fa fa-robot me-2"></i> Trợ lý AI Tạo CV</h2>
+                        </div>
+                        <div class="header-actions">
+                            <button id="sessionsBtn" class="btn btn-outline-light btn-sm">
+                                <i class="fa fa-history me-1"></i> Lịch sử
+                            </button>
+                            <button id="startChatBtn" class="btn btn-light btn-sm">
+                                <i class="fa fa-plus me-1"></i> Tạo mới
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Messages Area -->
+                <div class="messages-container" id="messagesContainer">
+                    <div class="welcome-message">
+                        <div class="welcome-icon">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <h3>Chào mừng đến với Trợ lý AI Tạo CV! 🎯</h3>
+                        <p class="text-muted">Tôi sẽ giúp bạn tạo CV chuyên nghiệp bằng cách thu thập thông tin và đề xuất nội dung phù hợp.</p>
+                        <button id="welcomeStartBtn" class="btn btn-primary btn-lg">
+                            <i class="fa fa-play me-2"></i> Bắt đầu tạo CV
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Input Area -->
+                <div class="input-container" id="inputContainer" style="display: none;">
+                    <div class="input-group">
+                        <textarea id="messageInput" class="form-control"
+                                  placeholder="Nhập thông tin của bạn (kinh nghiệm, học vấn, kỹ năng...)..."
+                                  rows="3"></textarea>
+                        <button id="sendBtn" class="btn btn-primary">
+                            <i class="fa fa-paper-plane"></i>
+                        </button>
+                    </div>
+                    <div class="input-hint">
+                        <small class="text-muted">Nhấn Enter để gửi, Shift+Enter để xuống dòng</small>
+                    </div>
+                </div>
+
+                <!-- Loading Indicator -->
+                <div id="loadingIndicator" class="loading-indicator" style="display: none;">
+                    <div class="typing-dots">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                    <span class="loading-text">AI đang trả lời...</span>
+                </div>
+
+                   <!-- Session Info -->
+                   <div id="sessionInfo" class="session-info" style="display: none;">
+                       <small class="text-muted">
+                           <i class="fa fa-key me-1"></i>
+                           Session: <span id="sessionGuid" class="font-monospace"></span>
+                       </small>
+                   </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Sessions Modal -->
+<div class="modal fade" id="sessionsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fa fa-history me-2"></i>Lịch sử CV của bạn</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="sessionsList" class="sessions-list">
+                    <div class="text-center py-4">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Đang tải...</span>
+                        </div>
+                        <p class="text-muted mt-2">Đang tải lịch sử...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <style>
+        .ai-chat-container {
+            max-width: 100%;
+            height: 80vh;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .chat-header {
+            padding: 1rem 1.5rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 12px 12px 0 0;
+            margin-top: 90px;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .messages-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.5rem;
+            background: #f8f9fa;
+        }
+
+        .welcome-message {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: #666;
+        }
+
+        .welcome-icon {
+            font-size: 4rem;
+            color: #667eea;
+            margin-bottom: 1rem;
+        }
+
+        .welcome-message h3 {
+            color: #333;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .message {
+            margin-bottom: 1.5rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .message.user {
+            align-items: flex-end;
+        }
+
+        .message.assistant {
+            align-items: flex-start;
+        }
+
+        .message-content {
+            max-width: 70%;
+            padding: 1rem 1.25rem;
+            border-radius: 18px;
+            line-height: 1.5;
+            background: white;
+            border: 1px solid #e1e5e9;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            white-space: pre-line;
+        }
+
+        .message.user .message-content {
+            background: #007bff;
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message.assistant .message-content {
+            border-bottom-left-radius: 4px;
+        }
+
+        .suggestions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+        }
+
+        .suggestion-btn {
+            background: #e9ecef;
+            border: 1px solid #dee2e6;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+            color: #495057;
+        }
+
+        .suggestion-btn:hover {
+            background: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+
+        .input-container {
+            padding: 1.5rem;
+            border-top: 1px solid #e1e5e9;
+            background: white;
+        }
+
+        .input-hint {
+            margin-top: 0.5rem;
+        }
+
+        .loading-indicator {
+            position: absolute;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            padding: 1rem 1.5rem;
+            border-radius: 25px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .typing-dots {
+            display: flex;
+            gap: 4px;
+        }
+
+        .typing-dots span {
+            height: 8px;
+            width: 8px;
+            background: #6c757d;
+            border-radius: 50%;
+            animation: typing 1.4s infinite ease-in-out;
+        }
+
+        .typing-dots span:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dots span:nth-child(2) { animation-delay: -0.16s; }
+
+        .loading-text {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+
+        .session-info {
+            padding: 0.5rem 1.5rem;
+            background: #f8f9fa;
+            border-top: 1px solid #e1e5e9;
+        }
+
+        .sessions-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .session-item {
+            padding: 1rem;
+            border: 1px solid #e1e5e9;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .session-item:hover {
+            background: #f8f9fa;
+            border-color: #007bff;
+        }
+
+        .session-title {
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .session-meta {
+            font-size: 0.8rem;
+            color: #6c757d;
+        }
+
+        .empty-sessions {
+            text-align: center;
+            padding: 2rem;
+            color: #6c757d;
+        }
+
+        @@keyframes typing {
+            0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
+            40% { transform: scale(1); opacity: 1; }
+        }
+
+        /* Responsive */
+        @@media (max-width: 768px) {
+            .message-content {
+                max-width: 85%;
+            }
+
+            .suggestions {
+                flex-direction: column;
+            }
+
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
+            }
+
+            .header-actions {
+                width: 100%;
+                justify-content: flex-end;
+            }
+        }
+    </style>
+
+@section Scripts {
+    <script>
+        // Biến toàn cục
+        let sessionGuid = null;
+        let isLoading = false;
+
+        // Elements
+        const messagesContainer = document.getElementById('messagesContainer');
+        const inputContainer = document.getElementById('inputContainer');
+        const messageInput = document.getElementById('messageInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const startChatBtn = document.getElementById('startChatBtn');
+        const welcomeStartBtn = document.getElementById('welcomeStartBtn');
+        const sessionsBtn = document.getElementById('sessionsBtn');
+        const loadingIndicator = document.getElementById('loadingIndicator');
+        const sessionInfo = document.getElementById('sessionInfo');
+        const sessionGuidSpan = document.getElementById('sessionGuid');
+        const sessionsModal = new bootstrap.Modal(document.getElementById('sessionsModal'));
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            startChatBtn.addEventListener('click', startNewChat);
+            welcomeStartBtn.addEventListener('click', startNewChat);
+            sessionsBtn.addEventListener('click', loadSessions);
+            sendBtn.addEventListener('click', () => sendMessage());
+
+            messageInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            });
+
+            // Auto-focus input khi hiển thị
+            inputContainer.addEventListener('transitionend', function() {
+                if (inputContainer.style.display !== 'none') {
+                    messageInput.focus();
+                }
+            });
+        });
+
+        // Khởi tạo chat mới
+        async function startNewChat() {
+            try {
+                showLoading(true);
+
+                const response = await fetch('/AIChat/StartChat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': getAntiForgeryToken()
+                    }
+                });
+
+                // ĐỌC TEXT TRƯỚC
+                const responseText = await response.text();
+                let result;
+                try {
+                    result = JSON.parse(responseText);
+                } catch (jsonError) {
+                    showError('Lỗi khởi tạo chat: Server trả về dữ liệu không hợp lệ');
+                    return;
+                }
+
+                if (result.success) {
+                    sessionGuid = result.data.sessionGuid;
+                    sessionGuidSpan.textContent = sessionGuid;
+                    sessionInfo.style.display = 'block';
+                    clearMessages();
+                    addMessage(result.data.message, 'assistant', result.data.suggestions);
+                    inputContainer.style.display = 'block';
+                } else {
+                    throw new Error(result.error || 'Failed to start chat');
+                }
+            } catch (error) {
+                showError('Có lỗi xảy ra khi khởi tạo chat: ' + error.message);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // Gửi message
+        async function sendMessage(message = messageInput.value) {
+            if (!message.trim() || isLoading) return;
+
+            // Thêm message của user
+            addMessage(message, 'user');
+            messageInput.value = '';
+            setIsLoading(true);
+            showLoadingIndicator();
+
+            try {
+                const response = await fetch('/AIChat/SendMessage', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': getAntiForgeryToken()
+                    },
+                    body: JSON.stringify({
+                        message: message,
+                        sessionGuid: sessionGuid,
+                        context: 'cv_creation'
+                    })
+                });
+
+                // ĐỌC RESPONSE TEXT TRƯỚC (KHÔNG PARSE JSON NGAY)
+                const responseText = await response.text();
+
+                let result;
+
+                // THỬ PARSE JSON - BẮT LỖI NẾU KHÔNG PHẢI JSON
+                try {
+                    result = JSON.parse(responseText);
+                } catch (jsonError) {
+                    // Nếu không phải JSON, hiển thị message lỗi thân thiện
+                    addMessage('Xin lỗi, server đang gặp sự cố kỹ thuật. Vui lòng thử lại sau.', 'assistant');
+                    return;
+                }
+
+                // XỬ LÝ KẾT QUẢ SAU KHI PARSE THÀNH CÔNG
+                if (result && result.success) {
+                    addMessage(result.data.message, 'assistant', result.data.suggestions);
+                    sessionGuid = result.data.sessionGuid;
+                    sessionGuidSpan.textContent = sessionGuid;
+                } else {
+                    // Xử lý lỗi từ API
+                    const errorMessage = result?.error || 'Không thể gửi tin nhắn';
+                    addMessage('Xin lỗi: ' + errorMessage, 'assistant');
+                }
+            } catch (error) {
+                addMessage('Xin lỗi, có lỗi kết nối xảy ra: ' + error.message, 'assistant');
+            } finally {
+                setIsLoading(false);
+                hideLoadingIndicator();
+            }
+        }
+
+        // Load danh sách sessions
+        async function loadSessions() {
+            try {
+                sessionsModal.show();
+
+                const response = await fetch('/AIChat/GetSessions', {
+                    headers: {
+                        'RequestVerificationToken': getAntiForgeryToken()
+                    }
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    displaySessions(result.data);
+                } else {
+                    throw new Error(result.error || 'Failed to load sessions');
+                }
+            } catch (error) {
+                document.getElementById('sessionsList').innerHTML =
+                    '<div class="empty-sessions">Lỗi tải lịch sử: ' + error.message + '</div>';
+            }
+        }
+
+        // Hiển thị sessions trong modal
+        function displaySessions(sessions) {
+            const sessionsList = document.getElementById('sessionsList');
+
+            if (sessions.length === 0) {
+                sessionsList.innerHTML = `
+                    <div class="empty-sessions">
+                        <i class="fa fa-inbox fa-3x text-muted mb-3"></i>
+                        <p>Chưa có phiên chat nào</p>
+                    </div>
+                `;
+                return;
+            }
+
+            sessionsList.innerHTML = sessions.map(session => `
+                <div class="session-item" onclick="loadSession('${session.sessionGuid}')">
+                    <div class="session-title">${session.title || 'CV Session'}</div>
+                    <div class="session-meta">
+                        <i class="fa fa-calendar me-1"></i> ${new Date(session.startedAt).toLocaleDateString('vi-VN')}
+                        • <i class="fa fa-comments me-1"></i> ${session.messageCount} tin nhắn
+                        ${session.isCompleted ? '• <span class="text-success"><i class="fa fa-check"></i> Hoàn thành</span>' : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Load session cụ thể
+        async function loadSession(guid) {
+            try {
+                const response = await fetch(`/AIChat/GetSession?sessionGuid=${encodeURIComponent(guid)}`, {
+                    headers: {
+                        'RequestVerificationToken': getAntiForgeryToken()
+                    }
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    sessionsModal.hide();
+                    sessionGuid = guid;
+                    sessionGuidSpan.textContent = sessionGuid;
+                    sessionInfo.style.display = 'block';
+                    inputContainer.style.display = 'block';
+
+                    clearMessages();
+                    addMessage('Đã tải phiên chat trước đó. Hãy tiếp tục trò chuyện để tạo CV nhé!', 'assistant');
+
+                } else {
+                    throw new Error(result.error || 'Failed to load session');
+                }
+            } catch (error) {
+                showError('Không thể tải phiên chat: ' + error.message);
+            }
+        }
+
+        // Xử lý click suggestion
+        function handleSuggestionClick(suggestionText) {
+            sendMessage(suggestionText);
+        }
+
+        // Thêm message vào UI
+        function addMessage(content, sender, suggestions = null) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+
+            let messageHTML = `
+                <div class="message-content">
+                    ${content.replace(/\n/g, '<br>')}
+                </div>
+            `;
+
+            if (suggestions && suggestions.length > 0) {
+                messageHTML += `<div class="suggestions">`;
+                suggestions.forEach(suggestion => {
+                    const escapedContent = suggestion.content.replace(/'/g, "&#39;").replace(/"/g, "&quot;");
+                    messageHTML += `
+                        <button class="suggestion-btn" onclick="handleSuggestionClick('${escapedContent}')">
+                            ${suggestion.content}
+                        </button>
+                    `;
+                });
+                messageHTML += `</div>`;
+            }
+
+            messageDiv.innerHTML = messageHTML;
+            messagesContainer.appendChild(messageDiv);
+            scrollToBottom();
+        }
+
+        // Xóa tất cả messages
+        function clearMessages() {
+            const welcomeMessage = document.querySelector('.welcome-message');
+            if (welcomeMessage) {
+                welcomeMessage.style.display = 'none';
+            }
+            messagesContainer.innerHTML = '';
+        }
+
+        // Hiển thị loading
+        function showLoading(show) {
+            if (show) {
+                startChatBtn.disabled = true;
+                startChatBtn.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i> Đang khởi tạo...';
+                welcomeStartBtn.disabled = true;
+                welcomeStartBtn.innerHTML = '<i class="fa fa-spinner fa-spin me-2"></i> Đang khởi tạo...';
+            } else {
+                startChatBtn.disabled = false;
+                startChatBtn.innerHTML = '<i class="fa fa-plus me-1"></i> Tạo mới';
+                welcomeStartBtn.disabled = false;
+                welcomeStartBtn.innerHTML = '<i class="fa fa-play me-2"></i> Bắt đầu tạo CV';
+            }
+        }
+
+        function showLoadingIndicator() {
+            loadingIndicator.style.display = 'flex';
+        }
+
+        function hideLoadingIndicator() {
+            loadingIndicator.style.display = 'none';
+        }
+
+        function setIsLoading(loading) {
+            isLoading = loading;
+            sendBtn.disabled = loading;
+            messageInput.disabled = loading;
+
+            if (loading) {
+                sendBtn.innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
+            } else {
+                sendBtn.innerHTML = '<i class="fa fa-paper-plane"></i>';
+            }
+        }
+
+        function scrollToBottom() {
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function showError(message) {
+            // Có thể thay bằng toast notification đẹp hơn
+            alert('Lỗi: ' + message);
+        }
+
+        // Lấy anti-forgery token
+        function getAntiForgeryToken() {
+            return document.querySelector('input[name="__RequestVerificationToken"]')?.value;
+        }
+    </script>
+}

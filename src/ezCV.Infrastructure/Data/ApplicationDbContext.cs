@@ -20,6 +20,12 @@ public partial class ApplicationDbContext : DbContext
 
     public virtual DbSet<Certificate> Certificates { get; set; }
 
+    public virtual DbSet<ChatMessage> ChatMessages { get; set; }
+
+    public virtual DbSet<ChatSession> ChatSessions { get; set; }
+
+    public virtual DbSet<CvGenerationResult> CvGenerationResults { get; set; }
+
     public virtual DbSet<CvTemplate> CvTemplates { get; set; }
 
     public virtual DbSet<Education> Educations { get; set; }
@@ -40,21 +46,19 @@ public partial class ApplicationDbContext : DbContext
 
     public virtual DbSet<User> Users { get; set; }
 
+    public virtual DbSet<UserPreference> UserPreferences { get; set; }
+
     public virtual DbSet<UserProfile> UserProfiles { get; set; }
 
     public virtual DbSet<UserSession> UserSessions { get; set; }
 
     public virtual DbSet<WorkExperience> WorkExperiences { get; set; }
 
-//     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-// #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-//         => optionsBuilder.UseSqlServer("Data Source=TANDAT\\MSSQLSERVER03;Initial Catalog=ezCV;User ID=sa;Password=1234;Encrypt=True;TrustServerCertificate=True");
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
+        => optionsBuilder.UseSqlServer("Data Source=TANDAT\\MSSQLSERVER03;Initial Catalog=ezCV;User ID=sa;Password=1234;Encrypt=True;Trust Server Certificate=True");
 
-protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-{
-    // Không config connection string ở đây
-    // Connection string sẽ được config từ Program.cs
-}    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Award>(entity =>
         {
@@ -80,6 +84,83 @@ protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
                 .HasForeignKey(d => d.UserId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Certificates_Users");
+        });
+
+        modelBuilder.Entity<ChatMessage>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__ChatMess__3214EC07B9CB78BC");
+
+            entity.HasIndex(e => e.MessageType, "IX_ChatMessages_MessageType");
+
+            entity.HasIndex(e => e.Sender, "IX_ChatMessages_Sender");
+
+            entity.HasIndex(e => e.SentAt, "IX_ChatMessages_SentAt");
+
+            entity.HasIndex(e => e.SessionId, "IX_ChatMessages_SessionId");
+
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
+            entity.Property(e => e.MessageType)
+                .HasMaxLength(20)
+                .HasDefaultValue("Question");
+            entity.Property(e => e.Sender)
+                .HasMaxLength(20)
+                .HasDefaultValue("User");
+            entity.Property(e => e.SentAt).HasDefaultValueSql("(getutcdate())");
+            entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(getutcdate())");
+
+            entity.HasOne(d => d.Session).WithMany(p => p.ChatMessages).HasForeignKey(d => d.SessionId);
+        });
+
+        modelBuilder.Entity<ChatSession>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__ChatSess__3214EC07F2A8D69C");
+
+            entity.HasIndex(e => e.SessionGuid, "IX_ChatSessions_SessionGuid").IsUnique();
+
+            entity.HasIndex(e => e.SessionType, "IX_ChatSessions_SessionType");
+
+            entity.HasIndex(e => e.StartedAt, "IX_ChatSessions_StartedAt");
+
+            entity.HasIndex(e => e.UserId, "IX_ChatSessions_UserId");
+
+            entity.HasIndex(e => e.SessionGuid, "UQ__ChatSess__898B5DF325695134").IsUnique();
+
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
+            entity.Property(e => e.IsActive).HasDefaultValue(true);
+            entity.Property(e => e.SessionGuid).HasMaxLength(36);
+            entity.Property(e => e.SessionType)
+                .HasMaxLength(50)
+                .HasDefaultValue("CV_CREATION");
+            entity.Property(e => e.StartedAt).HasDefaultValueSql("(getutcdate())");
+            entity.Property(e => e.Title)
+                .HasMaxLength(200)
+                .HasDefaultValue("CV Assistant Session");
+            entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(getutcdate())");
+
+            entity.HasOne(d => d.User).WithMany(p => p.ChatSessions).HasForeignKey(d => d.UserId);
+        });
+
+        modelBuilder.Entity<CvGenerationResult>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__CvGenera__3214EC07FD32720A");
+
+            entity.HasIndex(e => e.GeneratedSection, "IX_CvGenerationResults_GeneratedSection");
+
+            entity.HasIndex(e => e.IsAccepted, "IX_CvGenerationResults_IsAccepted");
+
+            entity.HasIndex(e => e.SessionId, "IX_CvGenerationResults_SessionId");
+
+            entity.HasIndex(e => e.UserId, "IX_CvGenerationResults_UserId");
+
+            entity.Property(e => e.ConfidenceScore).HasColumnType("decimal(3, 2)");
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
+            entity.Property(e => e.GeneratedAt).HasDefaultValueSql("(getutcdate())");
+            entity.Property(e => e.GeneratedSection).HasMaxLength(50);
+            entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(getutcdate())");
+
+            entity.HasOne(d => d.Session).WithMany(p => p.CvGenerationResults).HasForeignKey(d => d.SessionId);
+
+            entity.HasOne(d => d.User).WithMany(p => p.CvGenerationResults).HasForeignKey(d => d.UserId);
         });
 
         modelBuilder.Entity<CvTemplate>(entity =>
@@ -201,6 +282,30 @@ protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
                 .HasForeignKey(d => d.RoleId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Users_Roles");
+        });
+
+        modelBuilder.Entity<UserPreference>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__UserPref__3214EC0706C6C3C6");
+
+            entity.HasIndex(e => e.CollectedAt, "IX_UserPreferences_CollectedAt");
+
+            entity.HasIndex(e => e.PreferenceType, "IX_UserPreferences_PreferenceType");
+
+            entity.HasIndex(e => e.UserId, "IX_UserPreferences_UserId");
+
+            entity.Property(e => e.CollectedAt).HasDefaultValueSql("(getutcdate())");
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
+            entity.Property(e => e.PreferenceType).HasMaxLength(50);
+            entity.Property(e => e.Source)
+                .HasMaxLength(20)
+                .HasDefaultValue("ai_chat");
+            entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(getutcdate())");
+            entity.Property(e => e.Value).HasMaxLength(100);
+
+            entity.HasOne(d => d.User).WithMany(p => p.UserPreferences)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull);
         });
 
         modelBuilder.Entity<UserProfile>(entity =>

@@ -145,6 +145,85 @@ namespace ezCV.Web.Controllers
         }
 
 
+        [HttpGet("{email}")]
+        public async Task<IActionResult> AuthenWithEmail(string email)
+        {
+            var user = await _authService.AuthenWithEmail(email);
+            if (user == null) return BadRequest();
+            return View(user);
+        }
+
+        [HttpPost("send-otp")]
+        public async Task<IActionResult> SendOtp([FromBody] ForgotPasswordRequest request)
+        {
+            if (string.IsNullOrEmpty(request.Email))
+            {
+                return Json(new { success = false, message = "Email là bắt buộc." });
+            }
+
+            try
+            {
+                var otp = await _authService.AuthenWithEmail(request.Email);
+                return Json(new { success = true, message = "Mã OTP đã được gửi đến email của bạn." });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        [HttpPost("verify-otp")]
+        public async Task<IActionResult> VerifyOtp([FromBody] VerifyOtpRequest request)
+        {
+            if (string.IsNullOrEmpty(request.Email) || string.IsNullOrEmpty(request.Otp))
+            {
+                return Json(new { success = false, message = "Email và OTP là bắt buộc." });
+            }
+
+            try
+            {
+                var isValid = await _authService.VerifyOtp(request);
+                if (isValid)
+                {
+                    return Json(new { success = true, message = "Xác thực OTP thành công." });
+                }
+                else
+                {
+                    return Json(new { success = false, message = "Mã OTP không hợp lệ hoặc đã hết hạn." });
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        [HttpPost("reset-password-with-otp")]
+        public async Task<IActionResult> ResetPasswordWithOtp([FromBody] Models.Auth.ResetPasswordRequest request)
+        {
+            if (string.IsNullOrEmpty(request.Identifier) || string.IsNullOrEmpty(request.NewPassword) || string.IsNullOrEmpty(request.Otp))
+            {
+                return Json(new { success = false, message = "Thông tin không đầy đủ." });
+            }
+
+            try
+            {
+                var success = await _authService.ResetPasswordWithOtp(request.Identifier, request.NewPassword, request.Otp);
+                if (success)
+                {
+                    return Json(new { success = true, message = "Mật khẩu đã được đặt lại thành công." });
+                }
+                else
+                {
+                    return Json(new { success = false, message = "Đặt lại mật khẩu thất bại." });
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
 
         // Phương thức chung để lưu thông tin và đăng nhập Cookie
         private async Task StoreAuthTokenAndSignIn(AuthResponse authResponse)

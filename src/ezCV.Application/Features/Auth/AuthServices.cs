@@ -223,15 +223,16 @@ namespace ezCV.Application.Features.Auth
             await _userRepository.AddAsync(user, cancellationToken);
 
             // gửi email xác nhận
-            //if (!string.IsNullOrEmpty(request.Email))
-            //    await _emailSender.SendWelcomeEmailAsync(request.Email, "Welcome to ezCV", "Bạn đã đăng ký thành công!", cancellationToken);
+            if (!string.IsNullOrEmpty(request.Email))
+               await _emailSender.SendWelcomeEmailAsync(request.Email, "Welcome to ezCV", "Bạn đã đăng ký thành công!", cancellationToken);
 
             return await CreateAuthResponseAsync(user, role, cancellationToken);
         }
 
-        public async Task<bool> ForgotPasswordAsync(string email, CancellationToken cancellationToken = default)
+        public async Task<bool> ForgotPasswordAsync(string identifier, CancellationToken cancellationToken = default)
         {
-            var user = (await _userRepository.FindAsync(u => u.Email.Equals(email, StringComparison.OrdinalIgnoreCase), cancellationToken))
+            var normalizedIdentifier = identifier.ToLower();
+            var user = (await _userRepository.FindAsync(u => u.Email.ToLower() == normalizedIdentifier, cancellationToken))
         .FirstOrDefault();
 
             if (user == null)
@@ -241,16 +242,17 @@ namespace ezCV.Application.Features.Auth
             user.PasswordHash = HashingExtension.HashWithSHA256(tempPassword);
             await _userRepository.UpdateAsync(user, cancellationToken);
 
-            await _emailSender.SendEmailPasswordAsync(email, "Reset Password", $"Mật khẩu mới: {tempPassword}");
+            await _emailSender.SendEmailPasswordAsync(identifier, "Reset Password", $"Mật khẩu mới: {tempPassword}");
             return true;
         }
 
         // -----------------------------------------
         // Reset mật khẩu
         // -----------------------------------------
-        public async Task<bool> ResetPasswordAsync(string email, string newPassword, CancellationToken cancellationToken = default)
+        public async Task<bool> ResetPasswordAsync(string identifier, string newPassword, CancellationToken cancellationToken = default)
         {
-            var user = (await _userRepository.FindAsync(u => u.Email.Equals(email, StringComparison.OrdinalIgnoreCase), cancellationToken))
+            var normalizedIdentifier = identifier.ToLower();
+            var user = (await _userRepository.FindAsync(u => u.Email.ToLower() == normalizedIdentifier, cancellationToken))
         .FirstOrDefault();
 
             if (user == null)
@@ -261,5 +263,19 @@ namespace ezCV.Application.Features.Auth
             return true;
         }
 
+        public async Task<string> AuthenWithEmail(string email, CancellationToken cancellationToken = default)
+        {
+            var normalizedEmail = email.ToLower();
+            var user = (await _userRepository.FindAsync(e => e.Email.ToLower() == normalizedEmail, cancellationToken)).FirstOrDefault();
+            if (user != null)
+            {
+                var currentRole = _roleRepository.GetByIdAsync(user.RoleId, cancellationToken);  
+            }
+            var otp = GenarateOtpExtension.GenarateOtp();
+
+            // Send otp via email
+            await _emailSender.SendEmailAsync(email, "OTP Verification For 30DAY ezCV", otp, cancellationToken);
+            return otp;
+        }
     }
 }

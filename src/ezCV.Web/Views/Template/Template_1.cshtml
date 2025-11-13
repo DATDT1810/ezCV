@@ -32,7 +32,6 @@
             color: var(--gray-text);
             font-size: 10pt;
             font-weight: 300;
-            padding-top: 120px; /* Giảm padding vì đã bỏ header mới */
         }
 
         .page-container {
@@ -52,19 +51,30 @@
             margin: 0 auto;
             display: flex;
             flex-direction: column;
+            margin-top: 105px;
         }
 
         /* Option Panel Styles */
         .option-panel {
             position: fixed;
             top: 90px;
-            left: 0;
-            right: 0;
+            left: 50%; 
+            transform: translateX(-50%); 
+            width: 210mm; 
+            max-width: 100%;
             background: #f8f9fa;
-            padding: 1rem;
+            padding: 10px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             z-index: 999;
             border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: center;
+        }
+
+        .option-panel-container {
+            width: 210mm; 
+            max-width: 100%;
+            padding: 0 1rem;
         }
 
         .option-buttons {
@@ -83,6 +93,9 @@
             font-weight: 500;
             cursor: pointer;
             transition: all 0.3s ease;
+            flex: 1;
+            min-width: 200px;
+            max-width: 300px;
         }
 
             .option-btn:hover {
@@ -103,13 +116,25 @@
             border-radius: 8px;
             text-align: center;
             border: 2px dashed #dee2e6;
+            width: 210mm;
+            max-width: 100%;
         }
 
         .submit-btn {
             padding: 0.75rem 2rem;
             font-size: 1.1rem;
             font-weight: 600;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
         }
+
+            .submit-btn:hover {
+                background: #0da271;
+            }
 
         /* Modal cho thêm liên hệ */
         .contact-modal {
@@ -390,10 +415,32 @@
             margin-bottom: 0.5rem;
         }
 
+        .job-description {
+            padding-left: 0 !important;
+            margin-left: 0 !important;
+            text-indent: 0 !important;
+            white-space: pre-line !important;
+            line-height: 1.6 !important;
+            display: block !important;
+        }
+
+        .job-description {
+            padding-left: 0 !important;
+            margin-left: 0 !important;
+            text-indent: 0 !important;
+            white-space: normal !important; 
+            line-height: 1.6 !important;
+            display: block !important;
+            word-wrap: break-word !important;
+        }
+
         .job-item .job-description {
             line-height: 1.6;
-            white-space: pre-wrap;
+            white-space: pre-line; 
             min-height: 1.2em;
+            padding-left: 0 !important;
+            margin-left: 0 !important;
+            text-indent: 0 !important;
         }
 
         .edu-item .edu-degree,
@@ -555,7 +602,7 @@
             text-align: center;
         }
 
-        /* Responsive adjustments */
+        /* Responsive adjustments - ĐÃ CẢI THIỆN */
         @@media (max-width: 1200px) {
             .preview-header {
                 flex-wrap: wrap;
@@ -584,7 +631,16 @@
 
         @@media (max-width: 768px) {
             body {
-                padding-top: 150px;
+                padding-top: 180px;
+            }
+
+            .page-container {
+                padding: 20px;
+            }
+
+            .preview-pane {
+                width: 100%;
+                padding: 1.5rem;
             }
 
             .preview-body {
@@ -602,6 +658,7 @@
             .preview-header {
                 flex-direction: column;
                 text-align: center;
+                gap: 1rem;
             }
 
             .header-main {
@@ -614,6 +671,15 @@
 
             .contact-list {
                 justify-content: center;
+                flex-direction: column;
+            }
+
+            .contact-item {
+                justify-content: center;
+            }
+
+            .contact-value {
+                text-align: center;
             }
 
             .add-btn {
@@ -621,14 +687,56 @@
                 font-size: 0.8rem;
             }
 
+            .option-panel {
+                padding: 0.5rem;
+            }
+
+            .option-panel-container {
+                padding: 0 0.5rem;
+            }
+
             .option-buttons {
                 flex-direction: column;
                 align-items: center;
+                gap: 0.5rem;
             }
 
             .option-btn {
                 width: 100%;
-                max-width: 300px;
+                max-width: 100%;
+                min-width: auto;
+            }
+
+            .submit-section {
+                width: 100%;
+                padding: 1rem;
+            }
+        }
+
+        @@media (max-width: 480px) {
+            body {
+                padding-top: 200px;
+            }
+
+            .preview-pane {
+                padding: 1rem;
+            }
+
+            #preview-name {
+                font-size: 1.5rem;
+            }
+
+            .photo-container {
+                width: 80px;
+                height: 80px;
+            }
+
+            .interest-list {
+                justify-content: center;
+            }
+
+            .interest-item {
+                min-width: 70px;
             }
         }
     </style>
@@ -669,7 +777,7 @@
 
     <!-- Option Panel -->
     <div class="option-panel">
-        <div class="container">
+        <div class="option-panel-container">
             <div class="option-buttons">
                 <button class="option-btn active" onclick="useSampleData()">
                     <i class="fas fa-magic"></i> Sử dụng thông tin mẫu
@@ -883,9 +991,9 @@
                                 </div>
                                 <p class="job-company" contenteditable="true">Công ty Công nghệ XYZ</p>
                                 <p class="job-date" contenteditable="true">01/2022 - 10/2025</p>
-                                <p class="job-description" contenteditable="true">
-                                    • Phát triển và duy trì 3 module chính của hệ thống quản lý khách hàng (CRM) bằng .NET Core API và React.
-                                    • Tối ưu hóa hiệu suất database, giảm thời gian tải trang trung bình từ 3s xuống 1s.
+                                <p class="job-description" contenteditable="true" style="padding: 0; margin: 0; text-indent: 0; line-height: 1.6;">
+                                    • Phát triển và duy trì 3 module chính của hệ thống quản lý khách hàng (CRM) bằng .NET Core API và React.<br>
+                                    • Tối ưu hóa hiệu suất database, giảm thời gian tải trang trung bình từ 3s xuống 1s.<br>
                                     • Đào tạo và hỗ trợ 2 lập trình viên junior trong nhóm.
                                 </p>
                             </div>
@@ -896,8 +1004,8 @@
                                 </div>
                                 <p class="job-company" contenteditable="true">Công ty Phần mềm MNO</p>
                                 <p class="job-date" contenteditable="true">06/2019 - 12/2021</p>
-                                <p class="job-description" contenteditable="true">
-                                    • Tham gia phát triển ứng dụng thương mại điện tử sử dụng ASP.NET MVC và Angular.
+                                <p class="job-description" contenteditable="true" style="padding: 0; margin: 0; text-indent: 0; line-height: 1.6;">
+                                    • Tham gia phát triển ứng dụng thương mại điện tử sử dụng ASP.NET MVC và Angular. <br />
                                     • Xây dựng các API RESTful theo tiêu chuẩn bảo mật.
                                 </p>
                             </div>
@@ -932,7 +1040,7 @@
         <!-- Section Gửi CV ở cuối -->
         <div class="submit-section">
             <h4>Hoàn thành CV của bạn</h4>
-            <p class="text-muted">Kiểm tra lại thông tin và gửi CV qua email</p>
+            <p class="text-danger">Kiểm tra thông tin trước khi gửi. CV sẽ được gửi qua email bạn đã nhập (lưu ý điền đúng email)</p>
             <button type="button" class="btn btn-success submit-btn" onclick="saveAndSubmit()">
                 <i class="fas fa-paper-plane"></i> Gửi CV qua Email
             </button>
@@ -1008,7 +1116,6 @@
                 elementId: item.id
             }));
 
-            console.log("Initialized contacts state:", contactsState);
         }
 
         // === ĐỒNG BỘ STATE VỚI FORM ẨN ===
@@ -1019,8 +1126,8 @@
             document.getElementById('hiddenContactEmail').value = '';
             document.getElementById('hiddenPhoneNumber').value = '';
             document.getElementById('hiddenAddress').value = '';
-            document.getElementById('hiddenDateOfBirth').value = '';  // ✅ RESET
-            document.getElementById('hiddenGender').value = '';       // ✅ RESET
+            document.getElementById('hiddenDateOfBirth').value = ''; 
+            document.getElementById('hiddenGender').value = '';     
 
             // Xóa các dynamic inputs cũ
             document.querySelectorAll('.dynamic-contact-input').forEach(input => input.remove());
@@ -1049,7 +1156,7 @@
                         }
                         break;
                     case 'gender':
-                        document.getElementById('hiddenGender').value = contact.value; 
+                        document.getElementById('hiddenGender').value = contact.value;
                         break;
                     case 'website':
                         createHiddenInput('cvForm', 'Profile.Website', contact.value);
@@ -1061,9 +1168,6 @@
                         break;
                 }
             });
-
-            console.log("Form sync completed - DateOfBirth:", document.getElementById('hiddenDateOfBirth').value);
-            console.log("Form sync completed - Gender:", document.getElementById('hiddenGender').value);
         }
 
         // === CẬP NHẬT HÀM REMOVE ITEM ===
@@ -1072,7 +1176,6 @@
             if (item) {
                 // 1. Cập nhật state
                 contactsState = contactsState.filter(contact => contact.elementId !== elementId);
-                console.log("Updated contacts state after removal:", contactsState);
 
                 // 2. Xóa element khỏi DOM
                 item.remove();
@@ -1106,15 +1209,15 @@
             const defaultValue = getContactDefaultValue(type);
 
             const newItemHTML = `
-                        <li id="${newId}" class="contact-item dynamic-item" data-type="${type}">
-                            <button class="delete-btn" onclick="removeItem('${newId}')">
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
-                            <p contenteditable="true" class="contact-value">${defaultValue}</p>
-                            <div class="icon-wrapper">
-                                <i class="${getContactIconClass(type)}"></i>
-                            </div>
-                        </li>`;
+                                <li id="${newId}" class="contact-item dynamic-item" data-type="${type}">
+                                    <button class="delete-btn" onclick="removeItem('${newId}')">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                    <p contenteditable="true" class="contact-value">${defaultValue}</p>
+                                    <div class="icon-wrapper">
+                                        <i class="${getContactIconClass(type)}"></i>
+                                    </div>
+                                </li>`;
 
             list.insertAdjacentHTML('beforeend', newItemHTML);
 
@@ -1124,8 +1227,6 @@
                 value: defaultValue,
                 elementId: newId
             });
-
-            console.log("Added new contact to state:", contactsState);
 
             const newItem = list.lastElementChild;
             newItem.querySelector('.contact-value').focus();
@@ -1371,15 +1472,15 @@
             const list = document.getElementById('experience-list');
             const newId = `exp-${Date.now()}`;
             const newItemHTML = `
-                                <div id="${newId}" class="job-item dynamic-item">
-                                    <button class="delete-btn" onclick="removeItem('${newId}')"><i class="fas fa-trash-alt"></i></button>
-                                    <div class="job-header">
-                                        <h4 class="job-title" contenteditable="true">Chức danh</h4>
-                                    </div>
-                                    <p class="job-company" contenteditable="true">Tên công ty</p>
-                                    <p class="job-date" contenteditable="true">01/2022 - 10/2025</p>
-                                    <p class="job-description" contenteditable="true">• Mô tả công việc.</p>
-                                </div>`;
+                                        <div id="${newId}" class="job-item dynamic-item">
+                                            <button class="delete-btn" onclick="removeItem('${newId}')"><i class="fas fa-trash-alt"></i></button>
+                                            <div class="job-header">
+                                                <h4 class="job-title" contenteditable="true">Chức danh</h4>
+                                            </div>
+                                            <p class="job-company" contenteditable="true">Tên công ty</p>
+                                            <p class="job-date" contenteditable="true">01/2022 - 10/2025</p>
+                                            <p class="job-description" contenteditable="true">• Mô tả công việc.</p>
+                                        </div>`;
             insertAndFocus(list, newItemHTML, '.job-title');
         }
 
@@ -1387,14 +1488,14 @@
             const list = document.getElementById('projects-list');
             const newId = `proj-${Date.now()}`;
             const newItemHTML = `
-                                <div id="${newId}" class="job-item dynamic-item">
-                                    <button class="delete-btn" onclick="removeItem('${newId}')"><i class="fas fa-trash-alt"></i></button>
-                                    <div class="job-header">
-                                        <h4 class="job-title" contenteditable="true">Tên dự án</h4>
-                                    </div>
-                                    <p class="job-company" contenteditable="true">Link dự án (nếu có)</p>
-                                    <p class="job-description" contenteditable="true">• Mô tả dự án.</p>
-                                </div>`;
+                                        <div id="${newId}" class="job-item dynamic-item">
+                                            <button class="delete-btn" onclick="removeItem('${newId}')"><i class="fas fa-trash-alt"></i></button>
+                                            <div class="job-header">
+                                                <h4 class="job-title" contenteditable="true">Tên dự án</h4>
+                                            </div>
+                                            <p class="job-company" contenteditable="true">Link dự án (nếu có)</p>
+                                            <p class="job-description" contenteditable="true">• Mô tả dự án.</p>
+                                        </div>`;
             insertAndFocus(list, newItemHTML, '.job-title');
         }
 
@@ -1402,12 +1503,12 @@
             const list = document.getElementById('education-list');
             const newId = `edu-${Date.now()}`;
             const newItemHTML = `
-                                <div id="${newId}" class="edu-item dynamic-item">
-                                    <button class="delete-btn" onclick="removeItem('${newId}')"><i class="fas fa-trash-alt"></i></button>
-                                    <p class="edu-degree" contenteditable="true">Bằng cấp/Chuyên ngành</p>
-                                    <p class="edu-institution" contenteditable="true">Tên trường/Tổ chức</p>
-                                    <p class="edu-date" contenteditable="true">2018 - 2022</p>
-                                </div>`;
+                                        <div id="${newId}" class="edu-item dynamic-item">
+                                            <button class="delete-btn" onclick="removeItem('${newId}')"><i class="fas fa-trash-alt"></i></button>
+                                            <p class="edu-degree" contenteditable="true">Bằng cấp/Chuyên ngành</p>
+                                            <p class="edu-institution" contenteditable="true">Tên trường/Tổ chức</p>
+                                            <p class="edu-date" contenteditable="true">2018 - 2022</p>
+                                        </div>`;
             insertAndFocus(list, newItemHTML, '.edu-degree');
         }
 
@@ -1415,10 +1516,10 @@
             const list = document.getElementById('skills-list');
             const newId = `skill-${Date.now()}`;
             const newItemHTML = `
-                                <div id="${newId}" class="skill-item dynamic-item">
-                                    <button class="delete-btn" onclick="removeItem('${newId}')"><i class="fas fa-trash-alt"></i></button>
-                                    <p contenteditable="true">Kỹ năng mới</p>
-                                </div>`;
+                                        <div id="${newId}" class="skill-item dynamic-item">
+                                            <button class="delete-btn" onclick="removeItem('${newId}')"><i class="fas fa-trash-alt"></i></button>
+                                            <p contenteditable="true">Kỹ năng mới</p>
+                                        </div>`;
             insertAndFocus(list, newItemHTML, 'p');
         }
 
@@ -1426,11 +1527,11 @@
             const list = document.getElementById('certificates-list');
             const newId = `cert-${Date.now()}`;
             const newItemHTML = `
-                                <div id="${newId}" class="cert-item dynamic-item">
-                                    <button class="delete-btn" onclick="removeItem('${newId}')"><i class="fas fa-trash-alt"></i></button>
-                                    <p class="cert-title" contenteditable="true">Tên chứng chỉ</p>
-                                    <p class="cert-date" contenteditable="true">03/2023</p>
-                                </div>`;
+                                        <div id="${newId}" class="cert-item dynamic-item">
+                                            <button class="delete-btn" onclick="removeItem('${newId}')"><i class="fas fa-trash-alt"></i></button>
+                                            <p class="cert-title" contenteditable="true">Tên chứng chỉ</p>
+                                            <p class="cert-date" contenteditable="true">03/2023</p>
+                                        </div>`;
             insertAndFocus(list, newItemHTML, '.cert-title');
         }
 
@@ -1438,13 +1539,13 @@
             const list = document.getElementById('references-list');
             const newId = `ref-${Date.now()}`;
             const newItemHTML = `
-                                <div id="${newId}" class="edu-item dynamic-item">
-                                    <button class="delete-btn" onclick="removeItem('${newId}')"><i class="fas fa-trash-alt"></i></button>
-                                    <p class="edu-degree" contenteditable="true">Tên người tham chiếu</p>
-                                    <p class="edu-institution" contenteditable="true">Chức vụ, Công ty</p>
-                                    <p class="edu-date" contenteditable="true">Số điện thoại</p>
-                                    <p class="edu-date" contenteditable="true">Email</p>
-                                </div>`;
+                                        <div id="${newId}" class="edu-item dynamic-item">
+                                            <button class="delete-btn" onclick="removeItem('${newId}')"><i class="fas fa-trash-alt"></i></button>
+                                            <p class="edu-degree" contenteditable="true">Tên người tham chiếu</p>
+                                            <p class="edu-institution" contenteditable="true">Chức vụ, Công ty</p>
+                                            <p class="edu-date" contenteditable="true">Số điện thoại</p>
+                                            <p class="edu-date" contenteditable="true">Email</p>
+                                        </div>`;
             insertAndFocus(list, newItemHTML, '.edu-degree');
         }
 
@@ -1452,16 +1553,15 @@
             const list = document.getElementById('interests-list');
             const newId = `int-${Date.now()}`;
             const newItemHTML = `
-                                <div id="${newId}" class="dynamic-item">
-                                    <button class="delete-btn" onclick="removeItem('${newId}')"><i class="fas fa-trash-alt"></i></button>
-                                    <span class="interest-item" contenteditable="true">Sở thích mới</span>
-                                </div>`;
+                                        <div id="${newId}" class="dynamic-item">
+                                            <button class="delete-btn" onclick="removeItem('${newId}')"><i class="fas fa-trash-alt"></i></button>
+                                            <span class="interest-item" contenteditable="true">Sở thích mới</span>
+                                        </div>`;
             insertAndFocus(list, newItemHTML, '.interest-item');
         }
 
         // === FORM SUBMISSION ===
         function saveAndSubmit() {
-            console.log("=== BẮT ĐẦU GỬI CV ===");
 
             showLoading();
 
@@ -1472,7 +1572,6 @@
 
             updateHiddenForm();
 
-            console.log("Đang gửi form đến CvProcess/SubmitCv...");
             document.getElementById('cvForm').submit();
         }
 
@@ -1481,8 +1580,6 @@
             const emailItem = Array.from(document.querySelectorAll('#contact-list .contact-item'))
                 .find(item => item.dataset.type === 'email');
             const email = emailItem?.querySelector('.contact-value').innerText.trim();
-
-            console.log("Kiểm tra dữ liệu:", { fullName, email });
 
             if (!fullName || fullName === 'Họ và tên' || fullName === '') {
                 alert('Vui lòng nhập họ và tên');
@@ -1524,13 +1621,6 @@
             document.getElementById('hiddenFullName').value = fullName;
             document.getElementById('hiddenJobTitle').value = jobTitle;
             document.getElementById('hiddenSummary').value = summary;
-
-            console.log("Thông tin cá nhân:", { fullName, jobTitle, summary });
-
-            // 2. Thông tin liên hệ - INCLUDING GENDER AND DATE OF BIRTH
-            // (Đã được xử lý tự động bởi syncContactsToHiddenForm)
-
-            console.log("Thông tin liên hệ từ state:", contactsState);
 
             // 3. Tạo dynamic inputs cho các sections
             createDynamicInputs();
@@ -1695,7 +1785,7 @@
 
         function addToSocialLinks(type, value) {
             const form = document.getElementById('cvForm');
-            createHiddenInput(form, `Profile.SocialLinks[${socialLinkIndex}].PlatformName`, type); // SỬA Platform → PlatformName
+            createHiddenInput(form, `Profile.SocialLinks[${socialLinkIndex}].PlatformName`, type); 
             createHiddenInput(form, `Profile.SocialLinks[${socialLinkIndex}].Url`, value);
             socialLinkIndex++;
         }

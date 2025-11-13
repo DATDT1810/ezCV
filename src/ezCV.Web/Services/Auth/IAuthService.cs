@@ -13,5 +13,8 @@ namespace ezCV.Web.Services.Auth
         Task<bool> Logout(string sessionId);
         Task<bool> ForgotPassword(string email);
         Task<bool> ResetPassword(string email, string newPassword);
+        Task<string> AuthenWithEmail(string email, CancellationToken cancellationToken = default);
+        Task<bool> VerifyOtp(VerifyOtpRequest verifyOtp);
+        Task<bool> ResetPasswordWithOtp(string email, string newPassword, string otp);
     }
 }

@@ -118,7 +118,7 @@ namespace ezCV.Api.Controllers
         }
 
         // Endpoint: /api/auth/logout
-        //[Authorize]
+        [Authorize]
         [HttpPost("logout")]
         public async Task<IActionResult> Logout([FromBody] AuthRequest request)
         {
@@ -132,6 +132,47 @@ namespace ezCV.Api.Controllers
 
             // Trả về 204 No Content (thành công)
             return NoContent();
+        }
+
+        //[Authorize]
+        [HttpPost("authen-with-email")]
+        public async Task<IActionResult> AuthenWithEmail([FromBody] AuthenEmailRequest request)
+        {
+            var user = await _authService.AuthenWithEmail(request.Email);
+            if (user == null)
+            {
+                return BadRequest();
+            }
+            return Ok(user);
+        }
+
+        [HttpPost("verify-otp")]
+        public async Task<IActionResult> VerifyOtp([FromBody] VerifyOtpRequest request)
+        {
+            return Ok(new { success = true, message = "Xác thực OTP thành công." });
+        }
+
+        [HttpPost("reset-password-with-otp")]
+        public async Task<IActionResult> ResetPasswordWithOtp([FromBody] ResetPasswordRequest request)
+        {
+            try
+            {
+                // TODO: Thêm logic verify OTP trước khi reset password
+                var success = await _authService.ResetPasswordAsync(request.Identifier, request.NewPassword);
+
+                if (success)
+                {
+                    return Ok(new { success = true, message = "Mật khẩu đã được đặt lại thành công." });
+                }
+                else
+                {
+                    return BadRequest(new { success = false, message = "Đặt lại mật khẩu thất bại." });
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
+            }
         }
 
     }

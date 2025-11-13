@@ -1,4 +1,4 @@
-﻿using ezCV.Application.External.Models;
+﻿using ezCV.Application.External;
 using ezCV.Application.Features.CvProcessing.Models;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Logging;
@@ -68,14 +68,9 @@ namespace ezCV.Infrastructure.External
                 3 => GenerateTemplate3(cvData),  // Template Interactive (Amber)
                 4 => GenerateTemplate4(cvData),  // Template Sky Blue
                 5 => GenerateTemplate5(cvData),  // Template Black & White
-                6 => GenerateTemplate6(cvData),  // Template Black & White
+                6 => GenerateTemplate6(cvData),  // Template 
                 _ => GenerateTemplate1(cvData)   // Default
             };
-        }
-
-        private string GenerateTemplate6(CvSubmissionRequest cvData)
-        {
-            throw new NotImplementedException();
         }
 
         #region Template Base Methods
@@ -107,18 +102,22 @@ namespace ezCV.Infrastructure.External
         {
             return @"
         @@media print {
-            body {
-                background-color: #fff;
-                margin: 0;
-                padding: 0;
+            body * {
+                background: transparent !important;
+                color: black !important;
             }
-            .page-container {
-                padding: 0;
-                margin: 0;
-                background: white;
+            .cv-container,
+            .cv-container * {
+                background: white !important;
             }
             .page-header,
-            .add-btn-container {
+            .add-btn-container,
+            .print-button,
+            .picture-upload-label,
+            .dynamic-item:hover,
+            .delete-btn,
+            .add-btn-container,
+            .add-btn {
                 display: none !important;
             }
             .preview-pane {
@@ -132,29 +131,64 @@ namespace ezCV.Infrastructure.External
             .dynamic-item:hover {
                 background-color: transparent !important;
             }
-            .delete-btn {
-                display: none !important;
-            }
-            .print-button,
-            .picture-upload-label,
-            .add-btn-container,
-            .add-btn {
-                display: none !important;
-            }
         }";
         }
 
         #endregion
 
-        #region Template 1 - Professional
+        #region Template Methods
+
         private string GenerateTemplate1(CvSubmissionRequest cvData)
         {
             var profile = cvData.Profile;
             var css = GetTemplate1Styles();
             var body = GetTemplate1Body(profile, cvData);
-
             return GenerateBaseTemplate(cvData, css, body);
         }
+
+        private string GenerateTemplate2(CvSubmissionRequest cvData)
+        {
+            var profile = cvData.Profile;
+            var css = GetTemplate2Styles();
+            var body = GetTemplate2Body(profile, cvData);
+            return GenerateBaseTemplate(cvData, css, body);
+        }
+
+        private string GenerateTemplate3(CvSubmissionRequest cvData)
+        {
+            var profile = cvData.Profile;
+            var css = GetTemplate3Styles();
+            var body = GetTemplate3Body(profile, cvData);
+            return GenerateBaseTemplate(cvData, css, body);
+        }
+
+        private string GenerateTemplate4(CvSubmissionRequest cvData)
+        {
+            var profile = cvData.Profile;
+            var css = GetTemplate4Styles();
+            var body = GetTemplate4Body(profile, cvData);
+            return GenerateBaseTemplate(cvData, css, body);
+        }
+
+        private string GenerateTemplate5(CvSubmissionRequest cvData)
+        {
+            var profile = cvData.Profile;
+            var css = GetTemplate5Styles();
+            var body = GetTemplate5Body(profile, cvData);
+            return GenerateBaseTemplate(cvData, css, body);
+        }
+
+        private string GenerateTemplate6(CvSubmissionRequest cvData)
+        {
+            var profile = cvData.Profile;
+            var css = GetTemplate6Styles();
+            var body = GetTemplate6Body(profile, cvData);
+            return GenerateBaseTemplate(cvData, css, body);
+        }
+
+        #endregion
+
+        #region Template Styles
 
         private string GetTemplate1Styles()
         {
@@ -194,13 +228,12 @@ namespace ezCV.Infrastructure.External
             background-color: white;
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
             width: 210mm;
-            height: 297mm;
+            min-height: 297mm;
             padding: var(--cv-padding);
             margin: 0;
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            page-break-after: always;
             border: 1px solid #e0e0e0;
         }}
 
@@ -286,6 +319,9 @@ namespace ezCV.Infrastructure.External
             font-size: 8pt;
             margin: 0;
             line-height: 1.2;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }}
 
         .contact-item .icon-wrapper {{
@@ -399,6 +435,9 @@ namespace ezCV.Infrastructure.External
             white-space: pre-wrap;
             font-size: 8pt;
             margin: 0;
+            padding-left: 0 !important;
+            margin-left: 0 !important;
+            text-indent: 0 !important;
         }}
 
         .edu-item .edu-degree,
@@ -462,102 +501,12 @@ namespace ezCV.Infrastructure.External
 
         .list-container {{
             max-height: none;
+        }}
+
+        /* Ẩn section không có nội dung */
+        .empty-section {{
+            display: none !important;
         }}";
-        }
-
-        private string GetTemplate1Body(CvProfileRequest profile, CvSubmissionRequest cvData)
-        {
-            return $@"
-    <div class=""page-container"">
-        <div class=""preview-pane"">
-            <!-- Header -->
-            <header class=""preview-header"">
-                <img id=""preview-photo"" src=""{EscapeHtml(profile.AvatarUrl)}"" alt=""Profile Photo"">
-                <div class=""header-main"">
-                    <h1 id=""preview-name"">{EscapeHtml(profile.FullName)}</h1>
-                    <h2 id=""preview-title"">{EscapeHtml(profile.JobTitle)}</h2>
-                </div>
-                <div class=""header-divider""></div>
-                <div class=""contact-info"">
-                    <ul id=""contact-list"" class=""contact-list"">
-                        {RenderContactForTemplate1(profile)}
-                    </ul>
-                </div>
-            </header>
-
-            <!-- Body -->
-            <main class=""preview-body"">
-                <!-- Left Column -->
-                <div class=""left-column"">
-                    <section class=""cv-section"">
-                        <h3 class=""section-title"">Học vấn</h3>
-                        <div id=""education-list"" class=""list-container"">
-                            {RenderEducationForTemplate1(cvData.Educations)}
-                        </div>
-                    </section>
-                    <section class=""cv-section"">
-                        <h3 class=""section-title"">Kỹ năng</h3>
-                        <div id=""skills-list"" class=""list-container"">
-                            {RenderSkillsForTemplate1(cvData.Skills)}
-                        </div>
-                    </section>
-                    <section class=""cv-section"">
-                        <h3 class=""section-title"">Chứng chỉ</h3>
-                        <div id=""certificates-list"" class=""list-container"">
-                            {RenderCertificatesForTemplate1(cvData.Certificates)}
-                        </div>
-                    </section>
-                    <section class=""cv-section"">
-                        <h3 class=""section-title"">Người tham chiếu</h3>
-                        <div id=""references-list"" class=""list-container"">
-                            {RenderReferencesForTemplate1(cvData.References)}
-                        </div>
-                    </section>
-                    <section class=""cv-section"">
-                        <h3 class=""section-title"">Điều quan tâm</h3>
-                        <div id=""interests-list"" class=""interest-list"">
-                            {RenderInterestsForTemplate1(cvData.Hobbies)}
-                        </div>
-                    </section>
-                </div>
-
-                <div class=""main-divider""></div>
-
-                <!-- Right Column -->
-                <div class=""right-column"">
-                    <section class=""cv-section"">
-                        <h3 class=""section-title"">Giới thiệu</h3>
-                        <div id=""about-preview"">
-                            <p>{EscapeHtml(profile.Summary)}</p>
-                        </div>
-                    </section>
-                    <section class=""cv-section"">
-                        <h3 class=""section-title"">Kinh nghiệm làm việc</h3>
-                        <div id=""experience-list"" class=""list-container"">
-                            {RenderWorkExperiencesForTemplate1(cvData.WorkExperiences)}
-                        </div>
-                    </section>
-                    <section class=""cv-section"">
-                        <h3 class=""section-title"">Dự án</h3>
-                        <div id=""projects-list"" class=""list-container"">
-                            {RenderProjectsForTemplate1(cvData.Projects)}
-                        </div>
-                    </section>
-                </div>
-            </main>
-        </div>
-    </div>";
-        }
-        #endregion
-
-        #region Template 2 - Modern
-        private string GenerateTemplate2(CvSubmissionRequest cvData)
-        {
-            var profile = cvData.Profile;
-            var css = GetTemplate2Styles();
-            var body = GetTemplate2Body(profile, cvData);
-
-            return GenerateBaseTemplate(cvData, css, body);
         }
 
         private string GetTemplate2Styles()
@@ -572,7 +521,7 @@ namespace ezCV.Infrastructure.External
         }}
 
         body {{
-            background-color: #f0f2f5;
+            background-color: white;
             font-family: 'Roboto', sans-serif;
             color: var(--text-light);
             font-size: 9pt;
@@ -742,25 +691,26 @@ namespace ezCV.Infrastructure.External
             line-height: 1.2;
         }}
 
-        .item-description {{
+       .item-description {{
             padding-left: 1rem;
             list-style: none;
             margin: 0;
         }}
-        
+
         .item-description li {{
             position: relative;
             margin-bottom: 0.15rem;
-            font-size: 8pt;
+            font-size: 9pt;
             line-height: 1.3;
         }}
-        
+
         .item-description li::before {{
             content: '•';
             position: absolute;
             left: -0.8rem;
             color: var(--primary-color);
             font-weight: bold;
+            font-size: 1.2em;
         }}
 
         /* --- Remove interactive elements for PDF --- */
@@ -787,376 +737,288 @@ namespace ezCV.Infrastructure.External
         }}";
         }
 
-        private string GetTemplate2Body(CvProfileRequest profile, CvSubmissionRequest cvData)
-        {
-            return $@"
-    <div class=""page-container"">
-        <div class=""cv-container"">
-            <!-- Sidebar -->
-            <aside class=""cv-sidebar"">
-                <div class=""profile-picture-container"">
-                    <img id=""profile-picture"" src=""{EscapeHtml(profile.AvatarUrl)}"" alt=""Profile Picture"">
-                </div>
-
-                <section class=""sidebar-section"">
-                    <ul id=""contact-list"">
-                        {RenderContactForTemplate2(profile)}
-                    </ul>
-                </section>
-
-                <section class=""sidebar-section"">
-                    <h3 class=""section-title"">GIỚI THIỆU</h3>
-                    <p style=""font-size: 8.5pt; line-height: 1.4; margin: 0;"">{EscapeHtml(profile.Summary)}</p>
-                </section>
-
-                <section class=""sidebar-section"">
-                    <h3 class=""section-title"">KỸ NĂNG</h3>
-                    <ul style=""list-style: none; padding: 0; margin: 0; font-size: 8.5pt;"">
-                        {RenderSkillsForTemplate2(cvData.Skills)}
-                    </ul>
-                </section>
-            </aside>
-
-            <!-- Main Content -->
-            <main class=""cv-main"">
-                <header class=""main-header"">
-                    <h1 id=""cv-name"">{EscapeHtml(profile.FullName)}</h1>
-                    <h2 id=""cv-title"">{EscapeHtml(profile.JobTitle)}</h2>
-                </header>
-
-                <section class=""main-section"">
-                    <h3 class=""section-title"">HỌC VẤN</h3>
-                    <div id=""education-list"" class=""list-container"">
-                        {RenderEducationForTemplate2(cvData.Educations)}
-                    </div>
-                </section>
-
-                <section class=""main-section"" style=""margin-top: 1.5rem;"">
-                    <h3 class=""section-title"">KINH NGHIỆM LÀM VIỆC</h3>
-                    <div id=""experience-list"" class=""list-container"">
-                        {RenderWorkExperiencesForTemplate2(cvData.WorkExperiences)}
-                    </div>
-                </section>
-            </main>
-        </div>
-    </div>";
-        }
-        #endregion
-
-        #region Template 3 - Interactive (Amber)
-        private string GenerateTemplate3(CvSubmissionRequest cvData)
-        {
-            var profile = cvData.Profile;
-            var css = GetTemplate3Styles();
-            var body = GetTemplate3Body(profile, cvData);
-
-            return GenerateBaseTemplate(cvData, css, body);
-        }
-
         private string GetTemplate3Styles()
         {
-            return $@"
-        @@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css'); 
-        @@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+            return @"
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
         
-        :root {{
+        :root {
             --primary-color: #b45309;
             --dark-text: #292524;
             --gray-text: #57534e;
             --light-gray: #d6d3d1;
             --border-color: #e7e5e4;
-            --hover-bg: #fef3c7;
-        }}
+        }
         
-        body {{
+        body {
             font-family: 'Inter', sans-serif;
-            background-color: #f5f5f4;
+            background-color: white !important;
             color: var(--gray-text);
-            font-size: 10pt;
-            margin: 0;
-            padding: 0;
-        }}
+            font-size: 9pt;
+            line-height: 1.3;
+            margin: 0 !important;
+            padding: 0 !important;
+            width: 210mm;
+            height: 297mm;
+            overflow: hidden;
+        }
         
-        .cv-container {{
-            max-width: 210mm;
-            margin: 0 auto;
+        .cv-container {
+            width: 210mm;
+            height: 297mm;
             background: white;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            min-height: 297mm;
-            padding: 2rem;
-        }}
+            margin: 0 auto;
+            padding: 1rem 1.5rem;
+            overflow: hidden;
+            position: relative;
+        }
         
-        {GetCommonPrintStyles()}
-        
-        @@media print {{
-            .cv-container {{
-                box-shadow: none;
-                margin: 0;
-                padding: 1.5cm;
-            }}
-        }}
+        " + GetCommonPrintStyles() + @"
         
         /* Header */
-        .cv-header {{
+        .cv-header {
             text-align: center;
-            margin-bottom: 1.5rem;
-            padding-bottom: 1rem;
+            margin-bottom: 0.8rem;
+            padding-bottom: 0.5rem;
             border-bottom: 2px solid var(--primary-color);
-        }}
+        }
         
-        .cv-name {{
-            font-size: 1.8rem;
+        .cv-name {
+            font-size: 1.4rem;
             font-weight: 700;
             color: var(--dark-text);
             text-transform: uppercase;
             letter-spacing: 0.05em;
-            margin-bottom: 0.25rem;
-        }}
+            margin-bottom: 0.1rem;
+            line-height: 1.1;
+        }
         
-        .cv-title {{
-            font-size: 1rem;
+        .cv-title {
+            font-size: 0.8rem;
             font-weight: 500;
             color: var(--primary-color);
             text-transform: uppercase;
             letter-spacing: 0.1em;
-        }}
+        }
         
         /* Contact Info */
-        .contact-grid {{
+        .contact-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 0.5rem;
-            margin-bottom: 1.5rem;
-            font-size: 9pt;
-        }}
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 0.2rem;
+            margin-bottom: 0.8rem;
+            font-size: 8pt;
+        }
         
-        .contact-item {{
+        .contact-item {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-        }}
+            gap: 0.3rem;
+        }
         
-        .contact-icon {{
+        .contact-icon {
             color: var(--primary-color);
-            width: 16px;
+            width: 12px;
             text-align: center;
-        }}
+            font-size: 0.65rem;
+        }
         
         /* Main Layout */
-        .cv-main {{
+        .cv-main {
             display: grid;
             grid-template-columns: 35% 65%;
-            gap: 1.5rem;
-        }}
+            gap: 0.8rem;
+            height: calc(297mm - 7rem);
+            overflow: hidden;
+        }
         
-        .section-title {{
-            font-size: 0.9rem;
+        .section-title {
+            font-size: 0.8rem;
             font-weight: 600;
             color: var(--dark-text);
             text-transform: uppercase;
             letter-spacing: 0.1em;
-            margin-bottom: 0.75rem;
-            padding-bottom: 0.25rem;
+            margin-bottom: 0.4rem;
+            padding-bottom: 0.15rem;
             border-bottom: 1px solid var(--border-color);
-        }}
+        }
         
-        /* Left Column */
-        .left-column {{
+        /* Columns */
+        .left-column {
             display: flex;
             flex-direction: column;
-            gap: 1.25rem;
-        }}
+            gap: 0.8rem;
+            padding-right: 0.3rem;
+            overflow: hidden;
+        }
         
-        /* Right Column */
-        .right-column {{
+        .right-column {
             display: flex;
             flex-direction: column;
-            gap: 1.25rem;
+            gap: 0.8rem;
             border-left: 1px solid var(--border-color);
-            padding-left: 1.5rem;
-        }}
+            padding-left: 0.8rem;
+            overflow: hidden;
+        }
+        
+        /* GIỚI THIỆU - QUAN TRỌNG: ĐẢM BẢO HIỂN THỊ ĐẦY ĐỦ */
+        .summary-section {
+            flex-shrink: 0;
+        }
+        
+        .summary-content {
+            font-size: 8.5pt !important;
+            line-height: 1.4 !important;
+            text-align: justify;
+            white-space: pre-line !important;
+            word-wrap: break-word !important;
+            overflow: visible !important;
+            max-height: none !important;
+        }
         
         /* List Items */
-        .list-item {{
-            margin-bottom: 0.75rem;
-        }}
+        .list-item {
+            margin-bottom: 0.5rem;
+            page-break-inside: avoid;
+        }
         
-        .item-header {{
+        .item-header {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: 0.25rem;
-        }}
+            margin-bottom: 0.1rem;
+            flex-wrap: nowrap;
+        }
         
-        .item-title {{
+        .item-title {
             font-weight: 600;
             color: var(--dark-text);
-            font-size: 10pt;
-        }}
-        
-        .item-date {{
             font-size: 9pt;
+            line-height: 1.2;
+            flex: 1;
+        }
+        
+        .item-date {
+            font-size: 8pt;
             color: var(--gray-text);
             flex-shrink: 0;
-        }}
+            line-height: 1.2;
+            text-align: right;
+            min-width: 70px;
+            white-space: nowrap;
+            margin-left: 0.5rem;
+        }
         
-        .item-subtitle {{
+        .item-subtitle {
             font-style: italic;
             color: var(--gray-text);
-            font-size: 9.5pt;
-            margin-bottom: 0.25rem;
-        }}
+            font-size: 8.5pt;
+            margin-bottom: 0.15rem;
+            line-height: 1.2;
+        }
         
-        .item-description {{
-            font-size: 9pt;
-            line-height: 1.4;
-        }}
+        .item-description {
+            font-size: 8pt;
+            line-height: 1.3;
+            white-space: pre-line;
+        }
         
         /* Skills & Interests */
-        .skills-list {{
+        .skills-list {
             display: flex;
             flex-direction: column;
-            gap: 0.25rem;
-        }}
+            gap: 0.15rem;
+        }
         
-        .skill-item {{
-            padding: 0.1rem 0;
-        }}
+        .skill-item {
+            padding: 0.02rem 0;
+            font-size: 8pt;
+        }
         
-        .interests-list {{
+        .interests-list {
             display: flex;
             flex-wrap: wrap;
-            gap: 0.75rem;
-        }}
+            gap: 0.3rem;
+            margin-bottom: 0.2rem;
+        }
         
-        .interest-tag {{
+        .interest-tag {
             background: var(--light-gray);
-            padding: 0.4rem 0.8rem;
-            border-radius: 16px;
-            font-size: 9pt;
-        }}
+            padding: 0.2rem 0.4rem;
+            border-radius: 10px;
+            font-size: 8pt;
+            display: inline-block;
+        }
 
-        /* Languages & Interests Grid */
-        .languages-interests-grid {{
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1.5rem;
-        }}
+        /* Row-Col Layout */
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            margin-right: -0.3rem;
+            margin-left: -0.3rem;
+        }
+        
+        .g-3 {
+            gap: 0.6rem;
+        }
+        
+        .col-6 {
+            flex: 0 0 auto;
+            width: 50%;
+            padding-right: 0.3rem;
+            padding-left: 0.3rem;
+        }
 
-        /* Remove interactive elements */
+        .no-print,
         .print-button,
         .dynamic-item:hover,
         .delete-btn,
         .add-btn-container,
-        .add-btn {{
+        .add-btn,
+        .loading-overlay,
+        .contact-modal,
+        .option-panel,
+        .submit-section {
             display: none !important;
-        }}";
         }
 
-        private string GetTemplate3Body(CvProfileRequest profile, CvSubmissionRequest cvData)
-        {
-            return $@"
-    <div class=""cv-container"">
-        <header class=""cv-header"">
-            <div class=""cv-name"">{EscapeHtml(profile.FullName)}</div>
-            <div class=""cv-title"">{EscapeHtml(profile.JobTitle)}</div>
-        </header>
-        
-        <section class=""contact-grid"">
-            {RenderContactForTemplate3(profile)}
-        </section>
-        
-        <div class=""cv-main"">
-            <!-- LEFT COLUMN -->
-            <div class=""left-column"">
-                <section>
-                    <div class=""section-title"">Giới Thiệu</div>
-                    <div class=""item-description"" style=""line-height: 1.5;"">
-                        {EscapeHtml(profile.Summary)}
-                    </div>
-                </section>
-                
-                <section>
-                    <div class=""section-title"">Kỹ Năng</div>
-                    <div class=""skills-list"">
-                        {RenderSkillsForTemplate3(cvData.Skills)}
-                    </div>
-                </section>
-                
-                <section>
-                    <div class=""section-title"">Học Vấn</div>
-                    <div id=""education-list"">
-                        {RenderEducationForTemplate3(cvData.Educations)}
-                    </div>
-                </section>
-                
-                <section>
-                    <div class=""section-title"">Chứng Chỉ</div>
-                    <div id=""certifications-list"">
-                        {RenderCertificatesForTemplate3(cvData.Certificates)}
-                    </div>
-                </section>
-            </div>
-            
-            <!-- RIGHT COLUMN -->
-            <div class=""right-column"">
-                <section>
-                    <div class=""section-title"">Kinh Nghiệm Làm Việc</div>
-                    <div id=""experience-list"">
-                        {RenderWorkExperiencesForTemplate3(cvData.WorkExperiences)}
-                    </div>
-                </section>
-                
-                <section>
-                    <div class=""section-title"">Dự Án</div>
-                    <div id=""projects-list"">
-                        {RenderProjectsForTemplate3(cvData.Projects)}
-                    </div>
-                </section>
-                
-                <!-- GRID LAYOUT FOR LANGUAGES & INTERESTS -->
-                <div class=""languages-interests-grid"">
-                    <div>
-                        <div class=""section-title"">Ngôn Ngữ</div>
-                        <div id=""languages-list"">
-                            {RenderLanguagesForTemplate3(cvData.Languages)}
-                        </div>
-                    </div>
-                    <div>
-                        <div class=""section-title"">Sở Thích</div>
-                        <div class=""interests-list"" id=""interests-list"">
-                            {RenderInterestsForTemplate3(cvData.Hobbies)}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>";
+        .cv-container * {
+            background: transparent !important;
         }
-        #endregion
+        
+        .left-column,
+        .right-column {
+            background: white !important;
+        }
 
-        #region Template 4 - Sky Blue
-        private string GenerateTemplate4(CvSubmissionRequest cvData)
-        {
-            var profile = cvData.Profile;
-            var css = GetTemplate4Styles();
-            var body = GetTemplate4Body(profile, cvData);
-
-            return GenerateBaseTemplate(cvData, css, body);
+        .left-column {
+            min-height: 0;
+            flex: 1;
+        }
+        
+        .summary-content {
+            max-height: none !important;
+            overflow: visible !important;
+        }";
         }
 
         private string GetTemplate4Styles()
         {
-            return $@"
-        :root {{
+            return @"
+        :root {
             --primary-color: #0ea5e9;
             --text-dark: #1f2937;
             --text-medium: #4b5563;
             --text-light: #6b7280;
-            --bg-light: #ffffff; 
+            --bg-light: #ffffff;
             --border-color: #e5e7eb;
-        }}
-        body {{
+        }
+
+        body {
             font-family: 'Roboto', sans-serif;
             background-color: white;
             color: var(--text-medium);
@@ -1164,244 +1026,183 @@ namespace ezCV.Infrastructure.External
             padding: 0;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
-        }}
-        #resume-container {{
+        }
+
+        #resume-container {
             max-width: 210mm;
             min-height: 297mm;
             margin: 0 auto;
             background-color: white;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            padding: 2.5rem; 
-        }}
-        @@media (min-width: 640px) {{
-            #resume-container {{
+            padding: 2rem;
+        }
+
+        @@media (min-width: 640px) {
+            #resume-container {
                 padding: 2.5rem;
-            }}
-        }}
-        header {{
+            }
+        }
+
+        header {
             text-align: center;
             margin-bottom: 2.5rem;
-        }}
-        header h1 {{
+        }
+
+        header h1 {
             font-size: 2.25rem;
             font-weight: 700;
             letter-spacing: -0.025em;
             color: var(--text-dark);
             margin: 0;
-        }}
-        header h2 {{
+        }
+
+        header h2 {
             font-size: 1.5rem;
             color: var(--text-light);
             margin-top: 0.5rem;
-        }}
-        .section {{
+        }
+
+        .section {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 8px; 
+            gap: 8px;
             padding: 24px 0 0 0;
             border-top: 1px solid var(--border-color);
-        }}
-        main > .section:first-of-type {{
+        }
+
+        main > .section:first-of-type {
             border-top: none;
-            padding-top: 0; 
-        }}
-        @@media (min-width: 768px) {{
-            .section {{
+            padding-top: 0;
+        }
+
+        @@media (min-width: 768px) {
+            .section {
                 grid-template-columns: 1fr 3fr;
                 gap: 1.5rem;
-            }}
-        }}
-        .section-title {{
+            }
+        }
+
+        .section-title {
             font-size: 0.875rem;
             font-weight: 700;
             text-transform: uppercase;
             color: var(--primary-color);
             letter-spacing: 0.05em;
             margin: 0;
-        }}
-        @@media (min-width: 768px) {{
-            .section-title {{
+        }
+
+        @@media (min-width: 768px) {
+            .section-title {
                 text-align: right;
                 border-right: 2px solid var(--border-color);
                 padding-right: 1.5rem;
-            }}
-        }}
-        .section-content {{
+            }
+        }
+
+        .section-content {
             line-height: 1.625;
-        }}
-        .contact-grid {{
+        }
+
+        .contact-grid {
             display: grid;
             grid-template-columns: 1fr;
             gap: 0.5rem 2rem;
-        }}
-        @@media (min-width: 640px) {{
-            .contact-grid {{
+        }
+
+        @@media (min-width: 640px) {
+            .contact-grid {
                 grid-template-columns: 1fr 1fr;
-            }}
-        }}
-        .contact-item {{
+            }
+        }
+
+        .contact-item {
             display: flex;
             align-items: center;
-        }}
-        .contact-item i {{
+        }
+
+        .contact-item i {
             color: var(--primary-color);
             width: 1rem;
             margin-right: 0.75rem;
-        }}
-        .skills-list {{
+        }
+
+        .skills-list {
             display: flex;
             flex-wrap: wrap;
             gap: 1rem;
-        }}
-        .experience-list {{
+        }
+
+        .experience-list {
             display: flex;
             flex-direction: column;
             gap: 1.5rem;
-        }}
-        .experience-item-header {{
+        }
+
+        .experience-item-header {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
             gap: 1rem;
-        }}
-        .experience-item-header h3 {{
+        }
+
+        .experience-item-header h3 {
             font-size: 1.125rem;
             font-weight: 600;
             color: var(--text-dark);
             margin:0;
-        }}
-        .experience-item-header p {{
+        }
+
+        .experience-item-header p {
             font-weight: 500;
             color: var(--text-medium);
             margin: 0;
-        }}
-        .experience-item-date {{
+        }
+
+        .experience-item-date {
             font-size: 0.75rem;
             color: var(--text-light);
             white-space: nowrap;
             text-align: right;
-        }}
-        .responsibilities-list {{
+        }
+
+        .responsibilities-list {
             list-style: none;
             padding-left: 0;
             margin-top: 0.5rem;
             display: flex;
             flex-direction: column;
             gap: 0.5rem;
-        }}
-        .responsibility-item {{
+        }
+
+        .responsibility-item {
             display: flex;
             align-items: flex-start;
             gap: 0.5rem;
-        }}
-        .responsibility-item::before {{
+        }
+
+        .responsibility-item::before {
             content: '•';
             color: var(--primary-color);
             margin-top: 0.15em;
             font-size: 1.25em;
             line-height: 1;
-        }}
+        }
 
-        {GetCommonPrintStyles()}
+        " + GetCommonPrintStyles() + @"
 
         /* Remove interactive elements */
         .print-button,
         .dynamic-item:hover,
         .delete-btn,
         .add-btn-container,
-        .add-btn {{
+        .add-btn {
             display: none !important;
-        }}";
         }
 
-        private string GetTemplate4Body(CvProfileRequest profile, CvSubmissionRequest cvData)
-        {
-            // Tự động xây dựng các mục có dữ liệu
-            var summaryHtml = !string.IsNullOrWhiteSpace(profile.Summary) ? $@"
-        <section class=""section"">
-            <h2 class=""section-title"">Giới thiệu</h2>
-            <div class=""section-content"">
-                <div>{EscapeHtml(profile.Summary)}</div>
-            </div>
-        </section>" : "";
-
-            var contactHtml = !string.IsNullOrWhiteSpace(profile.ContactEmail) || !string.IsNullOrWhiteSpace(profile.PhoneNumber) || !string.IsNullOrWhiteSpace(profile.Address) || profile.DateOfBirth.HasValue || !string.IsNullOrWhiteSpace(profile.Gender) ? $@"
-        <section class=""section"">
-            <h2 class=""section-title"">Liên hệ</h2>
-            <div class=""section-content"">
-                <div class=""contact-grid"">
-                    {RenderContactForTemplate4(profile)}
-                </div>
-            </div>
-        </section>" : "";
-
-            var skillsHtml = (cvData.Skills != null && cvData.Skills.Any()) ? $@"
-        <section class=""section"">
-            <h2 class=""section-title"">Kỹ năng</h2>
-            <div class=""section-content"">
-                <div class=""skills-list"">
-                    {RenderSkillsForTemplate4(cvData.Skills)}
-                </div>
-            </div>
-        </section>" : "";
-
-            var experiencesHtml = (cvData.WorkExperiences != null && cvData.WorkExperiences.Any()) ? $@"
-        <section class=""section"">
-            <h2 class=""section-title"">Kinh nghiệm làm việc</h2>
-            <div class=""section-content"">
-                <div class=""experience-list"">
-                    {RenderWorkExperiencesForTemplate4(cvData.WorkExperiences)}
-                </div>
-            </div>
-        </section>" : "";
-
-            var educationHtml = (cvData.Educations != null && cvData.Educations.Any()) ? $@"
-        <section class=""section"">
-            <h2 class=""section-title"">Học vấn</h2>
-            <div class=""section-content"">
-                <div class=""experience-list"">
-                    {RenderEducationForTemplate4(cvData.Educations)}
-                </div>
-            </div>
-        </section>" : "";
-
-            var certificatesHtml = (cvData.Certificates != null && cvData.Certificates.Any()) ? $@"
-        <section class=""section"">
-            <h2 class=""section-title"">Chứng chỉ</h2>
-            <div class=""section-content"">
-                <div class=""experience-list"">
-                    {RenderCertificatesForTemplate4(cvData.Certificates)}
-                </div>
-            </div>
-        </section>" : "";
-
-            return $@"
-    <div id=""resume-container"">
-        <header>
-            <h1>{EscapeHtml(profile.FullName)}</h1>
-            <h2>{EscapeHtml(profile.JobTitle)}</h2>
-        </header>
-        
-        <main>
-            {summaryHtml}
-            {contactHtml}
-            {skillsHtml}
-            {experiencesHtml}
-            {educationHtml}
-            {certificatesHtml}
-        </main>
-    </div>";
-        }
-        #endregion
-
-        #region Template 5 - Black & White
-        private string GenerateTemplate5(CvSubmissionRequest cvData)
-        {
-            var profile = cvData.Profile;
-            var css = GetTemplate5Styles();
-            var body = GetTemplate5Body(profile, cvData);
-
-            return GenerateBaseTemplate(cvData, css, body);
+        /* Hide empty sections */
+        .empty-section {
+            display: none !important;
+        }";
         }
 
         private string GetTemplate5Styles()
@@ -1641,6 +1442,589 @@ namespace ezCV.Infrastructure.External
         }}";
         }
 
+        private string GetTemplate6Styles()
+        {
+            return @"
+        :root {
+            --primary-color: #DD704A;
+            --text-dark: #333;
+            --text-light: #555;
+            --border-color: #e0e0e0;
+            --hover-bg: #fef5f2;
+            --danger-color: #ef4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: white !important;
+            font-family: 'Roboto', sans-serif;
+            color: var(--text-light);
+            font-size: 11pt;
+            line-height: 1.6;
+            margin: 0 !important;
+            padding: 0 !important;
+            width: 210mm;
+            height: 297mm;
+            overflow: hidden;
+        }
+
+        .cv-container {
+            background-color: white !important;
+            box-shadow: none !important;
+            border: none !important;
+            margin: 0 auto;
+            width: 210mm;
+            min-height: 297mm;
+            padding: 2.5rem;
+            max-width: 100%;
+            box-sizing: border-box;
+            position: relative;
+        }
+
+        /* Header */
+        .cv-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 1.5rem;
+        }
+
+        .cv-name {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: var(--text-dark);
+            margin: 0;
+            line-height: 1.1;
+        }
+
+        .cv-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin: 0.25rem 0 0 0;
+        }
+
+        .header-right {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+
+        .contact-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            text-align: right;
+            font-size: 10pt;
+        }
+
+        .contact-list li {
+            position: relative;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            margin-bottom: 0.3rem;
+            padding: 2px 0;
+        }
+
+        .contact-list li:last-child {
+            margin-bottom: 0;
+        }
+
+        .contact-value {
+           margin-right: 0.5rem;
+           min-height: 1.2em;
+        }
+
+        .contact-icon {
+            color: var(--primary-color);
+            width: 16px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        /* Sections */
+        .cv-section {
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            color: var(--text-dark);
+            margin: 0 0 1rem 0;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--text-dark);
+        }
+
+        /* Entry Items (Experience & Education) */
+        .entry {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
+        .entry-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.25rem;
+        }
+
+        .entry-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin: 0;
+        }
+
+        .entry-company {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin: 0;
+        }
+
+        .entry-date {
+            color: var(--text-light);
+            font-weight: 500;
+            font-size: 10pt;
+            flex-shrink: 0;
+            margin-left: 1rem;
+            white-space: nowrap;
+        }
+
+        .entry-description {
+            padding-left: 1rem;
+            list-style: none;
+            margin: 0.5rem 0 0 0;
+        }
+
+        .entry-description li {
+            position: relative;
+            margin-bottom: 0.25rem;
+            font-size: 10pt;
+            line-height: 1.4;
+        }
+
+        .entry-description li::before {
+            content: '•';
+            position: absolute;
+            left: -1rem;
+            color: var(--text-dark);
+            font-weight: bold;
+        }
+
+        /* Remove all interactive elements */
+        .option-panel,
+        .submit-section,
+        .loading-overlay,
+        .contact-modal,
+        .add-btn,
+        .delete-btn,
+        .dynamic-item:hover,
+        [contenteditable],
+        .editable-field,
+        .print-button {
+            display: none !important;
+        }
+
+        " + GetCommonPrintStyles() + @"
+
+        @@media print {
+            body {
+                background-color: white !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            .cv-container {
+                box-shadow: none !important;
+                margin: 0 !important;
+                width: 100% !important;
+                height: 100% !important;
+                padding: 1.5cm !important;
+            }
+        }
+
+        @@media (max-width: 768px) {
+            body {
+                padding: 1rem !important;
+            }
+            .cv-header {
+                flex-direction: column;
+            }
+            .header-right {
+                align-items: flex-start;
+                margin-top: 1rem;
+            }
+            .contact-list {
+                text-align: left;
+            }
+            .contact-list li {
+                justify-content: flex-start;
+            }
+            .contact-list .contact-value {
+                margin-right: 0;
+                margin-left: 0.5rem;
+                order: 2;
+            }
+            .contact-list .contact-icon {
+                order: 1;
+            }
+        }";
+        }
+
+        #endregion
+
+        #region Template Body Methods
+
+        private string GetTemplate1Body(CvProfileRequest profile, CvSubmissionRequest cvData)
+        {
+            var educationHtml = RenderEducationForTemplate1(cvData.Educations);
+            var skillsHtml = RenderSkillsForTemplate1(cvData.Skills);
+            var certificatesHtml = RenderCertificatesForTemplate1(cvData.Certificates);
+            var referencesHtml = RenderReferencesForTemplate1(cvData.References);
+            var interestsHtml = RenderInterestsForTemplate1(cvData.Hobbies);
+            var experiencesHtml = RenderWorkExperiencesForTemplate1(cvData.WorkExperiences);
+            var projectsHtml = RenderProjectsForTemplate1(cvData.Projects);
+
+            return $@"
+        <div class=""page-container"">
+            <div class=""preview-pane"">
+                <!-- Header -->
+                <header class=""preview-header"">
+                    <img id=""preview-photo"" src=""{EscapeHtml(profile.AvatarUrl ?? profile.AvatarUrl ?? "")}"" alt=""Profile Photo"" style=""width: 80px; height: 80px; object-fit: cover; border-radius: 50%;"">
+                    <div class=""header-main"">
+                        <h1 id=""preview-name"">{EscapeHtml(profile.FullName)}</h1>
+                        <h2 id=""preview-title"">{EscapeHtml(profile.JobTitle)}</h2>
+                    </div>
+                    <div class=""header-divider""></div>
+                    <div class=""contact-info"">
+                        <ul id=""contact-list"" class=""contact-list"">
+                            {RenderContactForTemplate1(profile)}
+                        </ul>
+                    </div>
+                </header>
+
+                <!-- Body -->
+                <main class=""preview-body"">
+                    <!-- Left Column -->
+                    <div class=""left-column"">
+                        {(string.IsNullOrEmpty(educationHtml) ? "" : $@"
+                        <section class=""cv-section"">
+                            <h3 class=""section-title"">Học vấn</h3>
+                            <div id=""education-list"" class=""list-container"">
+                                {educationHtml}
+                            </div>
+                        </section>")}
+
+                        {(string.IsNullOrEmpty(skillsHtml) ? "" : $@"
+                        <section class=""cv-section"">
+                            <h3 class=""section-title"">Kỹ năng</h3>
+                            <div id=""skills-list"" class=""list-container"">
+                                {skillsHtml}
+                            </div>
+                        </section>")}
+
+                        {(string.IsNullOrEmpty(certificatesHtml) ? "" : $@"
+                        <section class=""cv-section"">
+                            <h3 class=""section-title"">Chứng chỉ</h3>
+                            <div id=""certificates-list"" class=""list-container"">
+                                {certificatesHtml}
+                            </div>
+                        </section>")}
+
+                        {(string.IsNullOrEmpty(referencesHtml) ? "" : $@"
+                        <section class=""cv-section"">
+                            <h3 class=""section-title"">Người tham chiếu</h3>
+                            <div id=""references-list"" class=""list-container"">
+                                {referencesHtml}
+                            </div>
+                        </section>")}
+
+                        {(string.IsNullOrEmpty(interestsHtml) ? "" : $@"
+                        <section class=""cv-section"">
+                            <h3 class=""section-title"">Sở thích</h3>
+                            <div id=""interests-list"" class=""interest-list"">
+                                {interestsHtml}
+                            </div>
+                        </section>")}
+                    </div>
+
+                    <div class=""main-divider""></div>
+
+                    <!-- Right Column -->
+                    <div class=""right-column"">
+                        {(string.IsNullOrEmpty(profile.Summary) ? "" : $@"
+                        <section class=""cv-section"">
+                            <h3 class=""section-title"">Giới thiệu</h3>
+                            <div id=""about-preview"">
+                                <p>{EscapeHtml(profile.Summary)}</p>
+                            </div>
+                        </section>")}
+
+                        {(string.IsNullOrEmpty(experiencesHtml) ? "" : $@"
+                        <section class=""cv-section"">
+                            <h3 class=""section-title"">Kinh nghiệm làm việc</h3>
+                            <div id=""experience-list"" class=""list-container"">
+                                {experiencesHtml}
+                            </div>
+                        </section>")}
+
+                        {(string.IsNullOrEmpty(projectsHtml) ? "" : $@"
+                        <section class=""cv-section"">
+                            <h3 class=""section-title"">Dự án</h3>
+                            <div id=""projects-list"" class=""list-container"">
+                                {projectsHtml}
+                            </div>
+                        </section>")}
+                    </div>
+                </main>
+            </div>
+        </div>";
+        }
+
+        private string GetTemplate2Body(CvProfileRequest profile, CvSubmissionRequest cvData)
+        {
+            return $@"
+        <div class=""page-container"">
+            <div class=""cv-container"">
+                <!-- Sidebar -->
+                <aside class=""cv-sidebar"">
+                    <div class=""profile-picture-container"">
+                        <img id=""profile-picture"" src=""{EscapeHtml(profile.AvatarUrl ?? "")}"" alt=""Profile Picture"">
+                    </div>
+
+                    <section class=""sidebar-section"">
+                        <ul id=""contact-list"">
+                            {RenderContactForTemplate2(profile)}
+                        </ul>
+                    </section>
+
+                    {(string.IsNullOrWhiteSpace(profile.Summary) ? "" : $@"
+                    <section class=""sidebar-section"">
+                        <h3 class=""section-title"">GIỚI THIỆU</h3>
+                        <p style=""font-size: 8.5pt; line-height: 1.4; margin: 0;"">{EscapeHtml(profile.Summary)}</p>
+                    </section>
+                    ")}
+
+                    {(cvData.Skills == null || !cvData.Skills.Any() ? "" : $@"
+                    <section class=""sidebar-section"">
+                        <h3 class=""section-title"">KỸ NĂNG</h3>
+                        <div id=""skills-list"" class=""list-container"">
+                            {RenderSkillsForTemplate2(cvData.Skills)}
+                        </div>
+                    </section>
+                    ")}
+                </aside>
+
+                <!-- Main Content -->
+                <main class=""cv-main"">
+                    <header class=""main-header"">
+                        <h1 id=""cv-name"">{EscapeHtml(profile.FullName)}</h1>
+                        <h2 id=""cv-title"">{EscapeHtml(profile.JobTitle)}</h2>
+                    </header>
+
+                    {(cvData.Educations == null || !cvData.Educations.Any() ? "" : $@"
+                    <section class=""main-section"">
+                        <h3 class=""section-title"">HỌC VẤN</h3>
+                        <div id=""education-list"" class=""list-container"">
+                            {RenderEducationForTemplate2(cvData.Educations)}
+                        </div>
+                    </section>
+                    ")}
+
+                    {(cvData.WorkExperiences == null || !cvData.WorkExperiences.Any() ? "" : $@"
+                    <section class=""main-section"" style=""margin-top: 1.5rem;"">
+                        <h3 class=""section-title"">KINH NGHIỆM LÀM VIỆC</h3>
+                        <div id=""experience-list"" class=""list-container"">
+                            {RenderWorkExperiencesForTemplate2(cvData.WorkExperiences)}
+                        </div>
+                    </section>
+                    ")}
+                </main>
+            </div>
+        </div>";
+        }
+
+        private string GetTemplate3Body(CvProfileRequest profile, CvSubmissionRequest cvData)
+        {
+            var summary = profile.Summary ?? "";
+
+            return $@"
+            <div class=""cv-container"">
+                <header class=""cv-header"">
+                    <div class=""cv-name"">{EscapeHtml(profile.FullName)}</div>
+                    <div class=""cv-title"">{EscapeHtml(profile.JobTitle)}</div>
+                </header>
+        
+                <section class=""contact-grid"">
+                    {RenderContactForTemplate3(profile)}
+                </section>
+        
+                <div class=""cv-main"">
+                    <!-- LEFT COLUMN -->
+                    <div class=""left-column"">
+                        {(string.IsNullOrWhiteSpace(summary) ? "" : $@"
+                        <section class=""summary-section"">
+                            <div class=""section-title"">Giới Thiệu</div>
+                            <div class=""summary-content"">
+                                {EscapeHtml(summary)}
+                            </div>
+                        </section>
+                        ")}
+                
+                        {(cvData.Skills == null || !cvData.Skills.Any() ? "" : $@"
+                        <section>
+                            <div class=""section-title"">Kỹ Năng</div>
+                            <div class=""skills-list"">
+                                {RenderSkillsForTemplate3(cvData.Skills.Take(6).ToList())}
+                            </div>
+                        </section>
+                        ")}
+                
+                        {(cvData.Educations == null || !cvData.Educations.Any() ? "" : $@"
+                        <section>
+                            <div class=""section-title"">Học Vấn</div>
+                            <div id=""education-list"">
+                                {RenderEducationForTemplate3(cvData.Educations.Take(2).ToList())}
+                            </div>
+                        </section>
+                        ")}
+                
+                        {(cvData.Certificates == null || !cvData.Certificates.Any() ? "" : $@"
+                        <section>
+                            <div class=""section-title"">Chứng Chỉ</div>
+                            <div id=""certifications-list"">
+                                {RenderCertificatesForTemplate3(cvData.Certificates.Take(2).ToList())}
+                            </div>
+                        </section>
+                        ")}
+                    </div>
+            
+                    <!-- RIGHT COLUMN -->
+                    <div class=""right-column"">
+                        {(cvData.WorkExperiences == null || !cvData.WorkExperiences.Any() ? "" : $@"
+                        <section>
+                            <div class=""section-title"">Kinh Nghiệm Làm Việc</div>
+                            <div id=""experience-list"">
+                                {RenderWorkExperiencesForTemplate3(cvData.WorkExperiences.Take(3).ToList())}
+                            </div>
+                        </section>
+                        ")}
+                
+                        {(cvData.Projects == null || !cvData.Projects.Any() ? "" : $@"
+                        <section>
+                            <div class=""section-title"">Dự Án</div>
+                            <div id=""projects-list"">
+                                {RenderProjectsForTemplate3(cvData.Projects.Take(2).ToList())}
+                            </div>
+                        </section>
+                        ")}
+                
+                        <!-- NGÔN NGỮ & SỞ THÍCH -->
+                        <div class=""row g-3"">
+                            {(cvData.Languages == null || !cvData.Languages.Any() ? "" : $@"
+                            <div class=""col-6"">
+                                <div class=""section-title"">Ngôn Ngữ</div>
+                                <div id=""languages-list"">
+                                    {RenderLanguagesForTemplate3(cvData.Languages.Take(2).ToList())}
+                                </div>
+                            </div>
+                            ")}
+                            
+                            {(cvData.Hobbies == null || !cvData.Hobbies.Any() ? "" : $@"
+                            <div class=""col-6"">
+                                <div class=""section-title"">Sở Thích</div>
+                                <div class=""interests-list"" id=""interests-list"">
+                                    {RenderInterestsForTemplate3(cvData.Hobbies.Take(3).ToList())}
+                                </div>
+                            </div>
+                            ")}
+                        </div>
+                    </div>
+                </div>
+            </div>";
+        }
+
+        private string GetTemplate4Body(CvProfileRequest profile, CvSubmissionRequest cvData)
+        {
+            var summaryHtml = !string.IsNullOrWhiteSpace(profile.Summary) ? $@"
+                <section class=""section"">
+                    <h2 class=""section-title"">Giới thiệu</h2>
+                    <div class=""section-content"">
+                        <div>{EscapeHtml(profile.Summary)}</div>
+                    </div>
+                </section>" : "";
+
+            var contactHtml = RenderContactSectionForTemplate4(profile);
+            var skillsHtml = (cvData.Skills != null && cvData.Skills.Any()) ? $@"
+                <section class=""section"">
+                    <h2 class=""section-title"">Kỹ năng</h2>
+                    <div class=""section-content"">
+                        <div class=""skills-list"">
+                            {RenderSkillsForTemplate4(cvData.Skills)}
+                        </div>
+                    </div>
+                </section>" : "";
+
+            var experiencesHtml = (cvData.WorkExperiences != null && cvData.WorkExperiences.Any()) ? $@"
+                <section class=""section"">
+                    <h2 class=""section-title"">Kinh nghiệm làm việc</h2>
+                    <div class=""section-content"">
+                        <div class=""experience-list"">
+                            {RenderWorkExperiencesForTemplate4(cvData.WorkExperiences)}
+                        </div>
+                    </div>
+                </section>" : "";
+
+            var educationHtml = (cvData.Educations != null && cvData.Educations.Any()) ? $@"
+                <section class=""section"">
+                    <h2 class=""section-title"">Học vấn</h2>
+                    <div class=""section-content"">
+                        <div class=""experience-list"">
+                            {RenderEducationForTemplate4(cvData.Educations)}
+                        </div>
+                    </div>
+                </section>" : "";
+
+            var certificatesHtml = (cvData.Certificates != null && cvData.Certificates.Any()) ? $@"
+                <section class=""section"">
+                    <h2 class=""section-title"">Chứng chỉ</h2>
+                    <div class=""section-content"">
+                        <div class=""experience-list"">
+                            {RenderCertificatesForTemplate4(cvData.Certificates)}
+                        </div>
+                    </div>
+                </section>" : "";
+
+            return $@"
+            <div id=""resume-container"">
+                <header>
+                    <h1>{EscapeHtml(profile.FullName)}</h1>
+                    <h2>{EscapeHtml(profile.JobTitle)}</h2>
+                </header>
+        
+                <main>
+                    {summaryHtml}
+                    {contactHtml}
+                    {skillsHtml}
+                    {experiencesHtml}
+                    {educationHtml}
+                    {certificatesHtml}
+                </main>
+            </div>";
+        }
+
         private string GetTemplate5Body(CvProfileRequest profile, CvSubmissionRequest cvData)
         {
             return $@"
@@ -1696,6 +2080,79 @@ namespace ezCV.Infrastructure.External
         </main>
     </div>";
         }
+
+        private string GetTemplate6Body(CvProfileRequest profile, CvSubmissionRequest cvData)
+        {
+            return $@"
+    <div class=""cv-container"">
+        <header class=""cv-header"">
+            <div class=""header-main"">
+                <h1 class=""cv-name"">{EscapeHtml(profile.FullName)}</h1>
+                <h2 class=""cv-title"">{EscapeHtml(profile.JobTitle)}</h2>
+            </div>
+            <div class=""header-right"">
+                <ul class=""contact-list"">
+                    {RenderContactForTemplate6(profile)}
+                </ul>
+            </div>
+        </header>
+
+        <main>
+            {(string.IsNullOrWhiteSpace(profile.Summary) ? "" : $@"
+            <section class=""cv-section"">
+                <h3 class=""section-title"">Giới thiệu</h3>
+                <p>{EscapeHtml(profile.Summary)}</p>
+            </section>
+            ")}
+
+            {(cvData.WorkExperiences == null || !cvData.WorkExperiences.Any() ? "" : $@"
+            <section class=""cv-section"">
+                <h3 class=""section-title"">Kinh nghiệm làm việc</h3>
+                <div id=""experience-list"">
+                    {RenderWorkExperiencesForTemplate6(cvData.WorkExperiences)}
+                </div>
+            </section>
+            ")}
+
+            {(cvData.Educations == null || !cvData.Educations.Any() ? "" : $@"
+            <section class=""cv-section"">
+                <h3 class=""section-title"">Học vấn</h3>
+                <div id=""education-list"">
+                    {RenderEducationForTemplate6(cvData.Educations)}
+                </div>
+            </section>
+            ")}
+
+            {(cvData.Projects == null || !cvData.Projects.Any() ? "" : $@"
+            <section class=""cv-section"">
+                <h3 class=""section-title"">Dự án</h3>
+                <div id=""projects-list"">
+                    {RenderProjectsForTemplate6(cvData.Projects)}
+                </div>
+            </section>
+            ")}
+
+            {(cvData.Skills == null || !cvData.Skills.Any() ? "" : $@"
+            <section class=""cv-section"">
+                <h3 class=""section-title"">Kỹ năng</h3>
+                <div id=""skills-list"">
+                    {RenderSkillsForTemplate6(cvData.Skills)}
+                </div>
+            </section>
+            ")}
+
+            {(cvData.Certificates == null || !cvData.Certificates.Any() ? "" : $@"
+            <section class=""cv-section"">
+                <h3 class=""section-title"">Chứng chỉ</h3>
+                <div id=""certificates-list"">
+                    {RenderCertificatesForTemplate6(cvData.Certificates)}
+                </div>
+            </section>
+            ")}
+        </main>
+    </div>";
+        }
+
         #endregion
 
         #region Shared Helper Methods
@@ -1703,58 +2160,113 @@ namespace ezCV.Infrastructure.External
         // ========== CONTACT RENDERERS ==========
         private string RenderContactForTemplate1(CvProfileRequest profile)
         {
-            return RenderContactWithIcons(profile, "icon-wrapper", "contact-value", "contact-item",
-                emailIcon: "📧", phoneIcon: "📞", addressIcon: "📍",
-                birthdayIcon: "🎂", genderIcon: "⚧");
+            var contacts = new List<string>();
+
+            if (!string.IsNullOrEmpty(profile.ContactEmail))
+            {
+                contacts.Add($@"
+        <li class=""contact-item"" data-type=""email"">
+            <p class=""contact-value"">{EscapeHtml(profile.ContactEmail)}</p>
+            <div class=""icon-wrapper"">
+                <i class=""fas fa-envelope"" style=""color: white;""></i>
+            </div>
+        </li>");
+            }
+
+            if (!string.IsNullOrEmpty(profile.PhoneNumber))
+            {
+                contacts.Add($@"
+        <li class=""contact-item"" data-type=""phone"">
+            <p class=""contact-value"">{EscapeHtml(profile.PhoneNumber)}</p>
+            <div class=""icon-wrapper"">
+                <i class=""fas fa-phone"" style=""color: white;""></i>
+            </div>
+        </li>");
+            }
+
+            if (!string.IsNullOrEmpty(profile.Address))
+            {
+                contacts.Add($@"
+        <li class=""contact-item"" data-type=""address"">
+            <p class=""contact-value"">{EscapeHtml(profile.Address)}</p>
+            <div class=""icon-wrapper"">
+                <i class=""fas fa-map-marker-alt"" style=""color: white;""></i>
+            </div>
+        </li>");
+            }
+
+            if (profile.DateOfBirth.HasValue)
+            {
+                contacts.Add($@"
+        <li class=""contact-item"" data-type=""birthday"">
+            <p class=""contact-value"">{profile.DateOfBirth.Value:dd/MM/yyyy}</p>
+            <div class=""icon-wrapper"">
+                <i class=""fas fa-birthday-cake"" style=""color: white;""></i>
+            </div>
+        </li>");
+            }
+
+            if (!string.IsNullOrEmpty(profile.Gender))
+            {
+                contacts.Add($@"
+        <li class=""contact-item"" data-type=""gender"">
+            <p class=""contact-value"">{EscapeHtml(profile.Gender)}</p>
+            <div class=""icon-wrapper"">
+                <i class=""fas fa-venus-mars"" style=""color: white;""></i>
+            </div>
+        </li>");
+            }
+
+            return string.Join("", contacts);
         }
 
         private string RenderContactForTemplate2(CvProfileRequest profile)
         {
             var contacts = new List<string>();
 
-            if (!string.IsNullOrEmpty(profile.ContactEmail))
+            if (profile.DateOfBirth.HasValue)
             {
                 contacts.Add($@"
-                <li class=""contact-item"">
-                    <div class=""contact-icon""><i class=""fas fa-envelope""></i></div>
-                    <div class=""contact-value"">{EscapeHtml(profile.ContactEmail)}</div>
-                </li>");
-            }
-
-            if (!string.IsNullOrEmpty(profile.PhoneNumber))
-            {
-                contacts.Add($@"
-                <li class=""contact-item"">
-                    <div class=""contact-icon""><i class=""fas fa-phone""></i></div>
-                    <div class=""contact-value"">{EscapeHtml(profile.PhoneNumber)}</div>
-                </li>");
+            <li class=""contact-item"">
+                <div class=""contact-icon""><i class=""fas fa-birthday-cake""></i></div>
+                <div class=""contact-value"">{profile.DateOfBirth.Value:dd/MM/yyyy}</div>
+            </li>");
             }
 
             if (!string.IsNullOrEmpty(profile.Address))
             {
                 contacts.Add($@"
-                <li class=""contact-item"">
-                    <div class=""contact-icon""><i class=""fas fa-map-marker-alt""></i></div>
-                    <div class=""contact-value"">{EscapeHtml(profile.Address)}</div>
-                </li>");
+            <li class=""contact-item"">
+                <div class=""contact-icon""><i class=""fas fa-map-marker-alt""></i></div>
+                <div class=""contact-value"">{EscapeHtml(profile.Address)}</div>
+            </li>");
             }
 
-            if (profile.DateOfBirth.HasValue)
+            if (!string.IsNullOrEmpty(profile.PhoneNumber))
             {
                 contacts.Add($@"
-                <li class=""contact-item"">
-                    <div class=""contact-icon""><i class=""fas fa-birthday-cake""></i></div>
-                    <div class=""contact-value"">{profile.DateOfBirth.Value:dd/MM/yyyy}</div>
-                </li>");
+            <li class=""contact-item"">
+                <div class=""contact-icon""><i class=""fas fa-phone""></i></div>
+                <div class=""contact-value"">{EscapeHtml(profile.PhoneNumber)}</div>
+            </li>");
+            }
+
+            if (!string.IsNullOrEmpty(profile.ContactEmail))
+            {
+                contacts.Add($@"
+            <li class=""contact-item"">
+                <div class=""contact-icon""><i class=""fas fa-envelope""></i></div>
+                <div class=""contact-value"">{EscapeHtml(profile.ContactEmail)}</div>
+            </li>");
             }
 
             if (!string.IsNullOrEmpty(profile.Gender))
             {
                 contacts.Add($@"
-                <li class=""contact-item"">
-                    <div class=""contact-icon""><i class=""fas fa-venus-mars""></i></div>
-                    <div class=""contact-value"">{EscapeHtml(profile.Gender)}</div>
-                </li>");
+            <li class=""contact-item"">
+                <div class=""contact-icon""><i class=""fas fa-venus-mars""></i></div>
+                <div class=""contact-value"">{EscapeHtml(profile.Gender)}</div>
+            </li>");
             }
 
             return string.Join("", contacts);
@@ -1915,74 +2427,159 @@ namespace ezCV.Infrastructure.External
             return string.Join("", contacts);
         }
 
-        private string RenderContactWithIcons(CvProfileRequest profile, string iconWrapperClass,
-            string valueClass, string itemClass, string emailIcon = "✉️", string phoneIcon = "📞",
-            string addressIcon = "📍", string birthdayIcon = "🎂", string genderIcon = "⚧")
+        private string RenderContactForTemplate6(CvProfileRequest profile)
         {
             var contacts = new List<string>();
 
             if (!string.IsNullOrEmpty(profile.ContactEmail))
             {
                 contacts.Add($@"
-        <li class=""{itemClass}"">
-            <p class=""{valueClass}"">{EscapeHtml(profile.ContactEmail)}</p>
-            <div class=""{iconWrapperClass}"">
-                <span style=""font-size: 11px; color: white; font-weight: bold;"">{emailIcon}</span>
-            </div>
+        <li>
+            <div class=""contact-value"">{EscapeHtml(profile.ContactEmail)}</div>
+            <i class=""fas fa-envelope contact-icon""></i>
         </li>");
             }
 
             if (!string.IsNullOrEmpty(profile.PhoneNumber))
             {
                 contacts.Add($@"
-        <li class=""{itemClass}"">
-            <p class=""{valueClass}"">{EscapeHtml(profile.PhoneNumber)}</p>
-            <div class=""{iconWrapperClass}"">
-                <span style=""font-size: 11px; color: white; font-weight: bold;"">{phoneIcon}</span>
-            </div>
+        <li>
+            <div class=""contact-value"">{EscapeHtml(profile.PhoneNumber)}</div>
+            <i class=""fas fa-phone contact-icon""></i>
         </li>");
             }
 
             if (!string.IsNullOrEmpty(profile.Address))
             {
                 contacts.Add($@"
-        <li class=""{itemClass}"">
-            <p class=""{valueClass}"" style=""white-space: pre-wrap;"">{EscapeHtml(profile.Address)}</p>
-            <div class=""{iconWrapperClass}"">
-                <span style=""font-size: 11px; color: white; font-weight: bold;"">{addressIcon}</span>
-            </div>
+        <li>
+            <div class=""contact-value"">{EscapeHtml(profile.Address)}</div>
+            <i class=""fas fa-map-marker-alt contact-icon""></i>
         </li>");
             }
 
             if (profile.DateOfBirth.HasValue)
             {
                 contacts.Add($@"
-        <li class=""{itemClass}"">
-            <p class=""{valueClass}"">{profile.DateOfBirth.Value:dd/MM/yyyy}</p>
-            <div class=""{iconWrapperClass}"">
-                <span style=""font-size: 11px; color: white; font-weight: bold;"">{birthdayIcon}</span>
-            </div>
+        <li>
+            <div class=""contact-value"">{profile.DateOfBirth.Value:dd/MM/yyyy}</div>
+            <i class=""fas fa-birthday-cake contact-icon""></i>
         </li>");
             }
 
             if (!string.IsNullOrEmpty(profile.Gender))
             {
                 contacts.Add($@"
-        <li class=""{itemClass}"">
-            <p class=""{valueClass}"">{EscapeHtml(profile.Gender)}</p>
-            <div class=""{iconWrapperClass}"">
-                <span style=""font-size: 11px; color: white; font-weight: bold;"">{genderIcon}</span>
-            </div>
+        <li>
+            <div class=""contact-value"">{EscapeHtml(profile.Gender)}</div>
+            <i class=""fas fa-venus-mars contact-icon""></i>
         </li>");
             }
 
+            if (!string.IsNullOrEmpty(profile.Website))
+            {
+                contacts.Add($@"
+        <li>
+            <div class=""contact-value"">{EscapeHtml(profile.Website)}</div>
+            <i class=""fas fa-globe contact-icon""></i>
+        </li>");
+            }
             return string.Join("", contacts);
+        }
+
+        private string RenderContactSectionForTemplate4(CvProfileRequest profile)
+        {
+            var contactItems = new List<string>();
+
+            if (!string.IsNullOrEmpty(profile.ContactEmail))
+            {
+                contactItems.Add($@"
+            <div class=""contact-item"">
+                <i class=""fas fa-envelope""></i>
+                <span>{EscapeHtml(profile.ContactEmail)}</span>
+            </div>");
+            }
+
+            if (!string.IsNullOrEmpty(profile.PhoneNumber))
+            {
+                contactItems.Add($@"
+            <div class=""contact-item"">
+                <i class=""fas fa-phone""></i>
+                <span>{EscapeHtml(profile.PhoneNumber)}</span>
+            </div>");
+            }
+
+            if (!string.IsNullOrEmpty(profile.Address))
+            {
+                contactItems.Add($@"
+            <div class=""contact-item"">
+                <i class=""fas fa-map-marker-alt""></i>
+                <span>{EscapeHtml(profile.Address)}</span>
+            </div>");
+            }
+
+            if (profile.DateOfBirth.HasValue)
+            {
+                contactItems.Add($@"
+            <div class=""contact-item"">
+                <i class=""fas fa-birthday-cake""></i>
+                <span>{profile.DateOfBirth.Value:dd/MM/yyyy}</span>
+            </div>");
+            }
+
+            if (!string.IsNullOrEmpty(profile.Gender))
+            {
+                contactItems.Add($@"
+            <div class=""contact-item"">
+                <i class=""fas fa-venus-mars""></i>
+                <span>{EscapeHtml(profile.Gender)}</span>
+            </div>");
+            }
+
+            if (!string.IsNullOrEmpty(profile.Website))
+            {
+                contactItems.Add($@"
+            <div class=""contact-item"">
+                <i class=""fas fa-globe""></i>
+                <span>{EscapeHtml(profile.Website)}</span>
+            </div>");
+            }
+
+            if (contactItems.Any())
+            {
+                return $@"
+        <section class=""section"">
+            <h2 class=""section-title"">Liên hệ</h2>
+            <div class=""section-content"">
+                <div class=""contact-grid"">
+                    {string.Join("", contactItems)}
+                </div>
+            </div>
+        </section>";
+            }
+
+            return "";
         }
 
         // ========== WORK EXPERIENCE RENDERERS ==========
         private string RenderWorkExperiencesForTemplate1(List<CvWorkExperienceRequest> experiences)
         {
-            return RenderWorkExperiencesCommon(experiences, "job-item", "job-title", "job-company", "job-date", "job-description");
+            if (experiences == null || !experiences.Any()) return "";
+
+            var sb = new StringBuilder();
+            foreach (var exp in experiences)
+            {
+                sb.AppendLine($@"
+        <div class=""job-item"">
+            <div class=""job-header"">
+                <h4 class=""job-title"">{EscapeHtml(exp.JobTitle)}</h4>
+            </div>
+            <p class=""job-company"">{EscapeHtml(exp.CompanyName)}</p>
+            <p class=""job-date"">{exp.StartDate:MM/yyyy} - {(exp.EndDate?.ToString("MM/yyyy") ?? "Present")}</p>
+            <p class=""job-description"" style=""padding-left: 0; margin-left: 0; text-indent: 0;"">{EscapeHtml(exp.Description)}</p>
+        </div>");
+            }
+            return sb.ToString();
         }
 
         private string RenderWorkExperiencesForTemplate2(List<CvWorkExperienceRequest> experiences)
@@ -1992,14 +2589,21 @@ namespace ezCV.Infrastructure.External
             var sb = new StringBuilder();
             foreach (var exp in experiences)
             {
+                var descriptionLines = exp.Description?
+                    .Split('\n', StringSplitOptions.RemoveEmptyEntries)
+                    .Where(line => !string.IsNullOrWhiteSpace(line))
+                    .Select(line => line.Trim())
+                    .ToList() ?? new List<string>();
+
                 sb.AppendLine($@"
-                <div class=""list-item"">
-                    <h4 class=""item-title"">{EscapeHtml(exp.JobTitle)}</h4>
-                    <p class=""item-subtitle"">{EscapeHtml(exp.CompanyName)} | {exp.StartDate:MM/yyyy} - {(exp.EndDate?.ToString("MM/yyyy") ?? "Present")}</p>
-                    <ul class=""item-description"">
-                        <li>{EscapeHtml(exp.Description)}</li>
-                    </ul>
-                </div>");
+            <div class=""list-item"">
+                <h4 class=""item-title"">{EscapeHtml(exp.JobTitle)}</h4>
+                <p class=""item-subtitle"">{EscapeHtml(exp.CompanyName)} | {exp.StartDate:MM/yyyy} - {(exp.EndDate?.ToString("MM/yyyy") ?? "Hiện tại")}</p>
+                {(descriptionLines.Any() ? $@"
+                <ul class=""item-description"">
+                    {string.Join("", descriptionLines.Select(line => $@"<li>{EscapeHtml(line.Replace("•", "").Trim())}</li>"))}
+                </ul>" : "")}
+            </div>");
             }
             return sb.ToString();
         }
@@ -2110,22 +2714,32 @@ namespace ezCV.Infrastructure.External
             return sb.ToString();
         }
 
-        private string RenderWorkExperiencesCommon(List<CvWorkExperienceRequest> experiences,
-            string itemClass, string titleClass, string companyClass, string dateClass, string descriptionClass)
+        private string RenderWorkExperiencesForTemplate6(List<CvWorkExperienceRequest> experiences)
         {
             if (experiences == null || !experiences.Any()) return "";
 
             var sb = new StringBuilder();
             foreach (var exp in experiences)
             {
+                var descriptionLines = exp.Description?
+                    .Split('\n', StringSplitOptions.RemoveEmptyEntries)
+                    .Where(line => !string.IsNullOrWhiteSpace(line))
+                    .Select(line => line.Trim())
+                    .ToList() ?? new List<string>();
+
                 sb.AppendLine($@"
-        <div class=""{itemClass}"">
-            <div class=""job-header"">
-                <h4 class=""{titleClass}"">{EscapeHtml(exp.JobTitle)}</h4>
+        <div class=""entry"">
+            <div class=""entry-header"">
+                <div>
+                    <h4 class=""entry-title"">{EscapeHtml(exp.JobTitle)}</h4>
+                    <p class=""entry-company"">{EscapeHtml(exp.CompanyName)}</p>
+                </div>
+                <div class=""entry-date"">{exp.StartDate:MM/yyyy} - {(exp.EndDate?.ToString("MM/yyyy") ?? "Hiện tại")}</div>
             </div>
-            <p class=""{companyClass}"">{EscapeHtml(exp.CompanyName)}</p>
-            <p class=""{dateClass}"">{exp.StartDate:MM/yyyy} - {(exp.EndDate?.ToString("MM/yyyy") ?? "Present")}</p>
-            <p class=""{descriptionClass}"">{EscapeHtml(exp.Description)}</p>
+            {(descriptionLines.Any() ? $@"
+            <ul class=""entry-description"">
+                {string.Join("", descriptionLines.Select(line => $@"<li>{EscapeHtml(line.Replace("•", "").Trim())}</li>"))}
+            </ul>" : "")}
         </div>");
             }
             return sb.ToString();
@@ -2134,7 +2748,19 @@ namespace ezCV.Infrastructure.External
         // ========== EDUCATION RENDERERS ==========
         private string RenderEducationForTemplate1(List<CvEducationRequest> educations)
         {
-            return RenderEducationCommon(educations, "edu-item", "edu-degree", "edu-institution", "edu-date");
+            if (educations == null || !educations.Any()) return "";
+
+            var sb = new StringBuilder();
+            foreach (var edu in educations)
+            {
+                sb.AppendLine($@"
+        <div class=""edu-item"">
+            <p class=""edu-degree"">{EscapeHtml(edu.Major)}</p>
+            <p class=""edu-institution"">{EscapeHtml(edu.SchoolName)}</p>
+            <p class=""edu-date"">{edu.StartDate:yyyy} - {(edu.EndDate?.ToString("yyyy") ?? "Present")}</p>
+        </div>");
+            }
+            return sb.ToString();
         }
 
         private string RenderEducationForTemplate2(List<CvEducationRequest> educations)
@@ -2144,15 +2770,21 @@ namespace ezCV.Infrastructure.External
             var sb = new StringBuilder();
             foreach (var edu in educations)
             {
+                var descriptionLines = edu.Description?
+                    .Split('\n', StringSplitOptions.RemoveEmptyEntries)
+                    .Where(line => !string.IsNullOrWhiteSpace(line))
+                    .Select(line => line.Trim())
+                    .ToList() ?? new List<string>();
+
                 sb.AppendLine($@"
-                <div class=""list-item"">
-                    <h4 class=""item-title"">{EscapeHtml(edu.Major)}</h4>
-                    <p class=""item-subtitle"">{EscapeHtml(edu.SchoolName)} | {edu.StartDate:yyyy} - {(edu.EndDate?.ToString("yyyy") ?? "Present")}</p>
-                    <ul class=""item-description"">
-                        <li>GPA: {edu.Gpa}</li>
-                        <li>{EscapeHtml(edu.Description)}</li>
-                    </ul>
-                </div>");
+            <div class=""list-item"">
+                <h4 class=""item-title"">{EscapeHtml(edu.Major)}</h4>
+                <p class=""item-subtitle"">{EscapeHtml(edu.SchoolName)} | {edu.StartDate:yyyy} - {(edu.EndDate?.ToString("yyyy") ?? "Hiện tại")}</p>
+                {(descriptionLines.Any() ? $@"
+                <ul class=""item-description"">
+                    {string.Join("", descriptionLines.Select(line => $@"<li>{EscapeHtml(line.Replace("•", "").Trim())}</li>"))}
+                </ul>" : "")}
+            </div>");
             }
             return sb.ToString();
         }
@@ -2254,19 +2886,32 @@ namespace ezCV.Infrastructure.External
             return sb.ToString();
         }
 
-        private string RenderEducationCommon(List<CvEducationRequest> educations,
-            string itemClass, string degreeClass, string institutionClass, string dateClass)
+        private string RenderEducationForTemplate6(List<CvEducationRequest> educations)
         {
             if (educations == null || !educations.Any()) return "";
 
             var sb = new StringBuilder();
             foreach (var edu in educations)
             {
+                var descriptionLines = edu.Description?
+                    .Split('\n', StringSplitOptions.RemoveEmptyEntries)
+                    .Where(line => !string.IsNullOrWhiteSpace(line))
+                    .Select(line => line.Trim())
+                    .ToList() ?? new List<string>();
+
                 sb.AppendLine($@"
-        <div class=""{itemClass}"">
-            <p class=""{degreeClass}"">{EscapeHtml(edu.Major)}</p>
-            <p class=""{institutionClass}"">{EscapeHtml(edu.SchoolName)}</p>
-            <p class=""{dateClass}"">{edu.StartDate:yyyy} - {(edu.EndDate?.ToString("yyyy") ?? "Present")}</p>
+        <div class=""entry"">
+            <div class=""entry-header"">
+                <div>
+                    <h4 class=""entry-title"">{EscapeHtml(edu.Major)}</h4>
+                    <p class=""entry-company"">{EscapeHtml(edu.SchoolName)}</p>
+                </div>
+                <div class=""entry-date"">{edu.StartDate:yyyy} - {(edu.EndDate?.ToString("yyyy") ?? "Hiện tại")}</div>
+            </div>
+            {(descriptionLines.Any() ? $@"
+            <ul class=""entry-description"">
+                {string.Join("", descriptionLines.Select(line => $@"<li>{EscapeHtml(line.Replace("•", "").Trim())}</li>"))}
+            </ul>" : "")}
         </div>");
             }
             return sb.ToString();
@@ -2275,7 +2920,17 @@ namespace ezCV.Infrastructure.External
         // ========== SKILLS RENDERERS ==========
         private string RenderSkillsForTemplate1(List<CvSkillRequest> skills)
         {
-            return RenderSkillsCommon(skills, "skill-item");
+            if (skills == null || !skills.Any()) return "";
+
+            var sb = new StringBuilder();
+            foreach (var skill in skills)
+            {
+                sb.AppendLine($@"
+        <div class=""skill-item"">
+            <p>{EscapeHtml(skill.SkillName)}</p>
+        </div>");
+            }
+            return sb.ToString();
         }
 
         private string RenderSkillsForTemplate2(List<CvSkillRequest> skills)
@@ -2285,7 +2940,10 @@ namespace ezCV.Infrastructure.External
             var sb = new StringBuilder();
             foreach (var skill in skills)
             {
-                sb.AppendLine($@"<li>• {EscapeHtml(skill.SkillName)}</li>");
+                sb.AppendLine($@"
+            <div class=""list-item"">
+                <h4 class=""item-title"">{EscapeHtml(skill.SkillName.Trim())}</h4>
+            </div>");
             }
             return sb.ToString();
         }
@@ -2335,7 +2993,7 @@ namespace ezCV.Infrastructure.External
             return sb.ToString();
         }
 
-        private string RenderSkillsCommon(List<CvSkillRequest> skills, string itemClass)
+        private string RenderSkillsForTemplate6(List<CvSkillRequest> skills)
         {
             if (skills == null || !skills.Any()) return "";
 
@@ -2343,9 +3001,13 @@ namespace ezCV.Infrastructure.External
             foreach (var skill in skills)
             {
                 sb.AppendLine($@"
-                <div class=""{itemClass}"">
-                    <p>{EscapeHtml(skill.SkillName)}</p>
-                </div>");
+        <div class=""entry"">
+            <div class=""entry-header"">
+                <div>
+                    <h4 class=""entry-title"">{EscapeHtml(skill.SkillName)}</h4>
+                </div>
+            </div>
+        </div>");
             }
             return sb.ToString();
         }
@@ -2353,7 +3015,18 @@ namespace ezCV.Infrastructure.External
         // ========== CERTIFICATES RENDERERS ==========
         private string RenderCertificatesForTemplate1(List<CvCertificateRequest> certificates)
         {
-            return RenderCertificatesCommon(certificates, "cert-item", "cert-title", "cert-date");
+            if (certificates == null || !certificates.Any()) return "";
+
+            var sb = new StringBuilder();
+            foreach (var cert in certificates)
+            {
+                sb.AppendLine($@"
+        <div class=""cert-item"">
+            <p class=""cert-title"">{EscapeHtml(cert.CertificateName)}</p>
+            <p class=""cert-date"">{cert.IssueDate:MM/yyyy}</p>
+        </div>");
+            }
+            return sb.ToString();
         }
 
         private string RenderCertificatesForTemplate3(List<CvCertificateRequest> certificates)
@@ -2424,8 +3097,7 @@ namespace ezCV.Infrastructure.External
             return sb.ToString();
         }
 
-        private string RenderCertificatesCommon(List<CvCertificateRequest> certificates,
-            string itemClass, string titleClass, string dateClass)
+        private string RenderCertificatesForTemplate6(List<CvCertificateRequest> certificates)
         {
             if (certificates == null || !certificates.Any()) return "";
 
@@ -2433,10 +3105,15 @@ namespace ezCV.Infrastructure.External
             foreach (var cert in certificates)
             {
                 sb.AppendLine($@"
-        <div class=""{itemClass}"">
-            <p class=""{titleClass}"">{EscapeHtml(cert.CertificateName)}</p>
-            <p class=""{dateClass}"">{cert.IssueDate:MM/yyyy}</p>
-        </div>");
+            <div class=""entry"">
+                <div class=""entry-header"">
+                    <div>
+                        <h4 class=""entry-title"">{EscapeHtml(cert.CertificateName)}</h4>
+                        <p class=""entry-company"">{EscapeHtml(cert.IssuingOrganization)}</p>
+                    </div>
+                    <div class=""entry-date"">{cert.IssueDate:MM/yyyy}</div>
+                </div>
+            </div>");
             }
             return sb.ToString();
         }
@@ -2444,7 +3121,21 @@ namespace ezCV.Infrastructure.External
         // ========== PROJECTS RENDERERS ==========
         private string RenderProjectsForTemplate1(List<CvProjectRequest> projects)
         {
-            return RenderProjectsCommon(projects, "job-item", "job-title", "job-company", "job-description");
+            if (projects == null || !projects.Any()) return "";
+
+            var sb = new StringBuilder();
+            foreach (var project in projects)
+            {
+                sb.AppendLine($@"
+        <div class=""job-item"">
+            <div class=""job-header"">
+                <h4 class=""job-title"">{EscapeHtml(project.ProjectName)}</h4>
+            </div>
+            <p class=""job-company"">{EscapeHtml(project.ProjectUrl)}</p>
+            <p class=""job-description"" style=""padding-left: 0; margin-left: 0; text-indent: 0;"">{EscapeHtml(project.Description)}</p>
+        </div>");
+            }
+            return sb.ToString();
         }
 
         private string RenderProjectsForTemplate3(List<CvProjectRequest> projects)
@@ -2468,7 +3159,6 @@ namespace ezCV.Infrastructure.External
 
         private string RenderProjectsForTemplate5(List<CvProjectRequest> projects)
         {
-            // Loại bỏ activities khỏi projects chính
             var mainProjects = projects?.Where(p =>
                 string.IsNullOrEmpty(p.ProjectName) ||
                 !p.ProjectName.Contains("activities-")
@@ -2513,22 +3203,33 @@ namespace ezCV.Infrastructure.External
             return sb.ToString();
         }
 
-        private string RenderProjectsCommon(List<CvProjectRequest> projects,
-            string itemClass, string titleClass, string urlClass, string descriptionClass)
+        private string RenderProjectsForTemplate6(List<CvProjectRequest> projects)
         {
             if (projects == null || !projects.Any()) return "";
 
             var sb = new StringBuilder();
             foreach (var project in projects)
             {
+                var descriptionLines = project.Description?
+                    .Split('\n', StringSplitOptions.RemoveEmptyEntries)
+                    .Where(line => !string.IsNullOrWhiteSpace(line))
+                    .Select(line => line.Trim())
+                    .ToList() ?? new List<string>();
+
                 sb.AppendLine($@"
-                <div class=""{itemClass}"">
-                    <div class=""job-header"">
-                        <h4 class=""{titleClass}"">{EscapeHtml(project.ProjectName)}</h4>
-                    </div>
-                    <p class=""{urlClass}"">{EscapeHtml(project.ProjectUrl)}</p>
-                    <p class=""{descriptionClass}"">{EscapeHtml(project.Description)}</p>
-                </div>");
+        <div class=""entry"">
+            <div class=""entry-header"">
+                <div>
+                    <h4 class=""entry-title"">{EscapeHtml(project.ProjectName)}</h4>
+                    <p class=""entry-company"">{EscapeHtml(project.TechnologiesUsed ?? "")}</p>
+                </div>
+                <div class=""entry-date"">{EscapeHtml(project.ProjectUrl ?? "")}</div>
+            </div>
+            {(descriptionLines.Any() ? $@"
+            <ul class=""entry-description"">
+                {string.Join("", descriptionLines.Select(line => $@"<li>{EscapeHtml(line.Replace("•", "").Trim())}</li>"))}
+            </ul>" : "")}
+        </div>");
             }
             return sb.ToString();
         }
@@ -2536,23 +3237,19 @@ namespace ezCV.Infrastructure.External
         // ========== REFERENCES RENDERERS ==========
         private string RenderReferencesForTemplate1(List<CvReferenceRequest> references)
         {
-            return RenderReferencesCommon(references, "edu-item", "edu-degree", "edu-institution", "edu-date");
-        }
-
-        private string RenderReferencesCommon(List<CvReferenceRequest> references,
-            string itemClass, string nameClass, string infoClass, string contactClass)
-        {
             if (references == null || !references.Any()) return "";
 
             var sb = new StringBuilder();
             foreach (var reference in references)
             {
+                var contactInfo = EscapeHtml(reference.ContactInfo ?? "").Trim();
+
                 sb.AppendLine($@"
-                <div class=""{itemClass}"">
-                    <p class=""{nameClass}"">{EscapeHtml(reference.FullName)}</p>
-                    <p class=""{infoClass}"">{EscapeHtml(reference.JobTitle)} - {EscapeHtml(reference.Company)}</p>
-                    <p class=""{contactClass}"">{EscapeHtml(reference.ContactInfo)}</p>
-                </div>");
+            <div class=""edu-item"">
+                <p class=""edu-degree"">{EscapeHtml(reference.FullName)}</p>
+                <p class=""edu-institution"">{EscapeHtml(reference.JobTitle)} - {EscapeHtml(reference.Company)}</p>
+                <p class=""edu-date"">{contactInfo}</p>
+            </div>");
             }
             return sb.ToString();
         }
@@ -2560,7 +3257,17 @@ namespace ezCV.Infrastructure.External
         // ========== INTERESTS/HOBBIES RENDERERS ==========
         private string RenderInterestsForTemplate1(List<CvHobbyRequest> hobbies)
         {
-            return RenderInterestsCommon(hobbies, "interest-item", "dynamic-item");
+            if (hobbies == null || !hobbies.Any()) return "";
+
+            var sb = new StringBuilder();
+            foreach (var hobby in hobbies)
+            {
+                sb.AppendLine($@"
+        <div>
+            <span class=""interest-item"">{EscapeHtml(hobby.HobbyName)}</span>
+        </div>");
+            }
+            return sb.ToString();
         }
 
         private string RenderInterestsForTemplate3(List<CvHobbyRequest> hobbies)
@@ -2573,21 +3280,6 @@ namespace ezCV.Infrastructure.External
             {
                 sb.AppendLine($@"
         <span class=""interest-tag"">{EscapeHtml(hobby.HobbyName)}</span>");
-            }
-            return sb.ToString();
-        }
-
-        private string RenderInterestsCommon(List<CvHobbyRequest> hobbies, string itemClass, string wrapperClass)
-        {
-            if (hobbies == null || !hobbies.Any()) return "";
-
-            var sb = new StringBuilder();
-            foreach (var hobby in hobbies)
-            {
-                sb.AppendLine($@"
-                <div class=""{wrapperClass}"">
-                    <span class=""{itemClass}"">{EscapeHtml(hobby.HobbyName)}</span>
-                </div>");
             }
             return sb.ToString();
         }
@@ -2612,7 +3304,6 @@ namespace ezCV.Infrastructure.External
         // ========== ACTIVITIES RENDERERS ==========
         private string RenderActivitiesForTemplate5(List<CvProjectRequest> projects)
         {
-            // Lọc activities từ projects (có chứa "activities" trong tên)
             var activities = projects?.Where(p =>
                 !string.IsNullOrEmpty(p.ProjectName) &&
                 p.ProjectName.Contains("activities-")
@@ -2673,86 +3364,26 @@ namespace ezCV.Infrastructure.External
             return System.Net.WebUtility.HtmlEncode(input);
         }
 
-        // private async Task<string> ConvertHtmlToPdf(string htmlContent, string fullName)
-        // {
-        //     // Download browser
-        //     await new BrowserFetcher().DownloadAsync();
-
-        //     using var browser = await Puppeteer.LaunchAsync(new LaunchOptions
-        //     {
-        //         Headless = true,
-        //         Args = new[] { "--no-sandbox" }
-        //     });
-
-        //     using var page = await browser.NewPageAsync();
-        //     await page.SetContentAsync(htmlContent);
-        //     await page.WaitForNetworkIdleAsync(new WaitForNetworkIdleOptions { IdleTime = 500, Timeout = 5000 });
-
-        //     // Tạo thư mục pdfs
-        //     var pdfsDir = Path.Combine(_environment.WebRootPath ?? "wwwroot", "pdfs");
-        //     if (!Directory.Exists(pdfsDir))
-        //         Directory.CreateDirectory(pdfsDir);
-
-        //     var fileName = $"CV_{SanitizeFileName(fullName)}_{DateTime.Now:yyyyMMddHHmmss}";
-        //     var pdfPath = Path.Combine(pdfsDir, $"{fileName}.pdf");
-
-        //     await page.PdfAsync(pdfPath, new PdfOptions
-        //     {
-        //         Format = PaperFormat.A4,
-        //         PrintBackground = true,
-        //         MarginOptions = new MarginOptions
-        //         {
-        //             Top = "0.5cm",
-        //             Right = "0.5cm",
-        //             Bottom = "0.5cm",
-        //             Left = "0.5cm"
-        //         }
-        //     });
-
-        //     return pdfPath;
-        // }
         private async Task<string> ConvertHtmlToPdf(string htmlContent, string fullName)
         {
-            // 🚫 Không dùng BrowserFetcher().DownloadAsync()
-            // Railway không cho tải binary Chromium trong container runtime.
+            await new BrowserFetcher().DownloadAsync();
 
-            var executablePath = Environment.GetEnvironmentVariable("PUPPETEER_EXECUTABLE_PATH")
-                                 ?? "/usr/bin/chromium";
-
-            _logger.LogInformation("Chromium path: {Path}", executablePath);
-
-            var launchOptions = new LaunchOptions
+            using var browser = await Puppeteer.LaunchAsync(new LaunchOptions
             {
                 Headless = true,
-                ExecutablePath = executablePath,
-                Args = new[]
-                {
-            "--no-sandbox",
-            "--disable-setuid-sandbox",
-            "--disable-gpu",
-            "--disable-dev-shm-usage",
-            "--disable-extensions",
-            "--disable-software-rasterizer"
-        }
-            };
+                Args = new[] { "--no-sandbox" }
+            });
 
-            _logger.LogInformation("Launching Puppeteer browser...");
-            using var browser = await Puppeteer.LaunchAsync(launchOptions);
             using var page = await browser.NewPageAsync();
-
-            _logger.LogInformation("Setting HTML content...");
             await page.SetContentAsync(htmlContent);
             await page.WaitForNetworkIdleAsync(new WaitForNetworkIdleOptions { IdleTime = 500, Timeout = 5000 });
 
-            // 📁 Đảm bảo thư mục pdfs tồn tại
             var pdfsDir = Path.Combine(_environment.WebRootPath ?? "wwwroot", "pdfs");
             if (!Directory.Exists(pdfsDir))
                 Directory.CreateDirectory(pdfsDir);
 
             var fileName = $"CV_{SanitizeFileName(fullName)}_{DateTime.Now:yyyyMMddHHmmss}";
             var pdfPath = Path.Combine(pdfsDir, $"{fileName}.pdf");
-
-            _logger.LogInformation("Saving PDF to {Path}", pdfPath);
 
             await page.PdfAsync(pdfPath, new PdfOptions
             {
@@ -2767,10 +3398,8 @@ namespace ezCV.Infrastructure.External
                 }
             });
 
-            _logger.LogInformation("PDF generated successfully!");
             return pdfPath;
         }
-
 
         private string SanitizeFileName(string fileName)
         {

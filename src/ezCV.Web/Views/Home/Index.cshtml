@@ -21,6 +21,8 @@
                     <span class="highlight"></span>
                     <span class="bar"></span>
                     <label>Email</label>
+                    <!-- Thêm span hiển thị lỗi cho email -->
+                    <span id="login-email-error" class="text-danger small error-message" style="display:none;"></span>
                 </div>
             </div>
             <div class="col-12 col-md-12">
@@ -29,6 +31,8 @@
                     <span class="highlight"></span>
                     <span class="bar"></span>
                     <label>Mật khẩu</label>
+                    <!-- Thêm span hiển thị lỗi cho password -->
+                    <span id="login-password-error" class="text-danger small error-message" style="display:none;"></span>
                 </div>
             </div>
 
@@ -36,7 +40,8 @@
                 <button type="submit" class="btn dream-btn">Đăng nhập</button>
             </div>
             <div class="col-12 col-sm-7 text-left">
-                <p class="mb-0 mt-10">Bạn chưa có tài khoản? <a href="#signup-popup" class="open-popup-link">Đăng ký</a></p>
+                <p class="mb-0">Bạn chưa có tài khoản? <a href="#signup-popup" class="open-popup-link">Đăng ký</a></p>
+                <p class="mb-0"><a href="#forgot-password-popup" class="open-popup-link">Quên mật khẩu?</a></p>
             </div>
         </div>
     </form>
@@ -65,6 +70,8 @@
                     <span class="highlight"></span>
                     <span class="bar"></span>
                     <label>Email</label>
+                    <!-- Thêm span hiển thị lỗi cho email đăng ký -->
+                    <span id="signup-email-error" class="text-danger small error-message" style="display:none;"></span>
                 </div>
             </div>
             <div class="col-12 col-md-12">
@@ -73,6 +80,8 @@
                     <span class="highlight"></span>
                     <span class="bar"></span>
                     <label>Mật khẩu</label>
+                    <!-- Thêm span hiển thị lỗi cho password -->
+                    <span id="signup-password-error" class="text-danger small error-message" style="display:none;"></span>
                 </div>
             </div>
             <div class="col-12 col-md-12">
@@ -81,6 +90,8 @@
                     <span class="highlight"></span>
                     <span class="bar"></span>
                     <label>Nhập lại mật khẩu</label>
+                    <!-- Thêm span hiển thị lỗi cho confirm password -->
+                    <span id="signup-confirm-password-error" class="text-danger small error-message" style="display:none;"></span>
                 </div>
             </div>
 
@@ -92,6 +103,124 @@
             </div>
         </div>
     </form>
+</div>
+
+<!-- Popup Quên mật khẩu -->
+<div id="forgot-password-popup" class="white-popup mfp-hide">
+    <div class="top-form-header">
+        <h4>Quên mật khẩu</h4>
+    </div>
+    <form id="forgot-password-form" method="post">
+        @Html.AntiForgeryToken()
+        <div class="row">
+            <!-- Khu vực hiển thị thông báo -->
+            <div id="forgot-password-message" class="col-12 mb-3" style="display:none;"></div>
+
+            <div class="col-12 col-md-12">
+                <div class="group">
+                    <input type="email" name="email" id="forgot-password-email" required="">
+                    <span class="highlight"></span>
+                    <span class="bar"></span>
+                    <label>Email đăng ký</label>
+                </div>
+                <p class="text-muted small mt-2">Chúng tôi sẽ gửi link đặt lại mật khẩu đến email của bạn.</p>
+            </div>
+
+            <div class="col-12 col-sm-6 text-left">
+                <button type="submit" class="btn dream-btn">Gửi yêu cầu</button>
+            </div>
+            <div class="col-12 col-sm-6 text-right">
+                <p class="mb-0 mt-10"><a href="#test-popup" class="open-popup-link">Quay lại đăng nhập</a></p>
+            </div>
+        </div>
+    </form>
+</div>
+<!-- Popup Nhập OTP -->
+<div id="otp-popup" class="white-popup mfp-hide">
+    <div class="top-form-header">
+        <h4>Xác thực OTP</h4>
+    </div>
+    <form id="otp-form" method="post">
+        @Html.AntiForgeryToken()
+        <div class="row">
+            <!-- Khu vực hiển thị thông báo -->
+            <div id="otp-message" class="col-12 mb-3" style="display:none;"></div>
+
+            <div class="col-12 col-md-12">
+                <div class="group">
+                    <input type="text" name="otp" id="otp-code" required="" maxlength="6">
+                    <span class="highlight"></span>
+                    <span class="bar"></span>
+                    <label>Mã OTP</label>
+                </div>
+                <p class="text-muted small mt-2">Mã OTP đã được gửi đến email của bạn.</p>
+            </div>
+
+            <div class="col-12 col-sm-6 text-left">
+                <button type="submit" class="btn dream-btn">Xác thực</button>
+            </div>
+            <div class="col-12 col-sm-6 text-right">
+                <p class="mb-0 mt-10"><a href="#" id="resend-otp" style="cursor:pointer;">Gửi lại OTP</a></p>
+                <p class="mb-0 mt-10"><a href="#forgot-password-popup" class="open-popup-link">Quay lại</a></p>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Popup Nhập Mật Khẩu Mới -->
+<div id="new-password-popup" class="white-popup mfp-hide">
+    <div class="top-form-header">
+        <h4>Đặt lại mật khẩu</h4>
+    </div>
+    <form id="new-password-form" method="post">
+        @Html.AntiForgeryToken()
+        <div class="row">
+            <!-- Khu vực hiển thị thông báo -->
+            <div id="new-password-message" class="col-12 mb-3" style="display:none;"></div>
+
+            <div class="col-12 col-md-12">
+                <div class="group">
+                    <input type="password" name="newPassword" id="new-password" required="">
+                    <span class="highlight"></span>
+                    <span class="bar"></span>
+                    <label>Mật khẩu mới</label>
+                    <span id="new-password-error" class="text-danger small error-message" style="display:none;"></span>
+                </div>
+            </div>
+            <div class="col-12 col-md-12">
+                <div class="group">
+                    <input type="password" name="confirmNewPassword" id="confirm-new-password" required="">
+                    <span class="highlight"></span>
+                    <span class="bar"></span>
+                    <label>Nhập lại mật khẩu mới</label>
+                    <span id="confirm-new-password-error" class="text-danger small error-message" style="display:none;"></span>
+                </div>
+            </div>
+
+            <div class="col-12 col-sm-6 text-left">
+                <button type="submit" class="btn dream-btn">Đặt lại mật khẩu</button>
+            </div>
+            <div class="col-12 col-sm-6 text-right">
+                <p class="mb-0 mt-10"><a href="#otp-popup" class="open-popup-link">Quay lại</a></p>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Popup Thành Công -->
+<div id="success-popup" class="white-popup mfp-hide">
+    <div class="top-form-header text-center">
+        <div class="success-icon mb-3">
+            <i class="fa fa-check-circle" style="font-size: 48px; color: #28a745;"></i>
+        </div>
+        <h4 class="text-success">Thành công!</h4>
+    </div>
+    <div class="row">
+        <div class="col-12 text-center">
+            <p id="success-message" class="mb-4">Mật khẩu đã được đặt lại thành công!</p>
+            <button type="button" class="btn dream-btn green-btn" onclick="closeSuccessPopup()">Đóng</button>
+        </div>
+    </div>
 </div>
 
 <!-- ##### Welcome Area Start ##### -->
@@ -127,8 +256,6 @@
     </div>
 </section>
 <!-- ##### Welcome Area End ##### -->
-
-<div class="clearfix"></div>
 
 <div class="clearfix"></div>
 
@@ -174,236 +301,215 @@
         </div>
     </div>
 </section>
+
+<!-- AI Chat Floating Button - Mở trang CreateCv -->
+<div id="aiChatFloating" class="ai-chat-floating" onclick="openAIChat()">
+    <div class="ai-chat-icon">
+        <i class="fas fa-robot"></i>
+        <span class="ai-pulse"></span>
+    </div>
+    <div class="ai-chat-tooltip">
+        Trợ lý AI tạo CV
+    </div>
+</div>
+
 @section Scripts {
-<script>
-const API_HOST = "https://ezcv-api.up.railway.app";
-
-// -------------------- Helper lấy anti-forgery token --------------------
-function getAntiForgeryToken() {
-    return document.querySelector('input[name="__RequestVerificationToken"]')?.value || "";
-}
-
-// -------------------- Kiểm tra user đã login hay chưa --------------------
-async function isUserLoggedIn() {
-    try {
-        console.log("🔍 Checking login status via Web backend...");
-        
-        // ✅ SỬA: Kiểm tra qua Web backend endpoint
-        const res = await fetch('/Auth/check-login', { 
-            credentials: 'include' 
-        });
-        
-        console.log("Login check response status:", res.status);
-        
-        if (res.ok) {
-            const data = await res.json();
-            console.log("✅ Login check result:", data);
-            return data.isLoggedIn === true;
-        } else {
-            console.log("Login check failed, status:", res.status);
-            return false;
-        }
-    } catch (err) {
-        console.error("Error checking login:", err);
-        return false;
-    }
-}
-
-// -------------------- Xử lý click "Sử dụng mẫu" --------------------
-async function handleUseTemplate(link) {
-    const loggedIn = await isUserLoggedIn();
-    if (loggedIn) {
-        return true; // cho phép redirect
-    }
-    // Nếu chưa login → mở popup
-    if (window.$ && $.magnificPopup) {
-        $.magnificPopup.open({
-            items: { src: '#test-popup' },
-            type: 'inline',
-            mainClass: 'mfp-fade'
-        });
-    }
-    return false; // chặn redirect
-}
-
-// -------------------- DOM Loaded --------------------
-document.addEventListener("DOMContentLoaded", () => {
-
-    // Gán sự kiện cho các nút "Sử dụng mẫu"
-    document.querySelectorAll('a.preview-demo.v2').forEach(link => {
-        link.addEventListener('click', async (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-
-            const loggedIn = await isUserLoggedIn();
-            if (loggedIn) {
-                window.location.href = link.href;
-                return;
-            }
-
-            if (window.$ && $.magnificPopup) {
-                $.magnificPopup.open({
-                    items: { src: '#test-popup' },
-                    type: 'inline',
-                    mainClass: 'mfp-fade'
-                });
-            }
-        });
-    });
-
-    // Popup login/register
-    if (window.$) {
-        $('a.open-popup-link').magnificPopup({
-            type: 'inline',
-            midClick: true,
-            mainClass: 'mfp-fade',
-            removalDelay: 300
-        });
-    }
-
-   // -------------------- Xử lý login --------------------
-// -------------------- Xử lý login --------------------
-const loginForm = document.getElementById("main_login_form");
-if (loginForm) {
-    loginForm.addEventListener("submit", async (e) => {
-        e.preventDefault();
-
-        const email = document.getElementById("login-email").value.trim();
-        const password = document.getElementById("login-password").value.trim();
-
-        if (!email || !password) {
-            alert("Vui lòng nhập đầy đủ email và mật khẩu");
-            return;
+    <style>
+        /* CSS cho trường bị lỗi */
+        .error-field {
+            border-color: #dc3545 !important;
+            background-color: #fff5f5 !important;
         }
 
-        try {
-            console.log("🔄 Sending login to Web backend...");
-            
-            const response = await fetch("/Auth/ajax-login", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "RequestVerificationToken": getAntiForgeryToken()
-                },
-                body: JSON.stringify({ email, password }),
-                credentials: 'include'
-            });
+            .error-field + .highlight {
+                background-color: #dc3545 !important;
+            }
 
-            const result = await response.json();
-            console.log("Response:", result);
-
-            if (response.ok && result.success) {
-                console.log("🎉 Login successful!");
-                
-                // Đóng popup
-                if (window.jQuery && window.jQuery.magnificPopup) {
-                    window.jQuery.magnificPopup.close();
+                .error-field + .highlight + .bar:before,
+                .error-field + .highlight + .bar:after {
+                    background-color: #dc3545 !important;
                 }
 
-                // Hiển thị thông báo thành công
-                alert("🎉 Đăng nhập thành công!");
+        .error-message {
+            font-size: 0.875em;
+            margin-top: 5px;
+            display: block;
+        }
 
-                // ✅ QUAN TRỌNG: Redirect về Home Index
-                setTimeout(() => {
-                    // Nếu có redirectUrl từ server thì dùng, không thì về Home
-                    if (result.redirectUrl) {
-                        window.location.href = result.redirectUrl;
-                    } else {
-                        window.location.href = '/'; // Về Home Index
-                    }
-                }, 1000);
-                
+        /* Style cho icon thành công */
+        .success-icon {
+            animation: bounceIn 0.6s ease-in-out;
+        }
+
+        @@keyframes bounceIn {
+            0% {
+                transform: scale(0.3);
+                opacity: 0;
+            }
+
+            50% {
+                transform: scale(1.05);
+                opacity: 1;
+            }
+
+            70% {
+                transform: scale(0.9);
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        /* AI Chat Floating Button */
+        .ai-chat-floating {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+            z-index: 1000;
+            transition: all 0.3s ease;
+            animation: float 3s ease-in-out infinite;
+        }
+
+            .ai-chat-floating:hover {
+                transform: scale(1.1);
+                box-shadow: 0 6px 25px rgba(102, 126, 234, 0.6);
+            }
+
+        .ai-chat-icon {
+            color: white;
+            font-size: 24px;
+            position: relative;
+        }
+
+        .ai-pulse {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 12px;
+            height: 12px;
+            background: #4ade80;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        .ai-chat-tooltip {
+            position: absolute;
+            right: 70px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .ai-chat-floating:hover .ai-chat-tooltip {
+            opacity: 1;
+        }
+
+        /* Animations */
+        @@keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        @@keyframes pulse {
+            0% {
+                transform: scale(0.8);
+                opacity: 1;
+            }
+
+            70% {
+                transform: scale(1.5);
+                opacity: 0;
+            }
+
+            100% {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+        }
+
+        /* Responsive */
+        @@media (max-width: 768px) {
+            .ai-chat-floating {
+                bottom: 20px;
+                right: 20px;
+                width: 50px;
+                height: 50px;
+            }
+
+            .ai-chat-icon {
+                font-size: 20px;
+            }
+
+            .ai-pulse {
+                width: 10px;
+                height: 10px;
+            }
+        }
+    </style>
+    <script src="~/assets/js/auth.js"></script>
+    <script>
+        function openAIChat() {
+            // Kiểm tra xem user đã đăng nhập chưa
+            const isAuthenticated = @User.Identity.IsAuthenticated.ToString().ToLower();
+
+            if (isAuthenticated) {
+                // Nếu đã đăng nhập, chuyển đến trang CreateCv
+                window.location.href = '/AIChat/CreateCv';
             } else {
-                console.error("❌ Login failed:", result.message);
-                alert(result.message || "Đăng nhập thất bại");
-            }
-
-        } catch (err) {
-            console.error("💥 Login error:", err);
-            alert("Lỗi đăng nhập: " + err.message);
-        }
-    });
-}
-
-    // -------------------- Xử lý đăng ký --------------------
-    const registerForm = document.getElementById("main_Signup_form");
-    if (registerForm) {
-        registerForm.addEventListener("submit", async (e) => {
-            e.preventDefault();
-
-            const email = document.getElementById("signup-email").value.trim();
-            const password = document.getElementById("signup-password").value.trim();
-            const confirmPassword = document.getElementById("signup-confirm-password").value.trim();
-
-            if (!email || !password || !confirmPassword) {
-                alert("Vui lòng nhập đầy đủ thông tin");
-                return;
-            }
-
-            if (password !== confirmPassword) {
-                alert("Mật khẩu nhập lại không khớp");
-                return;
-            }
-
-            try {
-                const response = await fetch(`${API_HOST}/api/auth/register`, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Accept": "application/json",
-                        "RequestVerificationToken": getAntiForgeryToken()
+                // Nếu chưa đăng nhập, hiển thị popup đăng nhập
+                $.magnificPopup.open({
+                    items: {
+                        src: '#test-popup'
                     },
-                    body: JSON.stringify({ email, password, confirmPassword })
+                    type: 'inline',
+                    mainClass: 'mfp-fade',
+                    removalDelay: 300
                 });
 
-                const result = await response.json();
-                if (response.ok && result.success) {
-                    // Đóng popup
-                    if (window.jQuery && window.jQuery.magnificPopup) {
-                        window.jQuery.magnificPopup.close();
-                    }
+                // Thêm event listener sau khi login thành công
+                $(document).on('auth:loginSuccess', function () {
+                    window.location.href = '/AIChat/CreateCv';
+                });
+            }
+        }
 
-                    alert("🎉 Đăng ký thành công! Vui lòng đăng nhập để tiếp tục.");
-                    // Mở popup login
-                    if (window.jQuery) {
-                        window.jQuery.magnificPopup.open({
-                            items: { src: '#test-popup' },
-                            type: 'inline'
-                        });
-                    }
+        // Thêm hiệu ứng khi scroll
+        document.addEventListener('DOMContentLoaded', function () {
+            const floatingBtn = document.getElementById('aiChatFloating');
+
+            window.addEventListener('scroll', function () {
+                if (window.scrollY > 300) {
+                    floatingBtn.style.opacity = '1';
+                    floatingBtn.style.transform = 'translateY(0)';
                 } else {
-                    alert(result.message || "Đăng ký thất bại");
+                    floatingBtn.style.opacity = '0.8';
                 }
-            } catch (err) {
-                console.error("Register error:", err);
-                alert("Lỗi kết nối đến server");
-            }
+            });
         });
-    }
-
-    // -------------------- Preview hình ảnh CV --------------------
-    const previewLinks = document.querySelectorAll(".demo-item .preview-btn-wrapper a:not(.v2)");
-    previewLinks.forEach(link => {
-        link.addEventListener("click", (e) => {
-            e.preventDefault();
-            const demoItem = link.closest(".demo-item");
-            if (!demoItem) return;
-
-            const imgElement = demoItem.querySelector("img");
-            const imageSrc = imgElement ? imgElement.src : null;
-
-            if (imageSrc && window.jQuery && window.jQuery.magnificPopup) {
-                window.jQuery.magnificPopup.open({
-                    items: { src: imageSrc },
-                    type: 'image',
-                    mainClass: 'mfp-with-zoom mfp-img-mobile mfp-cv-preview',
-                    closeOnContentClick: true,
-                    titleSrc: () => imgElement.alt || 'Mẫu CV'
-                }, 0);
-            }
-        });
-    });
-
-});
-</script>
+    </script>
 }
+

@@ -1,16 +1,25 @@
-﻿using ezCV.Web.Services.Auth;
+﻿using DotNetEnv;
+using ezCV.Web.Services.AIChat;
+using ezCV.Web.Services.Auth;
 using ezCV.Web.Services.CvProcess;
 using ezCV.Web.Services.CvTemplate;
+using ezCV.Web.Services.Users;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.Google;
 
 var builder = WebApplication.CreateBuilder(args);
+// =======================
+// Load .env file (Environment Variables)
+// =======================
+Env.Load(); 
+builder.Configuration.AddEnvironmentVariables();
 
 builder.Services.AddControllersWithViews();
 
 // --- HttpClient configuration ---
 // Get Base URL ONCE
-var apiBaseUrl = builder.Configuration["ApiSettings:BaseUrl"]; // Use ApiSettings:BaseUrl
+var apiBaseUrl = Environment.GetEnvironmentVariable("APISETTINGS__BASEURL")
+                 ?? builder.Configuration["ApiSettings:BaseUrl"];
+
 if (string.IsNullOrEmpty(apiBaseUrl))
 {
     throw new InvalidOperationException("ApiSettings:BaseUrl not configured in appsettings.json");
@@ -36,6 +45,21 @@ builder.Services.AddHttpClient<ICvTemplateService, CvTemplateService>(client =>
     client.DefaultRequestHeaders.Add("Accept", "application/json");
 });
 
+// Configure HttpClient for UserService
+builder.Services.AddHttpClient<IUserService, UserService>(client =>
+{
+    client.BaseAddress = new Uri(apiBaseUrl);
+    client.DefaultRequestHeaders.Add("Accept", "application/json");
+});
+
+// Configure HttpClient for AIChatService
+builder.Services.AddHttpClient<IAIChatService, AIChatService>(client =>
+{
+    client.BaseAddress = new Uri(apiBaseUrl);
+    client.DefaultRequestHeaders.Add("Accept", "application/json");
+    client.Timeout = TimeSpan.FromSeconds(60);
+});
+
 
 // --- Authentication ---
 builder.Services.AddAuthentication(options =>
@@ -46,26 +70,33 @@ builder.Services.AddAuthentication(options =>
 })
 .AddCookie(options =>
 {
-    options.LoginPath = "/Auth/Login"; // Ensure this path exists
+    options.LoginPath = "/Auth/Login"; 
     options.AccessDeniedPath = "/Auth/AccessDenied";
-    options.LogoutPath = "/Auth/Logout"; // Ensure this path exists
+    options.LogoutPath = "/Auth/Logout"; 
     options.ExpireTimeSpan = TimeSpan.FromDays(7);
+    options.SlidingExpiration = true;
 })
-.AddGoogle(options => // Ensure Google Auth is needed and configured
+.AddGoogle(options => 
 {
     // Make sure these keys exist in appsettings.json or user secrets
     options.ClientId = builder.Configuration["Authentication:Google:ClientId"];
     options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
-    options.CallbackPath = "/signin-google"; 
-    options.Events.OnRedirectToAuthorizationEndpoint = context =>
-        {
-            var uri = context.RedirectUri;
-        // Force HTTPS và đúng domain Railway
-        uri = uri.Replace("http://", "https://")
-                 .Replace("localhost", "ezcv.up.railway.app");
-        context.Response.Redirect(uri);
-        return Task.CompletedTask;
-        };
+    options.CallbackPath = "/signin-google";
+    //options.Events.OnRedirectToAuthorizationEndpoint = context =>
+    //{
+    //    var uri = context.RedirectUri;
+
+    //    if (!app.Environment.IsDevelopment())
+    //    {
+    //        // Khi deploy thật (Railway)
+    //        uri = uri.Replace("http://localhost:7000", "https://ezcv.up.railway.app")
+    //                 .Replace("http://localhost:7107", "https://ezcv.up.railway.app");
+    //    }
+
+    //    context.Response.Redirect(uri);
+    //    return Task.CompletedTask;
+    //};
+
 });
 
 
@@ -75,10 +106,10 @@ builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromDays(1);
     options.Cookie.HttpOnly = true;
-    options.Cookie.IsEssential = true; // Make session cookie essential
+    options.Cookie.IsEssential = true;
 });
 
-// CORS (Usually needed more on the API side, but harmless here)
+// CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
@@ -114,8 +145,18 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
-app.Urls.Add($"http://0.0.0.0:{port}");
+if (app.Environment.IsDevelopment())
+{
+    // Local: dùng launchSettings.json (7000 / 7107)
+    Console.WriteLine("Running in Development - using launchSettings.json port.");
+}
+else
+{
+    // Railway / Production: lắng nghe port do hệ thống cấp
+    var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+    app.Urls.Add($"http://0.0.0.0:{port}");
+}
+
 
 app.UseCors("AllowAll"); 
 

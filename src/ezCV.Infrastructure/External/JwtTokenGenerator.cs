@@ -15,29 +15,30 @@ namespace ezCV.Infrastructure.External
     public class JwtTokenGenerator : IJwtTokenGenerator
     {
         private readonly IConfiguration _configuration;
-        
+
         public JwtTokenGenerator(IConfiguration configuration)
         {
             _configuration = configuration;
         }
-        
+
         public (string Token, DateTime Expiry) GenerateAccessToken(User user, Role role)
         {
-            // Lấy JWT configuration từ nhiều nguồn
-            var secretKey = _configuration["JWT:SecretKey"] 
-                         ?? _configuration["JWT_SecretKey"]
-                         ?? Environment.GetEnvironmentVariable("JWT_SecretKey")
-                         ?? throw new InvalidOperationException("SecretKey not configured.");
+            // Lấy JWT configuration 
+            var secretKey = Environment.GetEnvironmentVariable("JWT_SECRETKEY")
+            ?? _configuration["Jwt:SecretKey"]
+            ?? throw new InvalidOperationException("JWT_SECRETKEY not configured.");
 
-            var issuer = _configuration["JWT:Issuer"] 
-                      ?? Environment.GetEnvironmentVariable("JWT_Issuer")
+            var issuer = _configuration["JWT:Issuer"]
+                      ?? Environment.GetEnvironmentVariable("JWT_ISSUER")
+                        ?? _configuration["Jwt:Issuer"]
                       ?? "https://ezcv-api.up.railway.app";
 
-            var audience = _configuration["JWT:Audience"] 
-                        ?? Environment.GetEnvironmentVariable("JWT_Audience")
+            var audience = _configuration["JWT:Audience"]
+                        ?? Environment.GetEnvironmentVariable("JWT_AUDIENCE")
+                         ?? _configuration["Jwt:Audience"]
                         ?? "https://ezcv.up.railway.app";
 
-            Console.WriteLine($"🔐 Generating token for: {user.Email}");
+            Console.WriteLine($"Generating token for: {user.Email}");
 
             var claims = new List<Claim>
             {
@@ -52,7 +53,7 @@ namespace ezCV.Infrastructure.External
 
             // Thời gian hết hạn
             var expiry = DateTime.UtcNow.AddHours(24);
-            
+
             var token = new JwtSecurityToken(
                 issuer: issuer,
                 audience: audience,

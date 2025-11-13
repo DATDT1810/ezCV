@@ -5,31 +5,31 @@ using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using ezCV.Infrastructure;
 using ezCV.Application.External.Models;
+using DotNetEnv;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // =======================
-// 1️⃣ Load SecretKey (robust fallback)
+// Load .env file (Environment Variables)
 // =======================
-var secretKey = Environment.GetEnvironmentVariable("SecretKey")
-                ?? Environment.GetEnvironmentVariable("JWT_SecretKey")
-                ?? Environment.GetEnvironmentVariable("JWT__SecretKey")
-                ?? Environment.GetEnvironmentVariable("Jwt__SecretKey")
-                ?? builder.Configuration["Jwt:SecretKey"]
-                ?? builder.Configuration["SecretKey"];
+Env.Load();
+
+// =======================
+// 1️ Load SecretKey (robust fallback)
+// =======================
+var secretKey = Environment.GetEnvironmentVariable("JWT_SECRETKEY")
+                ?? builder.Configuration["Jwt:SecretKey"];
 
 if (string.IsNullOrEmpty(secretKey))
 {
-    Console.WriteLine("❌ SecretKey NULL → API sẽ không hoạt động!");
     throw new InvalidOperationException("SecretKey not configured.");
 }
-Console.WriteLine("✅ SecretKey ĐÃ LOAD (present)."); // KHÔNG in secret trực tiếp
 
 // =======================
-// 2️⃣ Database
+// 2️ Database
 // =======================
-var connectionString = Environment.GetEnvironmentVariable("AZURE_SQL_CONNECTION")
-                       ?? builder.Configuration.GetConnectionString("DefaultConnection");
+var connectionString = Environment.GetEnvironmentVariable("DefaultConnection")
+                       ?? builder.Configuration.GetConnectionString("AZURE_SQL_CONNECTION");
 
 if (!string.IsNullOrEmpty(connectionString))
 {
@@ -41,27 +41,32 @@ if (!string.IsNullOrEmpty(connectionString))
 
     builder.Services.AddDbContext<ApplicationDbContext>(options =>
         options.UseSqlServer(connectionString));
-    Console.WriteLine("✅ Database connection string loaded.");
 }
 else
 {
-    Console.WriteLine("⚠️ Database connection string NULL!");
+    Console.WriteLine("Database connection string NULL!");
 }
 
 // =======================
-// 3️⃣ Email Configuration
+// 3️ Email Configuration
 // =======================
 builder.Services.Configure<EmailConfiguration>(options =>
 {
-    options.Email = builder.Configuration["EmailConfiguration:Email"];
+    options.Email = Environment.GetEnvironmentVariable("EMAIL_ADDRESS")
+                   ?? builder.Configuration["EmailConfiguration:Email"];
     options.Password = Environment.GetEnvironmentVariable("EMAIL_PASSWORD")
                        ?? builder.Configuration["EmailConfiguration:Password"];
-    options.Host = builder.Configuration["EmailConfiguration:Host"];
-    options.Port = builder.Configuration.GetValue<int>("EmailConfiguration:Port");
+    options.Host = Environment.GetEnvironmentVariable("EMAIL_HOST")
+                   ?? builder.Configuration["EmailConfiguration:Host"];
+    options.Port = int.Parse(Environment.GetEnvironmentVariable("EMAIL_PORT")
+                   ?? builder.Configuration["EmailConfiguration:Port"] ?? "587");
+    options.DisplayName = Environment.GetEnvironmentVariable("EMAIL_DISPLAYNAME")
+                         ?? builder.Configuration["EmailConfiguration:DisplayName"]
+                         ?? "ezCV System";
 });
 
 // =======================
-// 4️⃣ Cloudinary
+// 4️ Cloudinary
 // =======================
 builder.Services.Configure<CloudinarySetting>(options =>
 {
@@ -73,14 +78,12 @@ builder.Services.Configure<CloudinarySetting>(options =>
 });
 
 // =======================
-// 5️⃣ JWT Authentication (only validate issuer/audience when present)
+// 5️ JWT Authentication (only validate issuer/audience when present)
 // =======================
-var configuredIssuer = Environment.GetEnvironmentVariable("Jwt__Issuer")
-                       ?? Environment.GetEnvironmentVariable("JWT_ISSUER")
+var configuredIssuer = Environment.GetEnvironmentVariable("JWT_ISSUER")
                        ?? builder.Configuration["Jwt:Issuer"];
 
-var configuredAudience = Environment.GetEnvironmentVariable("Jwt__Audience")
-                       ?? Environment.GetEnvironmentVariable("JWT_AUDIENCE")
+var configuredAudience = Environment.GetEnvironmentVariable("JWT_AUDIENCE")
                        ?? builder.Configuration["Jwt:Audience"];
 
 var tokenValidationParameters = new TokenValidationParameters
@@ -102,25 +105,26 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 
 // =======================
-// 6️⃣ Infrastructure Services
+// 6️ Infrastructure Services
 // =======================
 builder.Services.AddInfrastructureServices(builder.Configuration);
 
 // =======================
-// 7️⃣ Controllers & Swagger
+// 7️ Controllers & Swagger
 // =======================
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // =======================
-// 8️⃣ CORS
+// 8️ CORS
 // =======================
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
     {
-        policy.WithOrigins("https://ezcv.up.railway.app")
+        policy.WithOrigins("https://ezcv.up.railway.app",
+            "https://localhost:7000")
               .AllowAnyMethod()
               .AllowAnyHeader()
               .AllowCredentials();
@@ -128,12 +132,12 @@ builder.Services.AddCors(options =>
 });
 
 // =======================
-// 9️⃣ Build App
+// 9️ Build App
 // =======================
 var app = builder.Build();
 
 // =======================
-// 10️⃣ Pipeline
+// 10️ Pipeline
 // =======================
 if (app.Environment.IsDevelopment())
 {
@@ -147,8 +151,11 @@ else
 }
 
 // Railway port
-var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
-app.Urls.Add($"http://0.0.0.0:{port}");
+if (app.Environment.IsProduction())
+{
+    var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+    app.Urls.Add($"http://0.0.0.0:{port}");
+}
 
 // Consider disabling HTTPS redirection in container env to avoid warnings.
 // app.UseHttpsRedirection();
@@ -163,7 +170,7 @@ app.UseAuthorization();
 app.MapGet("/debug/env", () => new {
     SecretKey_env = Environment.GetEnvironmentVariable("SecretKey") != null,
     JWT_SecretKey_env = Environment.GetEnvironmentVariable("JWT_SecretKey") != null,
-    Jwt__SecretKey_env = Environment.GetEnvironmentVariable("Jwt__SecretKey") != null,
+    Jwt__SecretKey_env = Environment.GetEnvironmentVariable("Jwt_SecretKey") != null,
     Builder_JwtSecret = !string.IsNullOrEmpty(app.Configuration["Jwt:SecretKey"]),
     Builder_SecretKey = !string.IsNullOrEmpty(app.Configuration["SecretKey"]),
     Builder_JwtIssuer = !string.IsNullOrEmpty(app.Configuration["Jwt:Issuer"]),
@@ -171,7 +178,7 @@ app.MapGet("/debug/env", () => new {
 });
 
 // =======================
-// 11️⃣ Health Check & Root
+// 11️ Health Check & Root
 // =======================
 app.MapGet("/", () => "ezCV API is running! - " + DateTime.UtcNow);
 app.MapGet("/health", () => "Healthy");
@@ -184,11 +191,11 @@ app.MapGet("/api/health", () => new
 });
 
 // =======================
-// 12️⃣ Controllers
+// 12️ Controllers
 // =======================
 app.MapControllers();
 
 // =======================
-// 13️⃣ Run App
+// 13️ Run App
 // =======================
 app.Run();
