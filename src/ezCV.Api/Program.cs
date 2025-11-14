@@ -158,7 +158,7 @@ if (app.Environment.IsProduction())
 }
 
 // Consider disabling HTTPS redirection in container env to avoid warnings.
-// app.UseHttpsRedirection();
+app.UseHttpsRedirection();
 
 app.UseCors("AllowAll");
 app.UseAuthentication();

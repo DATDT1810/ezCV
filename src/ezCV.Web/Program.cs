@@ -5,6 +5,7 @@ using ezCV.Web.Services.CvProcess;
 using ezCV.Web.Services.CvTemplate;
 using ezCV.Web.Services.Users;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.Google;
 
 var builder = WebApplication.CreateBuilder(args);
 // =======================
@@ -66,7 +67,7 @@ builder.Services.AddAuthentication(options =>
 {
     options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
     // Remove Google as default challenge unless specifically intended
-    // options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
 })
 .AddCookie(options =>
 {
@@ -82,20 +83,20 @@ builder.Services.AddAuthentication(options =>
     options.ClientId = builder.Configuration["Authentication:Google:ClientId"];
     options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
     options.CallbackPath = "/signin-google";
-    //options.Events.OnRedirectToAuthorizationEndpoint = context =>
-    //{
-    //    var uri = context.RedirectUri;
+    options.Events.OnRedirectToAuthorizationEndpoint = context =>
+    {
+       var uri = context.RedirectUri;
 
-    //    if (!app.Environment.IsDevelopment())
-    //    {
-    //        // Khi deploy thật (Railway)
-    //        uri = uri.Replace("http://localhost:7000", "https://ezcv.up.railway.app")
-    //                 .Replace("http://localhost:7107", "https://ezcv.up.railway.app");
-    //    }
+        if (!builder.Environment.IsDevelopment())
+       {
+           // Khi deploy thật (Railway)
+           uri = uri.Replace("http://localhost:7000", "https://ezcv.up.railway.app")
+                    .Replace("http://localhost:7107", "https://ezcv.up.railway.app");
+       }
 
-    //    context.Response.Redirect(uri);
-    //    return Task.CompletedTask;
-    //};
+       context.Response.Redirect(uri);
+       return Task.CompletedTask;
+    };
 
 });
 
