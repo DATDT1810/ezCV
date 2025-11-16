@@ -37,6 +37,7 @@ builder.Services.AddHttpClient<ICvProcessService, CvProcessService>(client =>
 {
     client.BaseAddress = new Uri(builder.Configuration["ApiSettings:BaseUrl"]);
     client.DefaultRequestHeaders.Add("Accept", "application/json");
+     client.Timeout = TimeSpan.FromMinutes(5);
 });
 
 // Configure HttpClient for CvTemplateService 
