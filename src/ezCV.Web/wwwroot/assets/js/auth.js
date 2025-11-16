@@ -219,12 +219,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             const loggedIn = await isUserLoggedIn();
             if (loggedIn) {
-                console.log('User đã đăng nhập → cho phép dùng mẫu');
                 window.location.href = link.href;
                 return;
             }
 
-            console.log('User chưa đăng nhập → mở popup');
             if (window.$ && $.magnificPopup) {
                 $.magnificPopup.open({
                     items: { src: '#test-popup' },
@@ -274,8 +272,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             if (hasError) return;
 
             try {
-                console.log("Sending login request...");
-
                 const response = await fetch("/Auth/ajax-login", {
                     method: "POST",
                     headers: {
@@ -288,8 +284,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                         password: password
                     })
                 });
-
-                console.log("Response status:", response.status);
 
                 if (!response.ok) {
                     const errorText = await response.text();
@@ -309,8 +303,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                 }
 
                 const result = await response.json();
-                console.log("Success result:", result);
-
                 if (result.success) {
                     // Đóng popup
                     if (window.$ && $.magnificPopup) {
@@ -435,14 +427,9 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
 
             try {
-                console.log("Sending OTP request for email:", email);
-
                 const requestBody = {
                     email: email
                 };
-
-                console.log("Request body:", requestBody);
-
                 const response = await fetch("/Auth/send-otp", {
                     method: "POST",
                     headers: {
@@ -452,11 +439,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                     body: JSON.stringify(requestBody)
                 });
 
-                console.log("OTP Response status:", response.status);
-
                 if (response.ok) {
                     const result = await response.json();
-                    console.log("OTP Response result:", result);
 
                     if (result.success) {
                         // Lưu email để sử dụng ở các bước sau
@@ -513,8 +497,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
 
             try {
-                console.log("Resending OTP for email:", currentResetEmail);
-
                 const requestBody = {
                     email: currentResetEmail
                 };
@@ -532,7 +514,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     const result = await response.json();
 
                     if (result.success) {
-                        showOtpMessage("✅ Mã OTP mới đã được gửi đến email của bạn.", "success");
+                        showOtpMessage("Mã OTP mới đã được gửi đến email của bạn.", "success");
                     } else {
                         showOtpMessage(result.message || "Có lỗi xảy ra. Vui lòng thử lại.", "danger");
                     }

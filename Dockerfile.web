@@ -2,10 +2,15 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-COPY . .
+COPY *.sln .
+COPY src/ezCV.Web/ezCV.Web.csproj ./src/ezCV.Web/
+COPY src/ezCV.Application/ezCV.Application.csproj ./src/ezCV.Application/
+COPY src/ezCV.Domain/ezCV.Domain.csproj ./src/ezCV.Domain/
 
-# Restore & publish Web
-RUN dotnet restore src/ezCV.Web/ezCV.Web.csproj
+RUN dotnet restore
+
+COPY src/ ./src/
+
 RUN dotnet publish src/ezCV.Web/ezCV.Web.csproj -c Release -o /app --no-restore -p:UseAppHost=false
 
 # ================= RUNTIME STAGE =================
@@ -14,8 +19,8 @@ WORKDIR /app
 
 COPY --from=build /app .
 
-# Đảm bảo static file (CSS/JS/images) tồn tại
-ENV ASPNETCORE_URLS=http://+:8080
-EXPOSE 8080
+# Render sử dụng port 10000
+ENV ASPNETCORE_URLS=http://+:${PORT:-10000}
+EXPOSE 10000
 
 ENTRYPOINT ["dotnet", "ezCV.Web.dll"]

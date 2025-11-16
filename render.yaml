@@ -1,0 +1,23 @@
+# render.yaml - AN TOÀN
+services:
+  - type: web
+    name: ezcv-api
+    plan: free
+    runtime: docker
+    dockerfilePath: Dockerfile.api
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+    domains:
+      - api.dvtienich.vn
+
+  - type: web
+    name: ezcv-web
+    plan: free
+    runtime: docker
+    dockerfilePath: Dockerfile.web
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+    domains:
+      - cv.dvtienich.vn

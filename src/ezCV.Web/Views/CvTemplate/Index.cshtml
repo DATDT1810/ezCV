@@ -159,7 +159,32 @@
 
 @section Scripts {
     <script>
-        // 🔹 Kiểm tra trạng thái đăng nhập qua API
+        // Xử lý xem mẫu (preview hình ảnh)
+        const previewLinks = document.querySelectorAll(".demo-item .preview-btn-wrapper a:not(.v2)");
+        previewLinks.forEach(link => {
+            link.addEventListener("click", (e) => {
+                e.preventDefault();
+                const demoItem = link.closest(".demo-item");
+                if (!demoItem) return;
+
+                const imgElement = demoItem.querySelector("img");
+                const imageSrc = imgElement ? imgElement.src : null;
+
+                if (imageSrc && window.$ && $.magnificPopup) {
+                    $.magnificPopup.open({
+                        items: { src: imageSrc },
+                        type: 'image',
+                        mainClass: 'mfp-with-zoom mfp-img-mobile mfp-cv-preview',
+                        closeOnContentClick: true,
+                        titleSrc: function (item) {
+                            return imgElement.alt || 'Mẫu CV';
+                        }
+                    }, 0);
+                }
+            });
+        });
+
+        // Kiểm tra trạng thái đăng nhập qua API
         async function isUserLoggedIn() {
             try {
                 const res = await fetch('/Auth/check-login', { credentials: 'include' });
@@ -167,30 +192,24 @@
                 const data = await res.json();
                 return data.isLoggedIn === true;
             } catch (err) {
-                console.error("Lỗi khi kiểm tra login:", err);
                 return false;
             }
         }
 
         document.addEventListener("DOMContentLoaded", () => {
-            console.log("Trang Mẫu CV - Khởi tạo sự kiện click");
-
-            // 🟢 Xử lý khi click "Sử dụng mẫu"
+            // Xử lý khi click "Sử dụng mẫu"
             document.querySelectorAll('a.preview-demo.v2').forEach(link => {
                 link.addEventListener('click', async (e) => {
                     e.preventDefault();
                     e.stopPropagation();
 
                     const loggedIn = await isUserLoggedIn();
-                    console.log("Kiểm tra login khi click:", loggedIn);
 
                     if (loggedIn) {
-                        console.log("✅ Đã đăng nhập → cho phép vào trang tạo CV");
                         window.location.href = link.href;
                         return;
                     }
 
-                    console.log("❌ Chưa đăng nhập → hiện popup login");
                     if (window.$ && $.magnificPopup) {
                         $.magnificPopup.open({
                             items: { src: '#test-popup' },
@@ -198,13 +217,12 @@
                             mainClass: 'mfp-fade'
                         });
                     } else {
-                        // fallback
                         window.location.href = '/Auth/Login?returnUrl=' + encodeURIComponent(link.href);
                     }
                 });
             });
 
-            // 🟣 Xử lý chuyển popup đăng nhập ↔ đăng ký
+            // Xử lý chuyển popup đăng nhập ↔ đăng ký
             document.querySelectorAll('a.open-popup-link').forEach(link => {
                 link.addEventListener('click', (e) => {
                     e.preventDefault();
@@ -222,7 +240,7 @@
                 });
             });
 
-            // 🟠 Xử lý login
+            // Xử lý login
             const loginForm = document.getElementById("main_login_form");
             if (loginForm) {
                 loginForm.addEventListener("submit", async (e) => {
@@ -249,22 +267,20 @@
                         const result = await response.json();
 
                         if (response.ok && result.success) {
-                            console.log("🎉 Đăng nhập thành công!");
                             if (window.$ && $.magnificPopup) {
                                 $.magnificPopup.close();
                             }
-                            window.location.reload(); // reload để cập nhật trạng thái login
+                            window.location.reload();
                         } else {
                             alert(result.message || "Đăng nhập thất bại");
                         }
                     } catch (err) {
-                        console.error("Lỗi đăng nhập:", err);
                         alert("Lỗi kết nối đến server");
                     }
                 });
             }
 
-            // 🔵 Xử lý đăng ký
+            // Xử lý đăng ký
             const registerForm = document.getElementById("main_Signup_form");
             if (registerForm) {
                 registerForm.addEventListener("submit", async (e) => {
@@ -296,7 +312,7 @@
                         const result = await response.json();
 
                         if (response.ok && result.success) {
-                            alert("🎉 Đăng ký thành công! Vui lòng đăng nhập.");
+                            alert("Đăng ký thành công! Vui lòng đăng nhập.");
                             if (window.$ && $.magnificPopup) {
                                 $.magnificPopup.close();
                                 setTimeout(() => {
@@ -311,14 +327,13 @@
                             alert(result.message || "Đăng ký thất bại");
                         }
                     } catch (err) {
-                        console.error("Lỗi đăng ký:", err);
                         alert("Lỗi kết nối đến server");
                     }
                 });
             }
         });
 
-        // 🧩 Helper lấy AntiForgeryToken
+        // Helper lấy AntiForgeryToken
         function getAntiForgeryToken() {
             return document.querySelector('input[name="__RequestVerificationToken"]')?.value || "";
         }
