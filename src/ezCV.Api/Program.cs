@@ -94,6 +94,11 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         options.TokenValidationParameters = tokenValidationParameters;
     });
 
+builder.Services.AddHttpClient("DefaultClient", client =>
+{
+    client.Timeout = TimeSpan.FromSeconds(300); 
+});
+
 // Infrastructure Services
 builder.Services.AddInfrastructureServices(builder.Configuration);
 
