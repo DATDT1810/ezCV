@@ -3,7 +3,6 @@ using System.Collections.Generic;
 
 namespace ezCV.Domain.Entities;
 
-
 public partial class Hobby
 {
     public long Id { get; set; }

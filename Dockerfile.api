@@ -2,14 +2,20 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-# 1️⃣ Copy project file & restore
+# Copy solution và project files
+COPY *.sln .
 COPY src/ezCV.Api/ezCV.API.csproj ./src/ezCV.Api/
-RUN dotnet restore src/ezCV.Api/ezCV.API.csproj
+COPY src/ezCV.Application/ezCV.Application.csproj ./src/ezCV.Application/
+COPY src/ezCV.Domain/ezCV.Domain.csproj ./src/ezCV.Domain/
+COPY src/ezCV.Infrastructure/ezCV.Infrastructure.csproj ./src/ezCV.Infrastructure/
 
-# 2️⃣ Copy toàn bộ source code
+# Restore packages
+RUN dotnet restore
+
+# Copy toàn bộ source code
 COPY src/ ./src/
 
-# 3️⃣ Publish Release
+# Publish Release
 RUN dotnet publish src/ezCV.Api/ezCV.API.csproj \
     -c Release \
     -o /app/publish \
@@ -19,11 +25,9 @@ RUN dotnet publish src/ezCV.Api/ezCV.API.csproj \
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
 
-# ✅ Cài Chromium và các thư viện cần thiết cho PuppeteerSharp
+# Cài Chromium và các thư viện cần thiết cho PuppeteerSharp
 RUN apt-get update && apt-get install -y \
     chromium \
-    chromium-common \
-    chromium-driver \
     libnss3 \
     libxss1 \
     libasound2 \
@@ -35,18 +39,15 @@ RUN apt-get update && apt-get install -y \
     libgbm1 \
     libgtk-3-0 \
     fonts-liberation \
-    libappindicator3-1 \
-    libxdamage1 \
-    xdg-utils \
     --no-install-recommends && \
     rm -rf /var/lib/apt/lists/*
 
-# ✅ Khai báo đường dẫn Chromium cho PuppeteerSharp
+# Khai báo đường dẫn Chromium cho PuppeteerSharp
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
 
-# ✅ Railway mặc định port 8080
-ENV ASPNETCORE_URLS=http://+:${PORT:-8080}
-EXPOSE 8080
+# Render sử dụng port 10000
+ENV ASPNETCORE_URLS=http://+:${PORT:-10000}
+EXPOSE 10000
 
 # Copy app đã publish
 COPY --from=build /app/publish .

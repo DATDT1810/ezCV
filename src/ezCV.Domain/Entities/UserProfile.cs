@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 namespace ezCV.Domain.Entities;
 
-public partial class UserProfile : BaseEntity
+public partial class UserProfile
 {
-    public long UserId { get; set; } 
+    public long UserId { get; set; }
 
     public string? FullName { get; set; }
 

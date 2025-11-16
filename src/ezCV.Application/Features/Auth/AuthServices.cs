@@ -136,7 +136,8 @@ namespace ezCV.Application.Features.Auth
                 {
                     Email = email,
                     PasswordHash = HashingExtension.HashWithSHA256(Guid.NewGuid().ToString()),
-                    RoleId = role.Id
+                    RoleId = role.Id,
+                    CreatedAt = DateTime.UtcNow
                 };
 
                 await _userRepository.AddAsync(user, cancellationToken);
@@ -217,7 +218,8 @@ namespace ezCV.Application.Features.Auth
             {
                 Email = request.Email,
                 PasswordHash = HashingExtension.HashWithSHA256(request.Password),
-                RoleId = role.Id
+                RoleId = role.Id,
+                CreatedAt = DateTime.UtcNow
             };
 
             await _userRepository.AddAsync(user, cancellationToken);

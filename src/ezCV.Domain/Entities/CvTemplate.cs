@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ezCV.Domain.Entities;
+using System;
 using System.Collections.Generic;
 
 namespace ezCV.Domain.Entities;

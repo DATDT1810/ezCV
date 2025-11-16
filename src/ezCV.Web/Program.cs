@@ -90,8 +90,9 @@ builder.Services.AddAuthentication(options =>
         if (!builder.Environment.IsDevelopment())
        {
            // Khi deploy thật (Railway)
-           uri = uri.Replace("http://localhost:7000", "https://ezcv.up.railway.app")
-                    .Replace("http://localhost:7107", "https://ezcv.up.railway.app");
+           uri = uri.Replace("http://localhost:7000", "https://cv.dvtienich.vn")
+                     .Replace("http://localhost:7107", "https://cv.dvtienich.vn")
+                     .Replace("https://ezcv-web.onrender.com", "https://cv.dvtienich.vn");
        }
 
        context.Response.Redirect(uri);

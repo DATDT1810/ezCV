@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 
 namespace ezCV.Domain.Entities;
+
 public partial class CvGenerationResult
 {
     public long Id { get; set; }

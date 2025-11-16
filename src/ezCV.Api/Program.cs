@@ -7,16 +7,15 @@ using ezCV.Infrastructure;
 using ezCV.Application.External.Models;
 using DotNetEnv;
 
+
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
 var builder = WebApplication.CreateBuilder(args);
 
-// =======================
 // Load .env file (Environment Variables)
-// =======================
 Env.Load();
 
-// =======================
-// 1️ Load SecretKey (robust fallback)
-// =======================
+// Load SecretKey 
 var secretKey = Environment.GetEnvironmentVariable("JWT_SECRETKEY")
                 ?? builder.Configuration["Jwt:SecretKey"];
 
@@ -25,31 +24,23 @@ if (string.IsNullOrEmpty(secretKey))
     throw new InvalidOperationException("SecretKey not configured.");
 }
 
-// =======================
-// 2️ Database
-// =======================
-var connectionString = Environment.GetEnvironmentVariable("DefaultConnection")
-                       ?? builder.Configuration.GetConnectionString("AZURE_SQL_CONNECTION");
+
+// Database
+var connectionString = Environment.GetEnvironmentVariable("DefaultConnection");
 
 if (!string.IsNullOrEmpty(connectionString))
 {
-    var dbPassword = Environment.GetEnvironmentVariable("AZURE_SQL_PASSWORD");
-    if (!string.IsNullOrEmpty(dbPassword) && !connectionString.Contains("Password="))
-    {
-        connectionString += $";Password={dbPassword}";
-    }
-
+    //builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    //    options.UseSqlServer(connectionString));
     builder.Services.AddDbContext<ApplicationDbContext>(options =>
-        options.UseSqlServer(connectionString));
+        options.UseNpgsql(connectionString));
 }
 else
 {
     Console.WriteLine("Database connection string NULL!");
 }
 
-// =======================
-// 3️ Email Configuration
-// =======================
+// Email Configuration
 builder.Services.Configure<EmailConfiguration>(options =>
 {
     options.Email = Environment.GetEnvironmentVariable("EMAIL_ADDRESS")
@@ -65,9 +56,7 @@ builder.Services.Configure<EmailConfiguration>(options =>
                          ?? "ezCV System";
 });
 
-// =======================
-// 4️ Cloudinary
-// =======================
+// Cloudinary
 builder.Services.Configure<CloudinarySetting>(options =>
 {
     options.CloudName = builder.Configuration["CloudinarySettings:CloudName"];
@@ -77,9 +66,8 @@ builder.Services.Configure<CloudinarySetting>(options =>
                         ?? builder.Configuration["CloudinarySettings:ApiSecret"];
 });
 
-// =======================
-// 5️ JWT Authentication (only validate issuer/audience when present)
-// =======================
+
+// JWT Authentication 
 var configuredIssuer = Environment.GetEnvironmentVariable("JWT_ISSUER")
                        ?? builder.Configuration["Jwt:Issuer"];
 
@@ -104,26 +92,20 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         options.TokenValidationParameters = tokenValidationParameters;
     });
 
-// =======================
-// 6️ Infrastructure Services
-// =======================
+// Infrastructure Services
 builder.Services.AddInfrastructureServices(builder.Configuration);
 
-// =======================
-// 7️ Controllers & Swagger
-// =======================
+// Controllers & Swagger
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// =======================
-// 8️ CORS
-// =======================
+// CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
     {
-        policy.WithOrigins("https://ezcv.up.railway.app",
+        policy.WithOrigins("https://cv.dvtienich.vn",
             "https://localhost:7000")
               .AllowAnyMethod()
               .AllowAnyHeader()
@@ -131,14 +113,10 @@ builder.Services.AddCors(options =>
     });
 });
 
-// =======================
-// 9️ Build App
-// =======================
+// Build App
 var app = builder.Build();
 
-// =======================
-// 10️ Pipeline
-// =======================
+// Pipeline
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -164,9 +142,7 @@ app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseAuthorization();
 
-// =======================
-// Debug endpoint (temporary) - returns presence boolean only
-// =======================
+// Debug endpoint (temporary)
 app.MapGet("/debug/env", () => new {
     SecretKey_env = Environment.GetEnvironmentVariable("SecretKey") != null,
     JWT_SecretKey_env = Environment.GetEnvironmentVariable("JWT_SecretKey") != null,
@@ -177,9 +153,7 @@ app.MapGet("/debug/env", () => new {
     Builder_JwtAudience = !string.IsNullOrEmpty(app.Configuration["Jwt:Audience"])
 });
 
-// =======================
-// 11️ Health Check & Root
-// =======================
+// Health Check & Root
 app.MapGet("/", () => "ezCV API is running! - " + DateTime.UtcNow);
 app.MapGet("/health", () => "Healthy");
 app.MapGet("/api/health", () => new
@@ -190,12 +164,8 @@ app.MapGet("/api/health", () => new
     version = "1.0"
 });
 
-// =======================
-// 12️ Controllers
-// =======================
+// Controllers
 app.MapControllers();
 
-// =======================
-// 13️ Run App
-// =======================
+// Run App
 app.Run();
