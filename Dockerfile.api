@@ -3,20 +3,20 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
 # Copy solution và project files
-COPY *.sln .
-COPY src/ezCV.Api/ezCV.API.csproj ./src/ezCV.Api/
-COPY src/ezCV.Application/ezCV.Application.csproj ./src/ezCV.Application/
-COPY src/ezCV.Domain/ezCV.Domain.csproj ./src/ezCV.Domain/
-COPY src/ezCV.Infrastructure/ezCV.Infrastructure.csproj ./src/ezCV.Infrastructure/
+COPY src/ezCV.sln .                     
+COPY src/ezCV.Api/*.csproj ./ezCV.Api/
+COPY src/ezCV.Application/*.csproj ./ezCV.Application/
+COPY src/ezCV.Domain/*.csproj ./ezCV.Domain/
+COPY src/ezCV.Infrastructure/*.csproj ./ezCV.Infrastructure/
 
 # Restore packages
-RUN dotnet restore
+RUN dotnet restore ezCV.sln
 
 # Copy toàn bộ source code
-COPY src/ ./src/
+COPY src/ ./ 
 
 # Publish Release
-RUN dotnet publish src/ezCV.Api/ezCV.API.csproj \
+RUN dotnet publish ezCV.Api/ezCV.API.csproj \
     -c Release \
     -o /app/publish \
     -p:UseAppHost=false
