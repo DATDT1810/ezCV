@@ -26,7 +26,8 @@ if (string.IsNullOrEmpty(secretKey))
 
 
 // Database
-var connectionString = Environment.GetEnvironmentVariable("DefaultConnection");
+// var connectionString = Environment.GetEnvironmentVariable("DefaultConnection");
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
 if (!string.IsNullOrEmpty(connectionString))
 {
@@ -126,13 +127,6 @@ else
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-}
-
-// Railway port
-if (app.Environment.IsProduction())
-{
-    var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
-    app.Urls.Add($"http://0.0.0.0:{port}");
 }
 
 // Consider disabling HTTPS redirection in container env to avoid warnings.
