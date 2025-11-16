@@ -2,7 +2,8 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-COPY *.sln .
+# Copy solution từ thư mục src
+COPY src/ezCV.sln .
 COPY src/ezCV.Web/ezCV.Web.csproj ./src/ezCV.Web/
 COPY src/ezCV.Application/ezCV.Application.csproj ./src/ezCV.Application/
 COPY src/ezCV.Domain/ezCV.Domain.csproj ./src/ezCV.Domain/
@@ -19,8 +20,7 @@ WORKDIR /app
 
 COPY --from=build /app .
 
-# Render sử dụng port 10000
-ENV ASPNETCORE_URLS=http://+:${PORT:-10000}
-EXPOSE 10000
+ENV ASPNETCORE_URLS=http://+:$PORT
+EXPOSE $PORT
 
 ENTRYPOINT ["dotnet", "ezCV.Web.dll"]
