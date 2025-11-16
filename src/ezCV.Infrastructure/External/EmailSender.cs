@@ -175,7 +175,7 @@ namespace ezCV.Infrastructure.External
                 </body>
             </html>";
         }
-        
+
         // public async Task SendCvByEmailAsync(string recipientEmail, string recipientName, string cvPdfAttachmentPath)
         // {
         //     var apiKey = Environment.GetEnvironmentVariable("SENDGRID_API_KEY");
@@ -217,20 +217,51 @@ namespace ezCV.Infrastructure.External
         //     _logger.LogInformation($"SendGrid gửi email thành công đến {recipientEmail}");
         // }
 
+        // public async Task SendCvByEmailAsync(string recipientEmail, string recipientName, string cvPdfAttachmentPath)
+        // {
+        //     var message = new MimeMessage();
+        //     message.From.Add(new MailboxAddress(_emailConfig.Email, _emailConfig.Email));
+        //     message.To.Add(new MailboxAddress(recipientName, recipientEmail));
+        //     message.Subject = $"CV của {recipientName}";
+
+        //     var builder = new BodyBuilder
+        //     {
+        //         HtmlBody = $@"
+        //     <p>Chúc mừng <strong>{recipientName}</strong>,</p>
+        //     <p>CV của bạn đã sẵn sàng! 🎉</p>
+        //     <p>Vui lòng xem tệp đính kèm bên dưới.</p>
+        //     <p>Trân trọng,<br><b>{_emailConfig.Email}</b></p>"
+        //     };
+
+        //     if (File.Exists(cvPdfAttachmentPath))
+        //         builder.Attachments.Add(cvPdfAttachmentPath);
+        //     else
+        //         throw new FileNotFoundException("Không tìm thấy file PDF để gửi.", cvPdfAttachmentPath);
+
+        //     message.Body = builder.ToMessageBody();
+
+        //     // Dùng namespace đầy đủ để tránh trùng
+        //     using var client = new MailKit.Net.Smtp.SmtpClient();
+        //     await client.ConnectAsync(_emailConfig.Host, _emailConfig.Port, MailKit.Security.SecureSocketOptions.StartTls);
+        //     await client.AuthenticateAsync(_emailConfig.Email, _emailConfig.Password);
+        //     await client.SendAsync(message);
+        //     await client.DisconnectAsync(true);
+        // }
+
         public async Task SendCvByEmailAsync(string recipientEmail, string recipientName, string cvPdfAttachmentPath)
         {
             var message = new MimeMessage();
-            message.From.Add(new MailboxAddress(_emailConfig.Email, _emailConfig.Email));
+            message.From.Add(new MailboxAddress(_emailConfig.Host ?? _emailConfig.Email, _emailConfig.Email));
             message.To.Add(new MailboxAddress(recipientName, recipientEmail));
             message.Subject = $"CV của {recipientName}";
 
             var builder = new BodyBuilder
             {
                 HtmlBody = $@"
-            <p>Chúc mừng <strong>{recipientName}</strong>,</p>
-            <p>CV của bạn đã sẵn sàng! 🎉</p>
-            <p>Vui lòng xem tệp đính kèm bên dưới.</p>
-            <p>Trân trọng,<br><b>{_emailConfig.Email}</b></p>"
+        <p>Chúc mừng <strong>{recipientName}</strong>,</p>
+        <p>CV của bạn đã sẵn sàng! 🎉</p>
+        <p>Vui lòng xem tệp đính kèm bên dưới.</p>
+        <p>Trân trọng,<br><b>{_emailConfig.Host ?? _emailConfig.Email}</b></p>"
             };
 
             if (File.Exists(cvPdfAttachmentPath))
@@ -240,12 +271,51 @@ namespace ezCV.Infrastructure.External
 
             message.Body = builder.ToMessageBody();
 
-            // Dùng namespace đầy đủ để tránh trùng
-            using var client = new MailKit.Net.Smtp.SmtpClient();
-            await client.ConnectAsync(_emailConfig.Host, _emailConfig.Port, MailKit.Security.SecureSocketOptions.StartTls);
-            await client.AuthenticateAsync(_emailConfig.Email, _emailConfig.Password);
-            await client.SendAsync(message);
-            await client.DisconnectAsync(true);
+            // Add retry logic with exponential backoff
+            const int maxRetries = 3;
+            var retryCount = 0;
+            var delay = 1000; // Start with 1 second
+
+            while (retryCount < maxRetries)
+            {
+                try
+                {
+                    using var client = new MailKit.Net.Smtp.SmtpClient();
+
+                    // Set timeout (default is 2 minutes, increase to 5 minutes)
+                    client.Timeout = 300000; // 5 minutes in milliseconds
+
+                    _logger.LogInformation($"Attempting to connect to SMTP server ({retryCount + 1}/{maxRetries})...");
+
+                    await client.ConnectAsync(_emailConfig.Host, _emailConfig.Port, MailKit.Security.SecureSocketOptions.StartTls);
+                    await client.AuthenticateAsync(_emailConfig.Email, _emailConfig.Password);
+                    await client.SendAsync(message);
+                    await client.DisconnectAsync(true);
+
+                    _logger.LogInformation($"Email sent successfully to {recipientEmail}");
+                    return; // Success, exit the method
+                }
+                catch (TimeoutException ex)
+                {
+                    retryCount++;
+                    _logger.LogWarning($"Timeout attempt {retryCount}/{maxRetries}: {ex.Message}");
+
+                    if (retryCount >= maxRetries)
+                    {
+                        _logger.LogError($"Failed to send email after {maxRetries} attempts: {ex.Message}");
+                        throw new Exception($"Không thể gửi email sau {maxRetries} lần thử. Vui lòng thử lại sau.");
+                    }
+
+                    // Exponential backoff
+                    await Task.Delay(delay);
+                    delay *= 2; // Double the delay for next retry
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError($"Error sending email: {ex.Message}");
+                    throw new Exception($"Lỗi gửi email: {ex.Message}");
+                }
+            }
         }
 
         public async Task SendEmailAsync(string sendFor, string subject, string body, CancellationToken cancellationToken = default)
