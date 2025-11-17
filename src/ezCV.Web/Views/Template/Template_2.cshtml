@@ -626,7 +626,7 @@
     </div>
 
     <!-- Form ẩn để submit data -->
-    <form id="cvForm" method="post" action="@Url.Action("SubmitCv", "CvProcess")" style="display: none;">
+    <form id="cvForm" method="post" action="@Url.Action("SubmitCv", "CvProcess")" enctype="multipart/form-data" style="display: none;">
         @Html.AntiForgeryToken()
         <input type="hidden" name="TemplateId" value="2" />
 
@@ -637,11 +637,10 @@
         <input type="hidden" name="Profile.PhoneNumber" id="hiddenPhoneNumber" />
         <input type="hidden" name="Profile.Address" id="hiddenAddress" />
         <input type="hidden" name="Profile.Summary" id="hiddenSummary" />
-        <input type="hidden" name="Profile.Photo" id="hiddenPhoto" />
         <input type="hidden" name="Profile.DateOfBirth" id="hiddenDateOfBirth" />
         <input type="hidden" name="Profile.Gender" id="hiddenGender" />
 
-        <!-- Các sections sẽ được tạo dynamic bằng JavaScript -->
+        <input type="file" name="ProfileImage" id="hiddenProfileImage" accept="image/*" />
     </form>
 
     <!-- Nội dung template CV -->
@@ -1102,8 +1101,13 @@
                     photoElement.style.backgroundSize = 'cover';
                     photoElement.style.backgroundPosition = 'center';
 
-                    // Lưu base64 string vào hidden field
-                    document.getElementById('hiddenPhoto').value = e.target.result;
+                    // QUAN TRỌNG: Gán file vào hidden file input (giống template 1)
+                    const hiddenFileInput = document.getElementById('hiddenProfileImage');
+                    const dataTransfer = new DataTransfer();
+                    dataTransfer.items.add(file);
+                    hiddenFileInput.files = dataTransfer.files;
+
+                    console.log("Đã gán file ảnh vào form:", file.name, file.size);
                 };
                 reader.onerror = function () {
                     alert("Có lỗi xảy ra khi đọc file ảnh");
@@ -1261,7 +1265,7 @@
             document.getElementById('hiddenJobTitle').value = jobTitle;
             document.getElementById('hiddenSummary').value = summary;
 
-            // 2. Thông tin liên hệ - ĐÃ ĐƯỢC XỬ LÝ BỞI syncContactsToHiddenForm
+            // 2. Thông tin liên hệ 
 
             // 3. Tạo dynamic inputs cho các sections
             createDynamicInputs();
