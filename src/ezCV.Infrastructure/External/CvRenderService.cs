@@ -3364,85 +3364,26 @@ namespace ezCV.Infrastructure.External
             return System.Net.WebUtility.HtmlEncode(input);
         }
 
-        // private async Task<string> ConvertHtmlToPdf(string htmlContent, string fullName)
-        // {
-        //     await new BrowserFetcher().DownloadAsync();
-
-        //     using var browser = await Puppeteer.LaunchAsync(new LaunchOptions
-        //     {
-        //         Headless = true,
-        //         Args = new[] { "--no-sandbox" }
-        //     });
-
-        //     using var page = await browser.NewPageAsync();
-        //     await page.SetContentAsync(htmlContent);
-        //     await page.WaitForNetworkIdleAsync(new WaitForNetworkIdleOptions { IdleTime = 500, Timeout = 5000 });
-
-        //     var pdfsDir = Path.Combine(_environment.WebRootPath ?? "wwwroot", "pdfs");
-        //     if (!Directory.Exists(pdfsDir))
-        //         Directory.CreateDirectory(pdfsDir);
-
-        //     var fileName = $"CV_{SanitizeFileName(fullName)}_{DateTime.Now:yyyyMMddHHmmss}";
-        //     var pdfPath = Path.Combine(pdfsDir, $"{fileName}.pdf");
-
-        //     await page.PdfAsync(pdfPath, new PdfOptions
-        //     {
-        //         Format = PaperFormat.A4,
-        //         PrintBackground = true,
-        //         MarginOptions = new MarginOptions
-        //         {
-        //             Top = "0.5cm",
-        //             Right = "0.5cm",
-        //             Bottom = "0.5cm",
-        //             Left = "0.5cm"
-        //         }
-        //     });
-
-        //     return pdfPath;
-        // }
-
         private async Task<string> ConvertHtmlToPdf(string htmlContent, string fullName)
         {
-            // 🚫 Không dùng BrowserFetcher().DownloadAsync()
-            // Railway không cho tải binary Chromium trong container runtime.
+            await new BrowserFetcher().DownloadAsync();
 
-            var executablePath = Environment.GetEnvironmentVariable("PUPPETEER_EXECUTABLE_PATH")
-                                 ?? "/usr/bin/chromium";
-
-            _logger.LogInformation("Chromium path: {Path}", executablePath);
-
-            var launchOptions = new LaunchOptions
+            using var browser = await Puppeteer.LaunchAsync(new LaunchOptions
             {
                 Headless = true,
-                ExecutablePath = executablePath,
-                Args = new[]
-                {
-                    "--no-sandbox",
-                    "--disable-setuid-sandbox",
-                    "--disable-gpu",
-                    "--disable-dev-shm-usage",
-                    "--disable-extensions",
-                    "--disable-software-rasterizer"
-                }
-            };
+                Args = new[] { "--no-sandbox" }
+            });
 
-            _logger.LogInformation("Launching Puppeteer browser...");
-            using var browser = await Puppeteer.LaunchAsync(launchOptions);
             using var page = await browser.NewPageAsync();
-
-            _logger.LogInformation("Setting HTML content...");
             await page.SetContentAsync(htmlContent);
             await page.WaitForNetworkIdleAsync(new WaitForNetworkIdleOptions { IdleTime = 500, Timeout = 5000 });
 
-            // 📁 Đảm bảo thư mục pdfs tồn tại
             var pdfsDir = Path.Combine(_environment.WebRootPath ?? "wwwroot", "pdfs");
             if (!Directory.Exists(pdfsDir))
                 Directory.CreateDirectory(pdfsDir);
 
             var fileName = $"CV_{SanitizeFileName(fullName)}_{DateTime.Now:yyyyMMddHHmmss}";
             var pdfPath = Path.Combine(pdfsDir, $"{fileName}.pdf");
-
-            _logger.LogInformation("Saving PDF to {Path}", pdfPath);
 
             await page.PdfAsync(pdfPath, new PdfOptions
             {
@@ -3457,9 +3398,65 @@ namespace ezCV.Infrastructure.External
                 }
             });
 
-            _logger.LogInformation("PDF generated successfully!");
             return pdfPath;
         }
+
+        //private async Task<string> ConvertHtmlToPdf(string htmlContent, string fullName)
+        //{
+        //    var executablePath = Environment.GetEnvironmentVariable("PUPPETEER_EXECUTABLE_PATH")
+        //                         ?? "/usr/bin/chromium";
+
+        //    _logger.LogInformation("Chromium path: {Path}", executablePath);
+
+        //    var launchOptions = new LaunchOptions
+        //    {
+        //        Headless = true,
+        //        ExecutablePath = executablePath,
+        //        Args = new[]
+        //        {
+        //            "--no-sandbox",
+        //            "--disable-setuid-sandbox",
+        //            "--disable-gpu",
+        //            "--disable-dev-shm-usage",
+        //            "--disable-extensions",
+        //            "--disable-software-rasterizer"
+        //        }
+        //    };
+
+        //    _logger.LogInformation("Launching Puppeteer browser...");
+        //    using var browser = await Puppeteer.LaunchAsync(launchOptions);
+        //    using var page = await browser.NewPageAsync();
+
+        //    _logger.LogInformation("Setting HTML content...");
+        //    await page.SetContentAsync(htmlContent);
+        //    await page.WaitForNetworkIdleAsync(new WaitForNetworkIdleOptions { IdleTime = 500, Timeout = 5000 });
+
+        //    // 📁 Đảm bảo thư mục pdfs tồn tại
+        //    var pdfsDir = Path.Combine(_environment.WebRootPath ?? "wwwroot", "pdfs");
+        //    if (!Directory.Exists(pdfsDir))
+        //        Directory.CreateDirectory(pdfsDir);
+
+        //    var fileName = $"CV_{SanitizeFileName(fullName)}_{DateTime.Now:yyyyMMddHHmmss}";
+        //    var pdfPath = Path.Combine(pdfsDir, $"{fileName}.pdf");
+
+        //    _logger.LogInformation("Saving PDF to {Path}", pdfPath);
+
+        //    await page.PdfAsync(pdfPath, new PdfOptions
+        //    {
+        //        Format = PaperFormat.A4,
+        //        PrintBackground = true,
+        //        MarginOptions = new MarginOptions
+        //        {
+        //            Top = "0.5cm",
+        //            Right = "0.5cm",
+        //            Bottom = "0.5cm",
+        //            Left = "0.5cm"
+        //        }
+        //    });
+
+        //    _logger.LogInformation("PDF generated successfully!");
+        //    return pdfPath;
+        //}
 
         private string SanitizeFileName(string fileName)
         {

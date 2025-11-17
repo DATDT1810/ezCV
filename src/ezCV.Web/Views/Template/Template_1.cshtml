@@ -790,7 +790,7 @@
     </div>
 
     <!-- Form ẩn để submit data -->
-    <form id="cvForm" method="post" action="@Url.Action("SubmitCv", "CvProcess")" style="display: none;">
+    <form id="cvForm" method="post" action="@Url.Action("SubmitCv", "CvProcess")" enctype="multipart/form-data" style="display: none;">
         @Html.AntiForgeryToken()
         <input type="hidden" name="TemplateId" value="@Model.TemplateId" />
 
@@ -801,11 +801,11 @@
         <input type="hidden" name="Profile.PhoneNumber" id="hiddenPhoneNumber" />
         <input type="hidden" name="Profile.Address" id="hiddenAddress" />
         <input type="hidden" name="Profile.Summary" id="hiddenSummary" />
-        <input type="hidden" name="Profile.Photo" id="hiddenPhoto" />
         <input type="hidden" name="Profile.DateOfBirth" id="hiddenDateOfBirth" />
         <input type="hidden" name="Profile.Gender" id="hiddenGender" />
 
-        <!-- Các sections sẽ được tạo dynamic bằng JavaScript -->
+        <!-- File input thực sự cho ảnh -->
+        <input type="file" name="ProfileImage" id="hiddenProfileImage" accept="image/*" />
     </form>
 
     <!-- Nội dung template CV -->
@@ -1328,37 +1328,42 @@
 
         // === PHOTO UPLOAD FUNCTION ===
         function handlePhotoUpload(event) {
-            const file = event.target.files[0];
-            if (file) {
-                // Kiểm tra kích thước file (tối đa 5MB)
-                if (file.size > 5 * 1024 * 1024) {
-                    alert("Kích thước ảnh không được vượt quá 5MB");
-                    return;
-                }
-
-                // Kiểm tra loại file
-                if (!file.type.startsWith('image/')) {
-                    alert("Vui lòng chọn file ảnh");
-                    return;
-                }
-
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    const photoElement = document.getElementById('preview-photo');
-                    photoElement.innerHTML = '';
-                    photoElement.style.backgroundImage = `url(${e.target.result})`;
-                    photoElement.style.backgroundSize = 'cover';
-                    photoElement.style.backgroundPosition = 'center';
-
-                    // Lưu base64 string vào hidden field
-                    document.getElementById('hiddenPhoto').value = e.target.result;
-                };
-                reader.onerror = function () {
-                    alert("Có lỗi xảy ra khi đọc file ảnh");
-                };
-                reader.readAsDataURL(file);
-            }
+    const file = event.target.files[0];
+    if (file) {
+        // Kiểm tra kích thước file (tối đa 5MB)
+        if (file.size > 5 * 1024 * 1024) {
+            alert("Kích thước ảnh không được vượt quá 5MB");
+            return;
         }
+
+        // Kiểm tra loại file
+        if (!file.type.startsWith('image/')) {
+            alert("Vui lòng chọn file ảnh");
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            const photoElement = document.getElementById('preview-photo');
+            photoElement.innerHTML = '';
+            photoElement.style.backgroundImage = `url(${e.target.result})`;
+            photoElement.style.backgroundSize = 'cover';
+            photoElement.style.backgroundPosition = 'center';
+
+            // QUAN TRỌNG: Gán file vào hidden file input
+            const hiddenFileInput = document.getElementById('hiddenProfileImage');
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(file);
+            hiddenFileInput.files = dataTransfer.files;
+            
+            console.log("Đã gán file ảnh vào form:", file.name, file.size);
+        };
+        reader.onerror = function () {
+            alert("Có lỗi xảy ra khi đọc file ảnh");
+        };
+        reader.readAsDataURL(file);
+    }
+}
 
         // === UTILITY FUNCTIONS ===
         function getContactIconClass(type) {
@@ -1562,18 +1567,26 @@
 
         // === FORM SUBMISSION ===
         function saveAndSubmit() {
+    showLoading();
 
-            showLoading();
+    if (!validateForm()) {
+        hideLoading();
+        return;
+    }
 
-            if (!validateForm()) {
-                hideLoading();
-                return;
-            }
+    updateHiddenForm();
 
-            updateHiddenForm();
+    // KIỂM TRA ẢNH TRƯỚC KHI SUBMIT
+    const photoFile = document.getElementById('hiddenProfileImage').files[0];
+    if (photoFile) {
+        console.log("Submitting with photo:", photoFile.name, photoFile.size);
+    } else {
+        console.log("Submitting without photo");
+    }
 
-            document.getElementById('cvForm').submit();
-        }
+    // Submit form thực sự
+    document.getElementById('cvForm').submit();
+}
 
         function validateForm() {
             const fullName = document.getElementById('preview-name').innerText.trim();

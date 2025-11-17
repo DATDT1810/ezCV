@@ -1191,9 +1191,7 @@ function initializeSampleContacts() {
         }
 
         // === FORM SUBMISSION ===
-        function saveAndSubmit() {
-            console.log("=== BẮT ĐẦU GỬI CV TEMPLATE 3 ===");
-            
+        function saveAndSubmit() {            
             showLoading();
 
             if (!validateForm()) {
@@ -1202,10 +1200,7 @@ function initializeSampleContacts() {
             }
 
             updateHiddenForm();
-            createDynamicInputs(); 
-
-            console.log("Đang gửi form đến CvProcess/SubmitCv...");
-            
+            createDynamicInputs();             
             // Gửi form thật
             document.getElementById('cvForm').submit();
         }
@@ -1261,7 +1256,7 @@ function initializeSampleContacts() {
                 return false;
             }
 
-            console.log("✅ Validation passed");
+            console.log("Validation passed");
             return true;
         }
 
@@ -1279,7 +1274,6 @@ function initializeSampleContacts() {
         }
 
         // === DYNAMIC INPUTS CREATION ===
-        // === DYNAMIC INPUTS CREATION - TEMPLATE 3 ===
 function createDynamicInputs() {
     const form = document.getElementById('cvForm');
     

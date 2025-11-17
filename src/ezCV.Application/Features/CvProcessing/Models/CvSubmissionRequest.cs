@@ -1,4 +1,5 @@
 ﻿using ezCV.Domain.Entities;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -16,6 +17,7 @@ namespace ezCV.Application.Features.CvProcessing.Models
         [Range(1, 100, ErrorMessage = "Mẫu CV không hợp lệ.")]
         public int TemplateId { get; set; }
 
+        public IFormFile? ProfileImage { get; set; }
 
         // Profile Information
         [Required]
