@@ -8,6 +8,8 @@ namespace ezCV.Web.Models.CvProcess
         [Range(1, 100, ErrorMessage = "Mẫu CV không hợp lệ.")]
         public int TemplateId { get; set; }
 
+        public IFormFile? ProfileImage { get; set; }
+
         // Profile Information
         [Required]
         public CvProfileRequest Profile { get; set; } = new();

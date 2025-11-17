@@ -60,6 +60,9 @@ namespace ezCV.Infrastructure
             // Cloudinary
             services.AddScoped<ICloudinaryService, CloudinaryService>();
 
+            services.AddScoped<ImageCvProcessingService>();
+
+
             // Đăng ký AIChat Service
             services.AddScoped<IAIChatService, AIChatService>();
             services.AddScoped<IAIChatRepository, AIChatRepository>();

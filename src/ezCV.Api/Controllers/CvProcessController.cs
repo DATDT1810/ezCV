@@ -27,7 +27,7 @@ namespace ezCV.API.Controllers
 
         [HttpPost("Submit")]
         [Authorize]
-        public async Task<IActionResult> SubmitCv([FromBody] CvSubmissionRequest request)
+        public async Task<IActionResult> SubmitCv([FromForm] CvSubmissionRequest request)
         {
             try
             {

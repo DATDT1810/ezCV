@@ -73,11 +73,11 @@
                                             </div>
                                         </div>
                                         <div class="user-dropdown-content">
-                                            <h6>Xem hồ sơ</h6>
-                                            <ul class="user-links">
-                                                <li><a href="#"><i class="ti-settings"></i>Cài đặt</a></li>
-                                                <li><a href="#"><i class="ti-user"></i>Mời bạn bè</a></li>
-                                            </ul>
+                                             @* <h6>Xem hồ sơ</h6>
+                                             <ul class="user-links">
+                                                 <li><a href="#"><i class="ti-settings"></i>Cài đặt</a></li>
+                                                 <li><a href="#"><i class="ti-user"></i>Mời bạn bè</a></li>
+                                             </ul> *@
                                             <div class="user-dropdown-footer">
                                                 <form asp-controller="Auth" asp-action="Logout" method="post">
                                                     <button type="submit" class="logout-btn">
@@ -91,7 +91,7 @@
                             }
                             else
                             {
-                // Hiển thị nút Đăng nhập và Đăng ký
+                                // Hiển thị nút Đăng nhập và Đăng ký
                                 <a href="#test-popup" class="btn login-btn mr-im open-login-popup">Đăng nhập</a>
                                 <a href="#signup-popup" class="btn login-btn open-signup-popup">Đăng ký</a>
                             }

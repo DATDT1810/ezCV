@@ -18,6 +18,12 @@ namespace ezCV.Infrastructure.External
 
         public CloudinaryService(IOptions<CloudinarySetting> config)
         {
+            if (config?.Value == null)
+            {
+                throw new ArgumentNullException(nameof(config), "Cloudinary configuration is null");
+            }
+
+            var cloudinaryConfig = config.Value;
             var acc = new Account
                    (
                    config.Value.CloudName,

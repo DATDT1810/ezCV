@@ -1,5 +1,7 @@
 ﻿using ezCV.Web.Models.CvProcess;
 using Microsoft.AspNetCore.Authentication;
+using System.Net.Http.Headers;
+using System.Reflection;
 
 namespace ezCV.Web.Services.CvProcess
 {
@@ -88,7 +90,55 @@ namespace ezCV.Web.Services.CvProcess
                 var client = GetAuthenticatedHttpClient();
                 _logger.LogInformation("Calling API: api/CvProcess/Submit");
 
-                var response = await client.PostAsJsonAsync("api/CvProcess/Submit", request);
+                // SỬA: Sử dụng FormData thay vì JSON
+                var formData = new MultipartFormDataContent();
+
+                // Thêm các field cơ bản
+                formData.Add(new StringContent(request.TemplateId.ToString()), "TemplateId");
+                formData.Add(new StringContent(request.Profile.FullName ?? ""), "Profile.FullName");
+                formData.Add(new StringContent(request.Profile.JobTitle ?? ""), "Profile.JobTitle");
+                formData.Add(new StringContent(request.Profile.ContactEmail ?? ""), "Profile.ContactEmail");
+                formData.Add(new StringContent(request.Profile.PhoneNumber ?? ""), "Profile.PhoneNumber");
+                formData.Add(new StringContent(request.Profile.Address ?? ""), "Profile.Address");
+                formData.Add(new StringContent(request.Profile.Summary ?? ""), "Profile.Summary");
+
+                if (request.Profile.DateOfBirth.HasValue)
+                    formData.Add(new StringContent(request.Profile.DateOfBirth.Value.ToString("yyyy-MM-dd")), "Profile.DateOfBirth");
+
+                formData.Add(new StringContent(request.Profile.Gender ?? ""), "Profile.Gender");
+                formData.Add(new StringContent(request.Profile.Website ?? ""), "Profile.Website");
+
+                // THÊM: Xử lý file ảnh - QUAN TRỌNG
+                if (request.ProfileImage != null && request.ProfileImage.Length > 0)
+                {
+                    _logger.LogInformation("Processing profile image: {FileName}, Size: {Size}",
+                        request.ProfileImage.FileName, request.ProfileImage.Length);
+
+                    var fileContent = new StreamContent(request.ProfileImage.OpenReadStream());
+                    fileContent.Headers.ContentType = new MediaTypeHeaderValue(request.ProfileImage.ContentType);
+
+                    // SỬA: Sử dụng đúng parameter name "ProfileImage"
+                    formData.Add(fileContent, "ProfileImage", request.ProfileImage.FileName);
+
+                    _logger.LogInformation("Successfully added profile image to FormData");
+                }
+                else
+                {
+                    _logger.LogInformation("No profile image found in request");
+                }
+
+                // Thêm các sections dynamic
+                AddSectionToFormData(formData, request.WorkExperiences, "WorkExperiences");
+                AddSectionToFormData(formData, request.Educations, "Educations");
+                AddSectionToFormData(formData, request.Skills, "Skills");
+                AddSectionToFormData(formData, request.Projects, "Projects");
+                AddSectionToFormData(formData, request.Certificates, "Certificates");
+                AddSectionToFormData(formData, request.References, "References");
+                AddSectionToFormData(formData, request.Hobbies, "Hobbies");
+                AddSectionToFormData(formData, request.SocialLinks, "SocialLinks");
+
+                // Gửi request với FormData
+                var response = await client.PostAsync("api/CvProcess/Submit", formData);
 
                 _logger.LogInformation($"API Response Status: {response.StatusCode}");
 
@@ -143,6 +193,61 @@ namespace ezCV.Web.Services.CvProcess
                     Message = "Không thể kết nối đến server. Vui lòng thử lại sau."
                 };
             }
+        }
+
+        // XỬ LÝ CÁC SECTIONS DYNAMIC
+        private void AddSectionToFormData<T>(MultipartFormDataContent formData, List<T> sections, string sectionName) where T : class
+        {
+            if (sections == null || !sections.Any()) return;
+
+            _logger.LogInformation("Adding {Count} items to {SectionName}", sections.Count, sectionName);
+
+            for (int i = 0; i < sections.Count; i++)
+            {
+                var section = sections[i];
+                var properties = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);
+
+                foreach (var prop in properties)
+                {
+                    var value = prop.GetValue(section);
+                    if (value != null)
+                    {
+                        string stringValue = ConvertValueToString(value, prop.PropertyType);
+
+                        if (!string.IsNullOrEmpty(stringValue))
+                        {
+                            var fieldName = $"{sectionName}[{i}].{prop.Name}";
+                            formData.Add(new StringContent(stringValue), fieldName);
+                            _logger.LogDebug("Added field: {FieldName} = {Value}", fieldName, stringValue);
+                        }
+                    }
+                }
+            }
+        }
+
+        // THÊM METHOD CHUYỂN ĐỔI GIÁ TRỊ THÀNH STRING
+        private string ConvertValueToString(object value, Type valueType)
+        {
+            if (value == null) return string.Empty;
+
+            // Xử lý Nullable types trước
+            if (valueType.IsGenericType && valueType.GetGenericTypeDefinition() == typeof(Nullable<>))
+            {
+                var underlyingType = Nullable.GetUnderlyingType(valueType);
+                return ConvertValueToString(value, underlyingType);
+            }
+
+            // Xử lý các specific types
+            return valueType.Name switch
+            {
+                nameof(DateOnly) => ((DateOnly)value).ToString("yyyy-MM-dd"),
+                nameof(DateTime) => ((DateTime)value).ToString("yyyy-MM-dd"),
+                nameof(Decimal) => ((decimal)value).ToString("0.##"),
+                nameof(Single) => ((float)value).ToString("0.##"),
+                nameof(Double) => ((double)value).ToString("0.##"),
+                nameof(Boolean) => value.ToString().ToLower(),
+                _ => value.ToString()
+            };
         }
 
         public async Task<List<TemplateResponse>> GetAvailableTemplatesAsync()

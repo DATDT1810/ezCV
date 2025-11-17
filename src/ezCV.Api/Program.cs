@@ -61,11 +61,9 @@ builder.Services.Configure<EmailConfiguration>(options =>
 // Cloudinary
 builder.Services.Configure<CloudinarySetting>(options =>
 {
-    options.CloudName = builder.Configuration["CloudinarySettings:CloudName"];
-    options.ApiKey = Environment.GetEnvironmentVariable("CLOUDINARY_APIKEY")
-                     ?? builder.Configuration["CloudinarySettings:ApiKey"];
-    options.ApiSecret = Environment.GetEnvironmentVariable("CLOUDINARY_APISECRET")
-                        ?? builder.Configuration["CloudinarySettings:ApiSecret"];
+    options.CloudName = Environment.GetEnvironmentVariable("CLOUDINARY_CLOUD_NAME");
+    options.ApiKey = Environment.GetEnvironmentVariable("CLOUDINARY_APIKEY");
+    options.ApiSecret = Environment.GetEnvironmentVariable("CLOUDINARY_APISECRET");
 });
 
 
