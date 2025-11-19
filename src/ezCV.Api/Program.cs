@@ -121,6 +121,11 @@ builder.Services.AddCors(options =>
 // Build App
 var app = builder.Build();
 
+// READ PORT for Render.com
+var port = Environment.GetEnvironmentVariable("PORT") ?? "5000";
+builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
+
+
 // Pipeline
 if (app.Environment.IsDevelopment())
 {
